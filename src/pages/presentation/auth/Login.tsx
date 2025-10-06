@@ -11,10 +11,10 @@ import Button from '../../../components/bootstrap/Button';
 import Logo from '../../../components/Logo';
 import useDarkMode from '../../../hooks/useDarkMode';
 import AuthContext from '../../../contexts/authContext';
-import USERS, { getUserDataWithUsername } from '../../../common/data/userDummyData';
+import { getUserDataWithUsername } from '../../../common/data/userDummyData';
 import Spinner from '../../../components/bootstrap/Spinner';
-import Alert from '../../../components/bootstrap/Alert';
 import { useLazyCheckEmailQuery } from '../../../store/api/auth.Api';
+import Select from '../../../components/bootstrap/forms/Select';
 
 interface ILoginHeaderProps {
 	isNewUser?: boolean;
@@ -23,15 +23,15 @@ const LoginHeader: FC<ILoginHeaderProps> = ({ isNewUser }) => {
 	if (isNewUser) {
 		return (
 			<>
-				<div className='text-center h1 fw-bold mt-5'>Create Account,</div>
-				<div className='text-center h4 text-muted mb-5'>Sign up to get started!</div>
+				<div className='text-center h1 fw-bold mt-5'>Crear cuenta,</div>
+				<div className='text-center h4 text-muted mb-5'>Regístrate para continuar</div>
 			</>
 		);
 	}
 	return (
 		<>
-			<div className='text-center h1 fw-bold mt-5'>Welcome,</div>
-			<div className='text-center h4 text-muted mb-5'>Sign in to continue!</div>
+			<div className='text-center h1 fw-bold mt-5'>Bienvenido,</div>
+			<div className='text-center h4 text-muted mb-5'>Inicia sesión para continuar</div>
 		</>
 	);
 };
@@ -40,9 +40,7 @@ interface ILoginProps {
 	isSignUp?: boolean;
 }
 const Login: FC<ILoginProps> = ({ isSignUp }) => {
-
 	const [checkEmail] = useLazyCheckEmailQuery();
-
 
 	const { setUser } = useContext(AuthContext);
 
@@ -104,21 +102,20 @@ const Login: FC<ILoginProps> = ({ isSignUp }) => {
 
 	const [isLoading, setIsLoading] = useState<boolean>(false);
 	const handleContinue = () => {
-		console.log('Checking user... handleContinue' , formik.values.loginUsername);
+		console.log('Checking user... handleContinue', formik.values.loginUsername);
 		setIsLoading(true);
-		setTimeout( async () => {
+		setTimeout(async () => {
 			const [respExists] = await checkEmail(formik.values.loginUsername).unwrap();
-			console.log('respExists', respExists );		
+			console.log('respExists', respExists);
 
-			if (respExists.exists ) {
-			// 	formik.setFieldError('loginUsername', 'No such user found in the system.');
-			// } else {
-			// 	setSignInPassword(true);
+			if (respExists.exists) {
+				// 	formik.setFieldError('loginUsername', 'No such user found in the system.');
+				// } else {
+				// 	setSignInPassword(true);
 			}
 			setIsLoading(false);
 		}, 1000);
 		// setTimeout(() => {
-
 
 		// 	if (
 		// 		!Object.keys(USERS).find(
@@ -136,11 +133,16 @@ const Login: FC<ILoginProps> = ({ isSignUp }) => {
 	return (
 		<PageWrapper
 			isProtected={false}
-			title={singUpStatus ? 'Sign Up' : 'Login'}
+			title={singUpStatus ? 'Registro' : 'Login'}
 			className={classNames({ 'bg-dark': !singUpStatus, 'bg-light': singUpStatus })}>
 			<Page className='p-0'>
 				<div className='row h-100 align-items-center justify-content-center'>
-					<div className='col-xl-4 col-lg-6 col-md-8 shadow-3d-container'>
+					<div
+						className={classNames('shadow-3d-container', {
+							'col-xl-4 col-lg-6 col-md-8': !singUpStatus,
+							'w-100': singUpStatus, // Bootstrap no tiene w-80 por defecto
+						})}
+						style={singUpStatus ? { maxWidth: '80%' } : {}}>
 						<Card className='shadow-3d-dark' data-tour='login-page'>
 							<CardBody>
 								<div className='text-center my-5'>
@@ -186,7 +188,7 @@ const Login: FC<ILoginProps> = ({ isSignUp }) => {
 													setSignInPassword(false);
 													setSingUpStatus(!singUpStatus);
 												}}>
-												Sign Up
+												Registro
 											</Button>
 										</div>
 									</div>
@@ -194,60 +196,81 @@ const Login: FC<ILoginProps> = ({ isSignUp }) => {
 
 								<LoginHeader isNewUser={singUpStatus} />
 
-								<Alert isLight icon='Lock' isDismissible>
-									<div className='row'>
-										<div className='col-12'>
-											<strong>Username:</strong> {USERS.JOHN.username}
-										</div>
-										<div className='col-12'>
-											<strong>Password:</strong> {USERS.JOHN.password}
-										</div>
-									</div>
-								</Alert>
 								<form className='row g-4'>
 									{singUpStatus ? (
 										<>
-											<div className='col-12'>
-												<FormGroup
-													id='signup-email'
-													isFloating
-													label='Your email'>
-													<Input type='email' autoComplete='email' />
-												</FormGroup>
-											</div>
-											<div className='col-12'>
-												<FormGroup
-													id='signup-name'
-													isFloating
-													label='Your name'>
-													<Input autoComplete='given-name' />
-												</FormGroup>
-											</div>
-											<div className='col-12'>
-												<FormGroup
-													id='signup-surname'
-													isFloating
-													label='Your surname'>
-													<Input autoComplete='family-name' />
-												</FormGroup>
-											</div>
-											<div className='col-12'>
-												<FormGroup
-													id='signup-password'
-													isFloating
-													label='Password'>
-													<Input
-														type='password'
-														autoComplete='password'
-													/>
-												</FormGroup>
-											</div>
+											<Card className='shadow-3d-dark p-4 mb-4'>
+												<CardBody className='g-2 row'>
+													<div className='col-12'>
+														<h5>Datos del representante legal</h5>
+													</div>
+													<div className='col-12 col-sm-6'>
+														<FormGroup
+															id='signup-name-legal-agent'
+															isFloating
+															label='Nombres y apellidos'>
+															<Input
+																type='email'
+																autoComplete='email'
+															/>
+														</FormGroup>
+													</div>
+													<div className='col-12 col-sm-6'>
+														<FormGroup
+															id='signup-ci-legal-agent'
+															isFloating
+															label='Identificación'>
+															<Input autoComplete='given-name' />
+														</FormGroup>
+													</div>
+													<div className='col-6 col-sm-3'>
+														<FormGroup
+															id='signup-ci-legal-agent'
+															label='Prefijo'
+															isFloating>
+															<Select
+																ariaLabel='Prefijo'
+																placeholder='Seleccione un prefijo'
+																title='Prefijo'
+																defaultValue='ruc'
+																list={[
+																	{
+																		value: 'ci',
+																		label: 'Cédula de identidad',
+																		text: 'CI',
+																	},
+																	{ value: 'ruc', label: 'RUC' },
+																]}
+															/>
+														</FormGroup>
+													</div>
+													<div className='col-12'>
+														<FormGroup
+															id='signup-surname'
+															isFloating
+															label='Your surname'>
+															<Input autoComplete='family-name' />
+														</FormGroup>
+													</div>
+													<div className='col-12'>
+														<FormGroup
+															id='signup-password'
+															isFloating
+															label='Password'>
+															<Input
+																type='password'
+																autoComplete='password'
+															/>
+														</FormGroup>
+													</div>
+												</CardBody>
+											</Card>
 											<div className='col-12'>
 												<Button
 													color='info'
 													className='w-100 py-3'
 													onClick={handleOnClick}>
-													Sign Up
+													Registrar
 												</Button>
 											</div>
 										</>
@@ -304,64 +327,15 @@ const Login: FC<ILoginProps> = ({ isSignUp }) => {
 												</FormGroup>
 											</div>
 											<div className='col-12'>
-												{!signInPassword ? (
-													<Button
-														color='warning'
-														className='w-100 py-3'
-														isDisable={!formik.values.loginUsername}
-														onClick={handleContinue}>
-														{isLoading && (
-															<Spinner isSmall inButton isGrow />
-														)}
-														Continue
-													</Button>
-												) : (
-													<Button
-														color='warning'
-														className='w-100 py-3'
-														onClick={formik.handleSubmit}>
-														Login
-													</Button>
-												)}
-											</div>
-										</>
-									)}
-
-									{/* BEGIN :: Social Login */}
-									{!signInPassword && (
-										<>
-											<div className='col-12 mt-3 text-center text-muted'>
-												OR
-											</div>
-											<div className='col-12 mt-3'>
 												<Button
-													isOutline
-													color={darkModeStatus ? 'light' : 'dark'}
-													className={classNames('w-100 py-3', {
-														'border-light': !darkModeStatus,
-														'border-dark': darkModeStatus,
-													})}
-													icon='CustomApple'
-													onClick={handleOnClick}>
-													Sign in with Apple
-												</Button>
-											</div>
-											<div className='col-12'>
-												<Button
-													isOutline
-													color={darkModeStatus ? 'light' : 'dark'}
-													className={classNames('w-100 py-3', {
-														'border-light': !darkModeStatus,
-														'border-dark': darkModeStatus,
-													})}
-													icon='CustomGoogle'
-													onClick={handleOnClick}>
-													Continue with Google
+													color='warning'
+													className='w-100 py-3'
+													onClick={formik.handleSubmit}>
+													Login
 												</Button>
 											</div>
 										</>
 									)}
-									{/* END :: Social Login */}
 								</form>
 							</CardBody>
 						</Card>
@@ -369,16 +343,16 @@ const Login: FC<ILoginProps> = ({ isSignUp }) => {
 							<a
 								href='/'
 								className={classNames('text-decoration-none me-3', {
-									'link-light': singUpStatus,
-									'link-dark': !singUpStatus,
+									'link-light': !singUpStatus,
+									'link-dark': singUpStatus,
 								})}>
 								Privacy policy
 							</a>
 							<a
 								href='/'
 								className={classNames('link-light text-decoration-none', {
-									'link-light': singUpStatus,
-									'link-dark': !singUpStatus,
+									'link-light': !singUpStatus,
+									'link-dark': singUpStatus,
 								})}>
 								Terms of use
 							</a>
