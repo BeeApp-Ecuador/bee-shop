@@ -1,7 +1,7 @@
-import React, { FC, useCallback, useContext, useEffect, useState } from 'react';
+import React, { FC, useCallback, useContext, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import classNames from 'classnames';
-import { FormikProps, useFormik } from 'formik';
+import { useFormik } from 'formik';
 import PageWrapper from '../../../layout/PageWrapper/PageWrapper';
 import Page from '../../../layout/Page/Page';
 import Card, { CardBody } from '../../../components/bootstrap/Card';
@@ -14,22 +14,20 @@ import AuthContext from '../../../contexts/authContext';
 import { getUserDataWithUsername } from '../../../common/data/userDummyData';
 // import Spinner from '../../../components/bootstrap/Spinner';
 import { useLazyCheckEmailQuery } from '../../../store/api/authApi';
-import Select from '../../../components/bootstrap/forms/Select';
-import { getCountries } from '../../../utils/getCountries';
 import { File } from 'buffer';
-import Textarea from '../../../components/bootstrap/forms/Textarea';
-import Icon from '../../../components/icon/Icon';
-import { useGetCountriesQuery, useLazyGetStatesQuery } from '../../../store/api/geoApi';
-import { CountryType } from '../../../type/country-type';
-import { StateType } from '../../../type/state-type';
+import LegalAgentInfo from './components/LegalAgentInfo';
+import BusinessInfo from './components/BusinessInfo';
+import LocationInfo from './components/LocationInfo';
+import SessionInfo from './components/SessionInfo';
 // import {Logo} from '../../../assets/logo.svg';
 
-interface RegisterFormValues {
+export interface RegisterFormValues {
 	nameLegalAgent: string;
 	ciLegalAgent: string;
 	prefixLegalAgent: string;
 	phoneLegalAgent: string;
 	addressLegalAgent: string;
+	identificationLegal: File | null;
 	// Bussiness Info
 	legalName: string;
 	businessName: string;
@@ -44,8 +42,10 @@ interface RegisterFormValues {
 	province: string;
 	city: string;
 	address: string;
-	lat: string;
-	lng: string;
+	// Session Info
+	email: string;
+	password: string;
+	confirmPassword: string;
 }
 
 interface ILoginHeaderProps {
@@ -85,12 +85,10 @@ const Login: FC<ILoginProps> = ({ isSignUp }) => {
 	const handleOnClick = useCallback(() => navigate('/'), [navigate]);
 
 	const usernameCheck = (username: string) => {
-		console.log('usernameCheck', username);
 		return !!getUserDataWithUsername(username);
 	};
 
 	const passwordCheck = (username: string, password: string) => {
-		console.log('passwordCheck', username, password);
 		return getUserDataWithUsername(username).password === password;
 	};
 
@@ -99,8 +97,6 @@ const Login: FC<ILoginProps> = ({ isSignUp }) => {
 		initialValues: {
 			loginUsername: 'tenesaca.999@gmail.co',
 			loginPassword: '12345',
-			// loginUsername: USERS.JOHN.username,
-			// loginPassword: USERS.JOHN.password,
 		},
 		validate: (values) => {
 			const errors: { loginUsername?: string; loginPassword?: string } = {};
@@ -117,7 +113,6 @@ const Login: FC<ILoginProps> = ({ isSignUp }) => {
 		},
 		validateOnChange: false,
 		onSubmit: (values) => {
-			console.log('Login submit', values);
 			if (usernameCheck(values.loginUsername)) {
 				if (passwordCheck(values.loginUsername, values.loginPassword)) {
 					if (setUser) {
@@ -154,11 +149,98 @@ const Login: FC<ILoginProps> = ({ isSignUp }) => {
 			province: '',
 			city: '',
 			address: '',
-			lat: '',
-			lng: '',
+			// Session Info
+			email: '',
+			password: '',
+			confirmPassword: '',
+		},
+		validate: (values) => {
+			const errors: Partial<Record<keyof RegisterFormValues, string>> = {};
+
+			// Legal Agent Info Validations
+			if (!values.nameLegalAgent) {
+				errors.nameLegalAgent = 'Requerido';
+			}
+			if (!values.ciLegalAgent) {
+				errors.ciLegalAgent = 'Requerido';
+			}
+			if (!values.prefixLegalAgent) {
+				errors.prefixLegalAgent = 'Requerido';
+			}
+			if (!values.phoneLegalAgent) {
+				errors.phoneLegalAgent = 'Requerido';
+			}
+			if (!values.addressLegalAgent) {
+				errors.addressLegalAgent = 'Requerido';
+			}
+
+			// Business Info Validations
+			if (!values.legalName) {
+				errors.legalName = 'Requerido';
+			}
+			if (!values.businessName) {
+				errors.businessName = 'Requerido';
+			}
+			if (!values.ruc) {
+				errors.ruc = 'Requerido';
+			}
+			if (!values.prefix) {
+				errors.prefix = 'Requerido';
+			}
+			if (!values.phone) {
+				errors.phone = 'Requerido';
+			}
+			if (!values.description) {
+				errors.description = 'Requerido';
+			}
+
+			// File Validations
+			if (!values.img) {
+				errors.img = 'Requerido';
+			}
+			if (!values.document) {
+				errors.document = 'Requerido';
+			}
+
+			// Location Info Validations
+			if (!values.country) {
+				errors.country = 'Requerido';
+			}
+			if (!values.province) {
+				errors.province = 'Requerido';
+			}
+			if (!values.city) {
+				errors.city = 'Requerido';
+			}
+			if (!values.address) {
+				errors.address = 'Requerido';
+			}
+
+			// Session Info Validations
+			if (!values.email) {
+				errors.email = 'Requerido';
+			} else if (!/^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i.test(values.email)) {
+				errors.email = 'Email inválido';
+			}
+
+			if (!values.password) {
+				errors.password = 'Requerido';
+			} else if (values.password.length < 6) {
+				errors.password = 'La contraseña debe tener al menos 6 caracteres';
+			}
+
+			if (!values.confirmPassword) {
+				errors.confirmPassword = 'Requerido';
+			} else if (values.confirmPassword !== values.password) {
+				errors.confirmPassword = 'Las contraseñas no coinciden';
+			}
+
+			return errors;
 		},
 
-		onSubmit(values, formikHelpers) {},
+		onSubmit(values, formikHelpers) {
+			console.log('Registering user...', values);
+		},
 	});
 
 	const [isLoading, setIsLoading] = useState<boolean>(false);
@@ -268,11 +350,12 @@ const Login: FC<ILoginProps> = ({ isSignUp }) => {
 											<LegalAgentInfo formikRegister={formikRegister} />
 											<BusinessInfo formikRegister={formikRegister} />
 											<LocationInfo formikRegister={formikRegister} />
+											<SessionInfo formikRegister={formikRegister} />
 											<div className='col-12'>
 												<Button
 													color='primary'
 													className='w-100 py-3'
-													onClick={handleOnClick}>
+													onClick={formikRegister.handleSubmit}>
 													Registrar
 												</Button>
 											</div>
@@ -368,463 +451,3 @@ const Login: FC<ILoginProps> = ({ isSignUp }) => {
 };
 
 export default Login;
-
-const LegalAgentInfo = ({
-	formikRegister,
-}: {
-	formikRegister: FormikProps<RegisterFormValues>;
-}) => {
-	const countryOptions = getCountries().map((country) => ({
-		value: country.dialCode,
-		label: `${country.flag} +${country.dialCode} ${country.name}`,
-		text: `+${country.dialCode} ${country.name}`,
-	}));
-	return (
-		<Card className='shadow-3d-dark p-4 mb-4'>
-			<CardBody className='g-2 row'>
-				<div className='col-12'>
-					<h5>Datos del representante legal</h5>
-				</div>
-				<div className='col-12 col-sm-6'>
-					<FormGroup id='nameLegalAgent' isFloating label='Nombres y apellidos'>
-						<Input
-							type='text'
-							autoComplete='nameLegalAgent'
-							value={formikRegister.values.nameLegalAgent}
-							isTouched={formikRegister.touched.nameLegalAgent}
-							invalidFeedback={formikRegister.errors.nameLegalAgent}
-							isValid={formikRegister.isValid}
-							onChange={formikRegister.handleChange}
-							onBlur={formikRegister.handleBlur}
-						/>
-					</FormGroup>
-				</div>
-				<div className='col-12 col-sm-6'>
-					<FormGroup id='ciLegalAgent' isFloating label='Identificación'>
-						<Input
-							type='text'
-							autoComplete='ciLegalAgent'
-							value={formikRegister.values.ciLegalAgent}
-							isTouched={formikRegister.touched.ciLegalAgent}
-							invalidFeedback={formikRegister.errors.ciLegalAgent}
-							isValid={formikRegister.isValid}
-							onChange={formikRegister.handleChange}
-							onBlur={formikRegister.handleBlur}
-						/>
-					</FormGroup>
-				</div>
-				<div className='col-6 col-sm-3'>
-					<FormGroup id='prefixLegalAgent' label='Prefijo' isFloating>
-						<Select
-							ariaLabel='Prefijo'
-							placeholder='Seleccione un prefijo'
-							title='Prefijo'
-							list={countryOptions}
-							value={formikRegister.values.prefixLegalAgent}
-							isTouched={formikRegister.touched.prefixLegalAgent}
-							invalidFeedback={formikRegister.errors.prefixLegalAgent}
-							isValid={formikRegister.isValid}
-							onChange={formikRegister.handleChange}
-							onBlur={formikRegister.handleBlur}
-						/>
-					</FormGroup>
-				</div>
-				<div className='col-6 col-sm-3'>
-					<FormGroup id='phoneLegalAgent' isFloating label='Número de teléfono'>
-						<Input
-							type='tel'
-							autoComplete='phoneLegalAgent'
-							value={formikRegister.values.phoneLegalAgent}
-							isTouched={formikRegister.touched.phoneLegalAgent}
-							invalidFeedback={formikRegister.errors.phoneLegalAgent}
-							isValid={formikRegister.isValid}
-							onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
-								const val = e.target.value.replace(/\D/g, '');
-								formikRegister.setFieldValue('phoneLegalAgent', val);
-							}}
-							onBlur={formikRegister.handleBlur}
-						/>
-					</FormGroup>
-				</div>
-				<div className='col-12 col-sm-6'>
-					<FormGroup id='addressLegalAgent' isFloating label='Dirección'>
-						<Input
-							type='text'
-							autoComplete='addressLegalAgent'
-							value={formikRegister.values.addressLegalAgent}
-							isTouched={formikRegister.touched.addressLegalAgent}
-							invalidFeedback={formikRegister.errors.addressLegalAgent}
-							isValid={formikRegister.isValid}
-							onChange={formikRegister.handleChange}
-							onBlur={formikRegister.handleBlur}
-						/>
-					</FormGroup>
-				</div>
-			</CardBody>
-		</Card>
-	);
-};
-
-const BusinessInfo = ({ formikRegister }: { formikRegister: FormikProps<RegisterFormValues> }) => {
-	const countryOptions = getCountries().map((country) => ({
-		value: country.dialCode,
-		label: `${country.flag} +${country.dialCode} ${country.name}`,
-		text: `+${country.dialCode} ${country.name}`,
-	}));
-
-	return (
-		<Card className='shadow-3d-dark p-4 mb-4'>
-			<CardBody className='g-2 row'>
-				{/* Encabezado */}
-				<div className='col-12'>
-					<h5>Datos del Local</h5>
-				</div>
-
-				{/* Inputs de texto */}
-				<div className='col-12 col-sm-6'>
-					<FormGroup id='legalName' isFloating label='Razón social'>
-						<Input
-							type='text'
-							autoComplete='legalName'
-							value={formikRegister.values.legalName}
-							isTouched={formikRegister.touched.legalName}
-							invalidFeedback={formikRegister.errors.legalName}
-							isValid={formikRegister.isValid}
-							onChange={formikRegister.handleChange}
-							onBlur={formikRegister.handleBlur}
-						/>
-					</FormGroup>
-				</div>
-
-				<div className='col-12 col-sm-6'>
-					<FormGroup id='businessName' isFloating label='Nombre comercial'>
-						<Input
-							type='text'
-							autoComplete='businessName'
-							value={formikRegister.values.businessName}
-							isTouched={formikRegister.touched.businessName}
-							invalidFeedback={formikRegister.errors.businessName}
-							isValid={formikRegister.isValid}
-							onChange={formikRegister.handleChange}
-							onBlur={formikRegister.handleBlur}
-						/>
-					</FormGroup>
-				</div>
-
-				{/* Prefijo y Teléfono */}
-				<div className='col-6 col-sm-3'>
-					<FormGroup id='prefix' label='Prefijo' isFloating>
-						<Select
-							ariaLabel='Prefijo'
-							placeholder='Seleccione un prefijo'
-							title='Prefijo'
-							list={countryOptions}
-							value={formikRegister.values.prefix}
-							isTouched={formikRegister.touched.prefix}
-							invalidFeedback={formikRegister.errors.prefix}
-							isValid={formikRegister.isValid}
-							onChange={formikRegister.handleChange}
-							onBlur={formikRegister.handleBlur}
-						/>
-					</FormGroup>
-				</div>
-
-				<div className='col-6 col-sm-3'>
-					<FormGroup id='phone' isFloating label='Número de teléfono'>
-						<Input
-							type='tel'
-							autoComplete='phone'
-							value={formikRegister.values.phone}
-							isTouched={formikRegister.touched.phone}
-							invalidFeedback={formikRegister.errors.phone}
-							isValid={formikRegister.isValid}
-							onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
-								const val = e.target.value.replace(/\D/g, '');
-								formikRegister.setFieldValue('phone', val);
-							}}
-							onBlur={formikRegister.handleBlur}
-						/>
-					</FormGroup>
-				</div>
-
-				{/* RUC */}
-				<div className='col-12 col-sm-6'>
-					<FormGroup id='ruc' isFloating label='RUC'>
-						<Input
-							type='text'
-							autoComplete='ruc'
-							value={formikRegister.values.ruc}
-							isTouched={formikRegister.touched.ruc}
-							invalidFeedback={formikRegister.errors.ruc}
-							isValid={formikRegister.isValid}
-							onChange={formikRegister.handleChange}
-							onBlur={formikRegister.handleBlur}
-						/>
-					</FormGroup>
-				</div>
-
-				{/* Descripción */}
-				<div className='col-12'>
-					<FormGroup id='description' isFloating label='Descripción'>
-						<Textarea
-							style={{ minHeight: '100px', resize: 'none' }}
-							autoComplete='description'
-							value={formikRegister.values.description}
-							isTouched={formikRegister.touched.description}
-							invalidFeedback={formikRegister.errors.description}
-							isValid={formikRegister.isValid}
-							onChange={formikRegister.handleChange}
-							onBlur={formikRegister.handleBlur}
-						/>
-					</FormGroup>
-				</div>
-
-				{/* Logo */}
-				{/* Logo */}
-				<div className='col-12 col-sm-6'>
-					<FormGroup id='img'>
-						<div className='d-flex flex-column align-items-center'>
-							{/* Botón centrado */}
-							<label htmlFor='img-upload' className='btn btn-outline-primary'>
-								Subir Logo
-							</label>
-							<input
-								id='img-upload'
-								type='file'
-								accept='image/*'
-								style={{ display: 'none' }}
-								onChange={(event) => {
-									if (event.currentTarget.files) {
-										formikRegister.setFieldValue(
-											'img',
-											event.currentTarget.files[0],
-										);
-									}
-								}}
-								onBlur={formikRegister.handleBlur}
-							/>
-
-							{/* Vista previa */}
-							{formikRegister.values.img && (
-								<div className='mt-2 text-center'>
-									<img
-										src={URL.createObjectURL(formikRegister.values.img)}
-										alt='Vista previa'
-										className='rounded'
-										style={{
-											width: '150px',
-											height: '150px',
-											objectFit: 'cover',
-											borderRadius: '8px',
-											border: '1px solid #ccc',
-										}}
-									/>
-									<div
-										className='mt-1 text-truncate'
-										style={{ maxWidth: '150px' }}>
-										{formikRegister.values.img.name}
-									</div>
-								</div>
-							)}
-
-							{/* Validación */}
-							{formikRegister.touched.img && formikRegister.errors.img && (
-								<div className='invalid-feedback d-block text-center'>
-									{formikRegister.errors.img}
-								</div>
-							)}
-						</div>
-					</FormGroup>
-				</div>
-
-				<div className='col-12 col-sm-6'>
-					<FormGroup id='document'>
-						<div className='d-flex flex-column align-items-center'>
-							<label htmlFor='document-upload' className='btn btn-outline-primary'>
-								Subir Documento
-							</label>
-
-							<input
-								id='document-upload'
-								type='file'
-								accept='application/pdf'
-								style={{ display: 'none' }}
-								onChange={(event) => {
-									if (event.currentTarget.files) {
-										formikRegister.setFieldValue(
-											'document',
-											event.currentTarget.files[0],
-										);
-									}
-								}}
-								onBlur={formikRegister.handleBlur}
-							/>
-
-							{/* Ícono del PDF */}
-							{formikRegister.values.document && (
-								<div className='mt-2 text-center'>
-									{/* <img
-										src='https://mecdata.it/wp-content/uploads/2021/04/534px-PDF_file_icon.svg_.png'
-										alt='Archivo PDF'
-										className='rounded'
-										style={{
-											width: '100px',
-											height: '100px',
-											objectFit: 'contain',
-										}}
-									/> */}
-									<img
-										className='img-fluid'
-										style={{
-											// width: '150px',
-											height: '150px',
-											// border: '1px solid #ccc',
-										}}
-										src='/img-pdf.png'
-										alt=''
-									/>
-									{/* <Icon
-										icon='FilePresent'
-										size='4x'
-										style={{
-											width: '150px',
-											height: '150px',
-											objectFit: 'cover',
-											borderRadius: '8px',
-											// border: '1px solid #ccc',
-										}}
-									/> */}
-									<div
-										className='mt-1 text-truncate'
-										style={{ maxWidth: '150px' }}>
-										{formikRegister.values.document.name}
-									</div>
-								</div>
-							)}
-
-							{/* Validación */}
-							{formikRegister.touched.document && formikRegister.errors.document && (
-								<div className='invalid-feedback d-block text-center'>
-									{formikRegister.errors.document}
-								</div>
-							)}
-						</div>
-					</FormGroup>
-				</div>
-			</CardBody>
-		</Card>
-	);
-};
-
-const LocationInfo = ({ formikRegister }: { formikRegister: FormikProps<RegisterFormValues> }) => {
-	const { data } = useGetCountriesQuery({});
-	const [getStatesByCountryId] = useLazyGetStatesQuery();
-
-	const [countries, setCountries] = useState<CountryType[]>([]);
-	const [states, setStates] = useState<StateType[]>([]);
-
-	const countryOptions = countries.map((country) => ({
-		value: country._id,
-		label: `${country.flag} ${country.name}`,
-		text: `${country.flag} ${country.name}`,
-	}));
-
-	useEffect(() => {
-		if (data && data.meta.status === 200) {
-			setCountries(data.countries);
-		}
-	}, [data]);
-
-	const getStatesByCountry = useCallback(async (countryId: string) => {
-		const { data } = await getStatesByCountryId(countryId);
-		if (data && data.meta.status === 200) {
-			setStates(data.provinces);
-		}
-	}, []);
-
-	useEffect(() => {
-		if (formikRegister.values.country) {
-			getStatesByCountry(formikRegister.values.country);
-		}
-	}, [formikRegister.values.country, getStatesByCountry]);
-
-	return (
-		<Card className='shadow-3d-dark p-4 mb-4'>
-			<CardBody className='g-2 row'>
-				<div className='col-12'>
-					<h5>Ubicación</h5>
-				</div>
-				<div className='col-12 col-sm-4'>
-					<FormGroup id='country' label='País' isFloating>
-						<Select
-							ariaLabel='País'
-							placeholder='Seleccione un País'
-							title='País'
-							list={countryOptions}
-							value={formikRegister.values.country}
-							isTouched={formikRegister.touched.country}
-							invalidFeedback={formikRegister.errors.country}
-							isValid={formikRegister.isValid}
-							onChange={formikRegister.handleChange}
-							onBlur={formikRegister.handleBlur}
-						/>
-					</FormGroup>
-				</div>
-				{formikRegister.values.country && states.length > 0 && (
-					<div className='col-12 col-sm-4'>
-						<FormGroup id='province' label='Provincia' isFloating>
-							<Select
-								ariaLabel='Provincia'
-								placeholder='Seleccione un Provincia'
-								title='Provincia'
-								list={states.map((state) => ({
-									value: state._id,
-									label: state.descripcion,
-									text: state.descripcion,
-								}))}
-								value={formikRegister.values.province}
-								isTouched={formikRegister.touched.province}
-								invalidFeedback={formikRegister.errors.province}
-								isValid={formikRegister.isValid}
-								onChange={formikRegister.handleChange}
-								onBlur={formikRegister.handleBlur}
-							/>
-						</FormGroup>
-					</div>
-				)}
-				{formikRegister.values.province && (
-					<div className='col-12 col-sm-4'>
-						<FormGroup id='city' label='Ciudad' isFloating>
-							<Select
-								ariaLabel='Ciudad'
-								placeholder='Seleccione un Ciudad'
-								title='Ciudad'
-								list={countryOptions}
-								value={formikRegister.values.city}
-								isTouched={formikRegister.touched.city}
-								invalidFeedback={formikRegister.errors.city}
-								isValid={formikRegister.isValid}
-								onChange={formikRegister.handleChange}
-								onBlur={formikRegister.handleBlur}
-							/>
-						</FormGroup>
-					</div>
-				)}
-				<div className='col-12'>
-					<FormGroup id='address' isFloating label='Dirección'>
-						<Input
-							type='text'
-							autoComplete='address'
-							value={formikRegister.values.address}
-							isTouched={formikRegister.touched.address}
-							invalidFeedback={formikRegister.errors.address}
-							isValid={formikRegister.isValid}
-							onChange={formikRegister.handleChange}
-							onBlur={formikRegister.handleBlur}
-						/>
-					</FormGroup>
-				</div>
-			</CardBody>
-		</Card>
-	);
-};
