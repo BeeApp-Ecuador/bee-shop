@@ -393,8 +393,8 @@ const LegalAgentInfo = ({
 							isTouched={formikRegister.touched.phoneLegalAgent}
 							invalidFeedback={formikRegister.errors.phoneLegalAgent}
 							isValid={formikRegister.isValid}
-							onChange={(e) => {
-								const val = e.target.value.replace(/\D/g, ''); // elimina todo lo que no sea número
+							onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+								const val = e.target.value.replace(/\D/g, '');
 								formikRegister.setFieldValue('phoneLegalAgent', val);
 							}}
 							onBlur={formikRegister.handleBlur}
