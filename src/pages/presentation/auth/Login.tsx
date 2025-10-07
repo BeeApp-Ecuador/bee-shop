@@ -27,6 +27,7 @@ export interface RegisterFormValues {
 	prefixLegalAgent: string;
 	phoneLegalAgent: string;
 	addressLegalAgent: string;
+	identificationLegal: File | null;
 	// Bussiness Info
 	legalName: string;
 	businessName: string;

@@ -127,7 +127,6 @@ const BusinessInfo = ({ formikRegister }: { formikRegister: FormikProps<Register
 				<div className='col-12 col-sm-6'>
 					<FormGroup id='img'>
 						<div className='d-flex flex-column align-items-center'>
-							{/* Botón centrado */}
 							<label htmlFor='img-upload' className='btn btn-outline-primary'>
 								Subir Logo
 							</label>
@@ -159,7 +158,6 @@ const BusinessInfo = ({ formikRegister }: { formikRegister: FormikProps<Register
 											height: '150px',
 											objectFit: 'cover',
 											borderRadius: '8px',
-											border: '1px solid #ccc',
 										}}
 									/>
 									<div
@@ -190,7 +188,7 @@ const BusinessInfo = ({ formikRegister }: { formikRegister: FormikProps<Register
 							<input
 								id='document-upload'
 								type='file'
-								accept='application/pdf'
+								accept='application/pdf,image/*'
 								style={{ display: 'none' }}
 								onChange={(event) => {
 									if (event.currentTarget.files) {
@@ -206,41 +204,36 @@ const BusinessInfo = ({ formikRegister }: { formikRegister: FormikProps<Register
 							{/* Ícono del PDF */}
 							{formikRegister.values.document && (
 								<div className='mt-2 text-center'>
-									{/* <img
-										src='https://mecdata.it/wp-content/uploads/2021/04/534px-PDF_file_icon.svg_.png'
-										alt='Archivo PDF'
-										className='rounded'
-										style={{
-											width: '100px',
-											height: '100px',
-											objectFit: 'contain',
-										}}
-									/> */}
-									<img
-										className='img-fluid'
-										style={{
-											// width: '150px',
-											height: '150px',
-											// border: '1px solid #ccc',
-										}}
-										src='/img-pdf.png'
-										alt=''
-									/>
-									{/* <Icon
-										icon='FilePresent'
-										size='4x'
-										style={{
-											width: '150px',
-											height: '150px',
-											objectFit: 'cover',
-											borderRadius: '8px',
-											// border: '1px solid #ccc',
-										}}
-									/> */}
+									{formikRegister.values.document.type === 'application/pdf' ? (
+										<img
+											className='img-fluid'
+											style={{
+												// width: '150px',
+												height: '150px',
+												// border: '1px solid #ccc',
+											}}
+											src='/img-pdf.png'
+											alt=''
+										/>
+									) : (
+										<img
+											src={URL.createObjectURL(
+												formikRegister.values.document!,
+											)}
+											alt='Vista previa'
+											className='rounded'
+											style={{
+												width: '150px',
+												height: '150px',
+												objectFit: 'cover',
+												borderRadius: '8px',
+											}}
+										/>
+									)}
 									<div
 										className='mt-1 text-truncate'
 										style={{ maxWidth: '150px' }}>
-										{formikRegister.values.document.name}
+										{formikRegister.values.document!.name}
 									</div>
 								</div>
 							)}
