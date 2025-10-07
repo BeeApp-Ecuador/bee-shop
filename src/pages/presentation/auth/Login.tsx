@@ -19,9 +19,14 @@ import { getCountries } from '../../../utils/getCountries';
 import { File } from 'buffer';
 import Textarea from '../../../components/bootstrap/forms/Textarea';
 import Icon from '../../../components/icon/Icon';
-import { useGetCountriesQuery, useLazyGetStatesQuery } from '../../../store/api/geoApi';
+import {
+	useGetCountriesQuery,
+	useLazyGetCitiesQuery,
+	useLazyGetStatesQuery,
+} from '../../../store/api/geoApi';
 import { CountryType } from '../../../type/country-type';
 import { StateType } from '../../../type/state-type';
+import { CityType } from '../../../type/city-type';
 // import {Logo} from '../../../assets/logo.svg';
 
 interface RegisterFormValues {
@@ -719,9 +724,11 @@ const BusinessInfo = ({ formikRegister }: { formikRegister: FormikProps<Register
 const LocationInfo = ({ formikRegister }: { formikRegister: FormikProps<RegisterFormValues> }) => {
 	const { data } = useGetCountriesQuery({});
 	const [getStatesByCountryId] = useLazyGetStatesQuery();
+	const [getCitiesByStateId] = useLazyGetCitiesQuery();
 
 	const [countries, setCountries] = useState<CountryType[]>([]);
 	const [states, setStates] = useState<StateType[]>([]);
+	const [cities, setCities] = useState<CityType[]>([]);
 
 	const countryOptions = countries.map((country) => ({
 		value: country._id,
@@ -748,6 +755,19 @@ const LocationInfo = ({ formikRegister }: { formikRegister: FormikProps<Register
 		}
 	}, [formikRegister.values.country, getStatesByCountry]);
 
+	const getCitiesByState = useCallback(async (stateId: string) => {
+		const { data } = await getCitiesByStateId(stateId);
+		if (data && data.meta.status === 200) {
+			setCities(data.cantons);
+		}
+	}, []);
+
+	useEffect(() => {
+		if (formikRegister.values.province) {
+			getCitiesByState(formikRegister.values.province);
+		}
+	}, [formikRegister.values.province, getCitiesByState]);
+
 	return (
 		<Card className='shadow-3d-dark p-4 mb-4'>
 			<CardBody className='g-2 row'>
@@ -765,7 +785,13 @@ const LocationInfo = ({ formikRegister }: { formikRegister: FormikProps<Register
 							isTouched={formikRegister.touched.country}
 							invalidFeedback={formikRegister.errors.country}
 							isValid={formikRegister.isValid}
-							onChange={formikRegister.handleChange}
+							onChange={(e: React.ChangeEvent<HTMLSelectElement>) => {
+								formikRegister.handleChange(e);
+								formikRegister.setFieldValue('province', '');
+								formikRegister.setFieldValue('city', '');
+								setStates([]);
+								setCities([]);
+							}}
 							onBlur={formikRegister.handleBlur}
 						/>
 					</FormGroup>
@@ -792,14 +818,18 @@ const LocationInfo = ({ formikRegister }: { formikRegister: FormikProps<Register
 						</FormGroup>
 					</div>
 				)}
-				{formikRegister.values.province && (
+				{formikRegister.values.province && states.length > 0 && cities.length > 0 && (
 					<div className='col-12 col-sm-4'>
 						<FormGroup id='city' label='Ciudad' isFloating>
 							<Select
 								ariaLabel='Ciudad'
 								placeholder='Seleccione un Ciudad'
 								title='Ciudad'
-								list={countryOptions}
+								list={cities.map((city) => ({
+									value: city._id,
+									label: city.description,
+									text: city.description,
+								}))}
 								value={formikRegister.values.city}
 								isTouched={formikRegister.touched.city}
 								invalidFeedback={formikRegister.errors.city}
