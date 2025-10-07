@@ -8,14 +8,15 @@ import Card, { CardBody } from '../../../components/bootstrap/Card';
 import FormGroup from '../../../components/bootstrap/forms/FormGroup';
 import Input from '../../../components/bootstrap/forms/Input';
 import Button from '../../../components/bootstrap/Button';
-import Logo from '../../../components/Logo';
+// import Logo from '../../../components/Logo';
 import useDarkMode from '../../../hooks/useDarkMode';
 import AuthContext from '../../../contexts/authContext';
 import { getUserDataWithUsername } from '../../../common/data/userDummyData';
-import Spinner from '../../../components/bootstrap/Spinner';
+// import Spinner from '../../../components/bootstrap/Spinner';
 import { useLazyCheckEmailQuery } from '../../../store/api/auth.Api';
 import Select from '../../../components/bootstrap/forms/Select';
 import { getCountries } from '../../../utils/getCountries';
+// import {Logo} from '../../../assets/logo.svg';
 
 interface RegisterFormValues {
 	nameLegalAgent: string;
@@ -178,7 +179,12 @@ const Login: FC<ILoginProps> = ({ isSignUp }) => {
 											},
 										)}
 										aria-label='Facit'>
-										<Logo width={200} />
+										<img
+											className='img-fluid'
+											width={250}
+											src='/logo.svg'
+											alt=''
+										/>
 									</Link>
 								</div>
 								<div
