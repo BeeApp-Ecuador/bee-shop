@@ -6,13 +6,15 @@ const { VITE_URL } = getEnvVariables();
 export const geoApi = createApi({
 	reducerPath: 'geoApi',
 	baseQuery: fetchBaseQuery({ baseUrl: VITE_URL }),
-	endpoints: (builder) => ({
-		getCountries: builder.query({
-			query: () => ({
-				url: `api/v2/countries`,
+	endpoints: (builder) => {
+		return {
+			getCountries: builder.query({
+				query: () => ({
+					url: `api/v2/country`,
+				}),
 			}),
-		}),
-	}),
+		};
+	},
 });
 
 export const { useGetCountriesQuery } = geoApi;

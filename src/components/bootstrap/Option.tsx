@@ -29,7 +29,7 @@ export interface IOptionsProps {
 export const Options: FC<IOptionsProps> = ({ list }) => {
 	return list?.map((item) => (
 		// eslint-disable-next-line react/jsx-props-no-spreading
-		<Option key={item.value} value={item.value} {...item}>
+		<Option key={item.label} value={item.value} {...item}>
 			{(item.text as string) || (item.label as string)}
 		</Option>
 	));

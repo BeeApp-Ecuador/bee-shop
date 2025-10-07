@@ -724,6 +724,8 @@ const LocationInfo = ({ formikRegister }: { formikRegister: FormikProps<Register
 		if (data) {
 			console.log('Countries data from API:', data);
 			// setCountries(data);
+		} else {
+			console.log('No country data available from API.');
 		}
 	}, [data]);
 
