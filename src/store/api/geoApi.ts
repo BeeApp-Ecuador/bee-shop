@@ -5,7 +5,18 @@ const { VITE_URL } = getEnvVariables();
 
 export const geoApi = createApi({
 	reducerPath: 'geoApi',
-	baseQuery: fetchBaseQuery({ baseUrl: VITE_URL }),
+	baseQuery: fetchBaseQuery({
+		baseUrl: VITE_URL,
+		responseHandler: async (response) => {
+			const data = await response.json();
+			return {
+				...data,
+				meta: {
+					status: response.status,
+				},
+			};
+		},
+	}),
 	endpoints: (builder) => {
 		return {
 			getCountries: builder.query({
