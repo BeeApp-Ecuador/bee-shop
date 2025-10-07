@@ -19,8 +19,9 @@ import { getCountries } from '../../../utils/getCountries';
 import { File } from 'buffer';
 import Textarea from '../../../components/bootstrap/forms/Textarea';
 import Icon from '../../../components/icon/Icon';
-import { useGetCountriesQuery } from '../../../store/api/geoApi';
+import { useGetCountriesQuery, useLazyGetStatesQuery } from '../../../store/api/geoApi';
 import { CountryType } from '../../../type/country-type';
+import { StateType } from '../../../type/state-type';
 // import {Logo} from '../../../assets/logo.svg';
 
 interface RegisterFormValues {
@@ -717,8 +718,11 @@ const BusinessInfo = ({ formikRegister }: { formikRegister: FormikProps<Register
 
 const LocationInfo = ({ formikRegister }: { formikRegister: FormikProps<RegisterFormValues> }) => {
 	const { data } = useGetCountriesQuery({});
+	const [getStatesByCountryId] = useLazyGetStatesQuery();
 
 	const [countries, setCountries] = useState<CountryType[]>([]);
+	const [states, setStates] = useState<StateType[]>([]);
+
 	const countryOptions = countries.map((country) => ({
 		value: country._id,
 		label: `${country.flag} ${country.name}`,
@@ -730,6 +734,19 @@ const LocationInfo = ({ formikRegister }: { formikRegister: FormikProps<Register
 			setCountries(data.countries);
 		}
 	}, [data]);
+
+	const getStatesByCountry = useCallback(async (countryId: string) => {
+		const { data } = await getStatesByCountryId(countryId);
+		if (data && data.meta.status === 200) {
+			setStates(data.provinces);
+		}
+	}, []);
+
+	useEffect(() => {
+		if (formikRegister.values.country) {
+			getStatesByCountry(formikRegister.values.country);
+		}
+	}, [formikRegister.values.country, getStatesByCountry]);
 
 	return (
 		<Card className='shadow-3d-dark p-4 mb-4'>
@@ -753,14 +770,18 @@ const LocationInfo = ({ formikRegister }: { formikRegister: FormikProps<Register
 						/>
 					</FormGroup>
 				</div>
-				{formikRegister.values.country && (
+				{formikRegister.values.country && states.length > 0 && (
 					<div className='col-12 col-sm-4'>
 						<FormGroup id='province' label='Provincia' isFloating>
 							<Select
 								ariaLabel='Provincia'
 								placeholder='Seleccione un Provincia'
 								title='Provincia'
-								list={countryOptions}
+								list={states.map((state) => ({
+									value: state._id,
+									label: state.descripcion,
+									text: state.descripcion,
+								}))}
 								value={formikRegister.values.province}
 								isTouched={formikRegister.touched.province}
 								invalidFeedback={formikRegister.errors.province}
