@@ -19,8 +19,9 @@ import { getCountries } from '../../../utils/getCountries';
 import { File } from 'buffer';
 import Textarea from '../../../components/bootstrap/forms/Textarea';
 import Icon from '../../../components/icon/Icon';
-import { useGetCountriesQuery } from '../../../store/api/geoApi';
+import { useGetCountriesQuery, useLazyGetStatesQuery } from '../../../store/api/geoApi';
 import { CountryType } from '../../../type/country-type';
+import { StateType } from '../../../type/state-type';
 // import {Logo} from '../../../assets/logo.svg';
 
 interface RegisterFormValues {
@@ -717,17 +718,35 @@ const BusinessInfo = ({ formikRegister }: { formikRegister: FormikProps<Register
 
 const LocationInfo = ({ formikRegister }: { formikRegister: FormikProps<RegisterFormValues> }) => {
 	const { data } = useGetCountriesQuery({});
+	const [getStatesByCountryId] = useLazyGetStatesQuery();
 
 	const [countries, setCountries] = useState<CountryType[]>([]);
+	const [states, setStates] = useState<StateType[]>([]);
+
+	const countryOptions = countries.map((country) => ({
+		value: country._id,
+		label: `${country.flag} ${country.name}`,
+		text: `${country.flag} ${country.name}`,
+	}));
 
 	useEffect(() => {
-		if (data) {
-			console.log('Countries data from API:', data);
-			// setCountries(data);
-		} else {
-			console.log('No country data available from API.');
+		if (data && data.meta.status === 200) {
+			setCountries(data.countries);
 		}
 	}, [data]);
+
+	const getStatesByCountry = useCallback(async (countryId: string) => {
+		const { data } = await getStatesByCountryId(countryId);
+		if (data && data.meta.status === 200) {
+			setStates(data.provinces);
+		}
+	}, []);
+
+	useEffect(() => {
+		if (formikRegister.values.country) {
+			getStatesByCountry(formikRegister.values.country);
+		}
+	}, [formikRegister.values.country, getStatesByCountry]);
 
 	return (
 		<Card className='shadow-3d-dark p-4 mb-4'>
@@ -735,75 +754,70 @@ const LocationInfo = ({ formikRegister }: { formikRegister: FormikProps<Register
 				<div className='col-12'>
 					<h5>Ubicación</h5>
 				</div>
-				<div className='col-12 col-sm-6'>
-					<FormGroup id='nameLegalAgent' isFloating label='Nombres y apellidos'>
-						<Input
-							type='text'
-							autoComplete='nameLegalAgent'
-							value={formikRegister.values.nameLegalAgent}
-							isTouched={formikRegister.touched.nameLegalAgent}
-							invalidFeedback={formikRegister.errors.nameLegalAgent}
-							isValid={formikRegister.isValid}
-							onChange={formikRegister.handleChange}
-							onBlur={formikRegister.handleBlur}
-						/>
-					</FormGroup>
-				</div>
-				<div className='col-12 col-sm-6'>
-					<FormGroup id='ciLegalAgent' isFloating label='Identificación'>
-						<Input
-							type='text'
-							autoComplete='ciLegalAgent'
-							value={formikRegister.values.ciLegalAgent}
-							isTouched={formikRegister.touched.ciLegalAgent}
-							invalidFeedback={formikRegister.errors.ciLegalAgent}
-							isValid={formikRegister.isValid}
-							onChange={formikRegister.handleChange}
-							onBlur={formikRegister.handleBlur}
-						/>
-					</FormGroup>
-				</div>
-				{/* <div className='col-6 col-sm-3'>
-					<FormGroup id='prefixLegalAgent' label='Prefijo' isFloating>
+				<div className='col-12 col-sm-4'>
+					<FormGroup id='country' label='País' isFloating>
 						<Select
-							ariaLabel='Prefijo'
-							placeholder='Seleccione un prefijo'
-							title='Prefijo'
+							ariaLabel='País'
+							placeholder='Seleccione un País'
+							title='País'
 							list={countryOptions}
-							value={formikRegister.values.prefixLegalAgent}
-							isTouched={formikRegister.touched.prefixLegalAgent}
-							invalidFeedback={formikRegister.errors.prefixLegalAgent}
+							value={formikRegister.values.country}
+							isTouched={formikRegister.touched.country}
+							invalidFeedback={formikRegister.errors.country}
 							isValid={formikRegister.isValid}
 							onChange={formikRegister.handleChange}
 							onBlur={formikRegister.handleBlur}
 						/>
 					</FormGroup>
-				</div> */}
-				<div className='col-6 col-sm-3'>
-					<FormGroup id='phoneLegalAgent' isFloating label='Número de teléfono'>
-						<Input
-							type='tel'
-							autoComplete='phoneLegalAgent'
-							value={formikRegister.values.phoneLegalAgent}
-							isTouched={formikRegister.touched.phoneLegalAgent}
-							invalidFeedback={formikRegister.errors.phoneLegalAgent}
-							isValid={formikRegister.isValid}
-							onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
-								const val = e.target.value.replace(/\D/g, '');
-								formikRegister.setFieldValue('phoneLegalAgent', val);
-							}}
-							onBlur={formikRegister.handleBlur}
-						/>
-					</FormGroup>
 				</div>
-				<div className='col-12 col-sm-6'>
-					<FormGroup id='addressLegalAgent' isFloating label='Dirección'>
+				{formikRegister.values.country && states.length > 0 && (
+					<div className='col-12 col-sm-4'>
+						<FormGroup id='province' label='Provincia' isFloating>
+							<Select
+								ariaLabel='Provincia'
+								placeholder='Seleccione un Provincia'
+								title='Provincia'
+								list={states.map((state) => ({
+									value: state._id,
+									label: state.descripcion,
+									text: state.descripcion,
+								}))}
+								value={formikRegister.values.province}
+								isTouched={formikRegister.touched.province}
+								invalidFeedback={formikRegister.errors.province}
+								isValid={formikRegister.isValid}
+								onChange={formikRegister.handleChange}
+								onBlur={formikRegister.handleBlur}
+							/>
+						</FormGroup>
+					</div>
+				)}
+				{formikRegister.values.province && (
+					<div className='col-12 col-sm-4'>
+						<FormGroup id='city' label='Ciudad' isFloating>
+							<Select
+								ariaLabel='Ciudad'
+								placeholder='Seleccione un Ciudad'
+								title='Ciudad'
+								list={countryOptions}
+								value={formikRegister.values.city}
+								isTouched={formikRegister.touched.city}
+								invalidFeedback={formikRegister.errors.city}
+								isValid={formikRegister.isValid}
+								onChange={formikRegister.handleChange}
+								onBlur={formikRegister.handleBlur}
+							/>
+						</FormGroup>
+					</div>
+				)}
+				<div className='col-12'>
+					<FormGroup id='address' isFloating label='Dirección'>
 						<Input
 							type='text'
-							autoComplete='addressLegalAgent'
-							value={formikRegister.values.addressLegalAgent}
-							isTouched={formikRegister.touched.addressLegalAgent}
-							invalidFeedback={formikRegister.errors.addressLegalAgent}
+							autoComplete='address'
+							value={formikRegister.values.address}
+							isTouched={formikRegister.touched.address}
+							invalidFeedback={formikRegister.errors.address}
 							isValid={formikRegister.isValid}
 							onChange={formikRegister.handleChange}
 							onBlur={formikRegister.handleBlur}
