@@ -29,8 +29,13 @@ export const geoApi = createApi({
 					url: `api/v2/province/${countryId}`,
 				}),
 			}),
+			getCities: builder.query({
+				query: (stateId) => ({
+					url: `api/v2/canton/${stateId}`,
+				}),
+			}),
 		};
 	},
 });
 
-export const { useGetCountriesQuery, useLazyGetStatesQuery } = geoApi;
+export const { useGetCountriesQuery, useLazyGetStatesQuery, useLazyGetCitiesQuery } = geoApi;
