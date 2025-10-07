@@ -1,12 +1,11 @@
-import { configureStore } from "@reduxjs/toolkit";
-import { authApi } from "./api/auth.Api";
-
+import { configureStore } from '@reduxjs/toolkit';
+import { authApi, geoApi } from './api/';
 
 export const store = configureStore({
-    reducer: {
-        [authApi.reducerPath]: authApi.reducer,
-    },
-    middleware: (getDefaultMiddleware) =>
-        getDefaultMiddleware()
-            .concat(authApi.middleware),
+	reducer: {
+		[authApi.reducerPath]: authApi.reducer,
+		[geoApi.reducerPath]: geoApi.reducer,
+	},
+	middleware: (getDefaultMiddleware) =>
+		getDefaultMiddleware().concat(authApi.middleware).concat(geoApi.middleware),
 });

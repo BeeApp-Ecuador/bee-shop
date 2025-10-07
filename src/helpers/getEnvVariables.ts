@@ -1,5 +1,5 @@
 export const getEnvVariables = (): any => {
-    return {
-        ...process.env
-    }
-}
+	return {
+		...import.meta.env,
+	};
+};
