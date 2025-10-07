@@ -415,16 +415,6 @@ const LegalAgentInfo = ({
 						/>
 					</FormGroup>
 				</div>
-				<div className='col-12'>
-					<FormGroup id='signup-surname' isFloating label='Your surname'>
-						<Input autoComplete='family-name' />
-					</FormGroup>
-				</div>
-				<div className='col-12'>
-					<FormGroup id='signup-password' isFloating label='Password'>
-						<Input type='password' autoComplete='password' />
-					</FormGroup>
-				</div>
 			</CardBody>
 		</Card>
 	);
