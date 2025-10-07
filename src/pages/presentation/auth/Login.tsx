@@ -1,4 +1,4 @@
-import React, { FC, useCallback, useContext, useState } from 'react';
+import React, { FC, useCallback, useContext, useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import classNames from 'classnames';
 import { FormikProps, useFormik } from 'formik';
@@ -13,12 +13,14 @@ import useDarkMode from '../../../hooks/useDarkMode';
 import AuthContext from '../../../contexts/authContext';
 import { getUserDataWithUsername } from '../../../common/data/userDummyData';
 // import Spinner from '../../../components/bootstrap/Spinner';
-import { useLazyCheckEmailQuery } from '../../../store/api/auth.Api';
+import { useLazyCheckEmailQuery } from '../../../store/api/authApi';
 import Select from '../../../components/bootstrap/forms/Select';
 import { getCountries } from '../../../utils/getCountries';
 import { File } from 'buffer';
 import Textarea from '../../../components/bootstrap/forms/Textarea';
 import Icon from '../../../components/icon/Icon';
+import { useGetCountriesQuery } from '../../../store/api/geoApi';
+import { CountryType } from '../../../type/country-type';
 // import {Logo} from '../../../assets/logo.svg';
 
 interface RegisterFormValues {
@@ -264,9 +266,10 @@ const Login: FC<ILoginProps> = ({ isSignUp }) => {
 										<>
 											<LegalAgentInfo formikRegister={formikRegister} />
 											<BusinessInfo formikRegister={formikRegister} />
+											<LocationInfo formikRegister={formikRegister} />
 											<div className='col-12'>
 												<Button
-													color='info'
+													color='primary'
 													className='w-100 py-3'
 													onClick={handleOnClick}>
 													Registrar
@@ -460,6 +463,7 @@ const LegalAgentInfo = ({
 		</Card>
 	);
 };
+
 const BusinessInfo = ({ formikRegister }: { formikRegister: FormikProps<RegisterFormValues> }) => {
 	const countryOptions = getCountries().map((country) => ({
 		value: country.dialCode,
@@ -704,6 +708,104 @@ const BusinessInfo = ({ formikRegister }: { formikRegister: FormikProps<Register
 								</div>
 							)}
 						</div>
+					</FormGroup>
+				</div>
+			</CardBody>
+		</Card>
+	);
+};
+
+const LocationInfo = ({ formikRegister }: { formikRegister: FormikProps<RegisterFormValues> }) => {
+	const { data } = useGetCountriesQuery({});
+
+	const [countries, setCountries] = useState<CountryType[]>([]);
+
+	useEffect(() => {
+		if (data) {
+			console.log('Countries data from API:', data);
+			// setCountries(data);
+		}
+	}, [data]);
+
+	return (
+		<Card className='shadow-3d-dark p-4 mb-4'>
+			<CardBody className='g-2 row'>
+				<div className='col-12'>
+					<h5>Ubicación</h5>
+				</div>
+				<div className='col-12 col-sm-6'>
+					<FormGroup id='nameLegalAgent' isFloating label='Nombres y apellidos'>
+						<Input
+							type='text'
+							autoComplete='nameLegalAgent'
+							value={formikRegister.values.nameLegalAgent}
+							isTouched={formikRegister.touched.nameLegalAgent}
+							invalidFeedback={formikRegister.errors.nameLegalAgent}
+							isValid={formikRegister.isValid}
+							onChange={formikRegister.handleChange}
+							onBlur={formikRegister.handleBlur}
+						/>
+					</FormGroup>
+				</div>
+				<div className='col-12 col-sm-6'>
+					<FormGroup id='ciLegalAgent' isFloating label='Identificación'>
+						<Input
+							type='text'
+							autoComplete='ciLegalAgent'
+							value={formikRegister.values.ciLegalAgent}
+							isTouched={formikRegister.touched.ciLegalAgent}
+							invalidFeedback={formikRegister.errors.ciLegalAgent}
+							isValid={formikRegister.isValid}
+							onChange={formikRegister.handleChange}
+							onBlur={formikRegister.handleBlur}
+						/>
+					</FormGroup>
+				</div>
+				{/* <div className='col-6 col-sm-3'>
+					<FormGroup id='prefixLegalAgent' label='Prefijo' isFloating>
+						<Select
+							ariaLabel='Prefijo'
+							placeholder='Seleccione un prefijo'
+							title='Prefijo'
+							list={countryOptions}
+							value={formikRegister.values.prefixLegalAgent}
+							isTouched={formikRegister.touched.prefixLegalAgent}
+							invalidFeedback={formikRegister.errors.prefixLegalAgent}
+							isValid={formikRegister.isValid}
+							onChange={formikRegister.handleChange}
+							onBlur={formikRegister.handleBlur}
+						/>
+					</FormGroup>
+				</div> */}
+				<div className='col-6 col-sm-3'>
+					<FormGroup id='phoneLegalAgent' isFloating label='Número de teléfono'>
+						<Input
+							type='tel'
+							autoComplete='phoneLegalAgent'
+							value={formikRegister.values.phoneLegalAgent}
+							isTouched={formikRegister.touched.phoneLegalAgent}
+							invalidFeedback={formikRegister.errors.phoneLegalAgent}
+							isValid={formikRegister.isValid}
+							onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+								const val = e.target.value.replace(/\D/g, '');
+								formikRegister.setFieldValue('phoneLegalAgent', val);
+							}}
+							onBlur={formikRegister.handleBlur}
+						/>
+					</FormGroup>
+				</div>
+				<div className='col-12 col-sm-6'>
+					<FormGroup id='addressLegalAgent' isFloating label='Dirección'>
+						<Input
+							type='text'
+							autoComplete='addressLegalAgent'
+							value={formikRegister.values.addressLegalAgent}
+							isTouched={formikRegister.touched.addressLegalAgent}
+							invalidFeedback={formikRegister.errors.addressLegalAgent}
+							isValid={formikRegister.isValid}
+							onChange={formikRegister.handleChange}
+							onBlur={formikRegister.handleBlur}
+						/>
 					</FormGroup>
 				</div>
 			</CardBody>

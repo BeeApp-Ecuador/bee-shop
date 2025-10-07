@@ -1,4 +1,5 @@
 export interface CountryType {
+	_id?: string;
 	name: string;
 	nameTranslations: any;
 	flag: string;
