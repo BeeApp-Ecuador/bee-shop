@@ -169,7 +169,7 @@ const BusinessInfo = ({ formikRegister }: { formikRegister: FormikProps<Register
 							)}
 
 							{/* Validación */}
-							{formikRegister.touched.img && formikRegister.errors.img && (
+							{formikRegister.errors.img && (
 								<div className='invalid-feedback d-block text-center'>
 									{formikRegister.errors.img}
 								</div>
@@ -239,7 +239,7 @@ const BusinessInfo = ({ formikRegister }: { formikRegister: FormikProps<Register
 							)}
 
 							{/* Validación */}
-							{formikRegister.touched.document && formikRegister.errors.document && (
+							{formikRegister.errors.document && (
 								<div className='invalid-feedback d-block text-center'>
 									{formikRegister.errors.document}
 								</div>

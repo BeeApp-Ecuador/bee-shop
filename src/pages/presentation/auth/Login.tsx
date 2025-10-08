@@ -173,6 +173,12 @@ const Login: FC<ILoginProps> = ({ isSignUp }) => {
 			if (!values.addressLegalAgent) {
 				errors.addressLegalAgent = 'Requerido';
 			}
+			if (!values.identificationLegal) {
+				errors.identificationLegal = 'Requerido';
+			}
+			if (values.identificationLegal === undefined) {
+				errors.identificationLegal = 'Requerido';
+			}
 
 			// Business Info Validations
 			if (!values.legalName) {
@@ -193,12 +199,17 @@ const Login: FC<ILoginProps> = ({ isSignUp }) => {
 			if (!values.description) {
 				errors.description = 'Requerido';
 			}
-
 			// File Validations
 			if (!values.img) {
 				errors.img = 'Requerido';
 			}
+			if (values.img === undefined) {
+				errors.img = 'Requerido';
+			}
 			if (!values.document) {
+				errors.document = 'Requerido';
+			}
+			if (values.document === undefined) {
 				errors.document = 'Requerido';
 			}
 
@@ -240,6 +251,8 @@ const Login: FC<ILoginProps> = ({ isSignUp }) => {
 
 		onSubmit(values, formikHelpers) {
 			console.log('Registering user...', values);
+			// TODO: Implement registration logic here
+			formikHelpers.resetForm();
 		},
 	});
 
@@ -258,19 +271,6 @@ const Login: FC<ILoginProps> = ({ isSignUp }) => {
 			}
 			setIsLoading(false);
 		}, 1000);
-		// setTimeout(() => {
-
-		// 	if (
-		// 		!Object.keys(USERS).find(
-		// 			(f) => USERS[f].username.toString() === formik.values.loginUsername,
-		// 		)
-		// 	) {
-		// 		formik.setFieldError('loginUsername', 'No such user found in the system.');
-		// 	} else {
-		// 		setSignInPassword(true);
-		// 	}
-		// 	setIsLoading(false);
-		// }, 1000);
 	};
 
 	return (
@@ -283,9 +283,13 @@ const Login: FC<ILoginProps> = ({ isSignUp }) => {
 					<div
 						className={classNames('shadow-3d-container', {
 							'col-xl-4 col-lg-6 col-md-8': !singUpStatus,
-							'w-100': singUpStatus, // Bootstrap no tiene w-80 por defecto
+							'w-100 mt-5 mb-5': singUpStatus, // Bootstrap no tiene w-80 por defecto
 						})}
-						style={singUpStatus ? { maxWidth: '80%' } : {}}>
+						style={
+							singUpStatus
+								? { maxWidth: '80%', transition: 'all 0.4s ease-in-out' }
+								: { transition: 'all 0.4s ease-in-out' }
+						}>
 						<Card className='shadow-3d-dark' data-tour='login-page'>
 							<CardBody>
 								<div className='text-center my-5'>
