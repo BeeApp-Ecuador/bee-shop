@@ -161,12 +161,11 @@ const LegalAgentInfo = ({
 							)}
 
 							{/* Validación */}
-							{formikRegister.touched.identificationLegal &&
-								formikRegister.errors.identificationLegal && (
-									<div className='invalid-feedback d-block text-center'>
-										{formikRegister.errors.identificationLegal}
-									</div>
-								)}
+							{formikRegister.errors.identificationLegal && (
+								<div className='invalid-feedback d-block text-center'>
+									{formikRegister.errors.identificationLegal}
+								</div>
+							)}
 						</div>
 					</FormGroup>
 				</div>
