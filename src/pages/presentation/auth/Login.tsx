@@ -13,12 +13,18 @@ import useDarkMode from '../../../hooks/useDarkMode';
 import AuthContext from '../../../contexts/authContext';
 import { getUserDataWithUsername } from '../../../common/data/userDummyData';
 // import Spinner from '../../../components/bootstrap/Spinner';
-import { useLazyCheckEmailQuery } from '../../../store/api/authApi';
+import { useLazyCheckEmailQuery, useRegisterMutation } from '../../../store/api/authApi';
 import { File } from 'buffer';
 import LegalAgentInfo from './components/LegalAgentInfo';
 import BusinessInfo from './components/BusinessInfo';
 import LocationInfo from './components/LocationInfo';
 import SessionInfo from './components/SessionInfo';
+import Modal, {
+	ModalBody,
+	ModalFooter,
+	ModalHeader,
+	ModalTitle,
+} from '../../../components/bootstrap/Modal';
 // import {Logo} from '../../../assets/logo.svg';
 
 export interface RegisterFormValues {
@@ -36,7 +42,7 @@ export interface RegisterFormValues {
 	prefix: string;
 	phone: string;
 	img: File | null;
-	document: File | null;
+	identificationBusiness: File | null;
 	// Location Info
 	country: string;
 	province: string;
@@ -80,9 +86,12 @@ const Login: FC<ILoginProps> = ({ isSignUp }) => {
 
 	const [signInPassword, setSignInPassword] = useState<boolean>(false);
 	const [singUpStatus, setSingUpStatus] = useState<boolean>(!!isSignUp);
+	const [isOpen, setIsOpen] = useState(false);
+	const [error, setError] = useState<string>('');
 
 	const navigate = useNavigate();
 	const handleOnClick = useCallback(() => navigate('/'), [navigate]);
+	const [registerShop] = useRegisterMutation();
 
 	const usernameCheck = (username: string) => {
 		return !!getUserDataWithUsername(username);
@@ -143,7 +152,7 @@ const Login: FC<ILoginProps> = ({ isSignUp }) => {
 			prefix: '',
 			phone: '',
 			img: null,
-			document: null,
+			identificationBusiness: null,
 			// Location Info
 			country: '',
 			province: '',
@@ -249,10 +258,39 @@ const Login: FC<ILoginProps> = ({ isSignUp }) => {
 			return errors;
 		},
 
-		onSubmit(values, formikHelpers) {
+		onSubmit: async (values, formikHelpers) => {
 			console.log('Registering user...', values);
-			// TODO: Implement registration logic here
-			formikHelpers.resetForm();
+			const formData = new FormData();
+
+			for (const key in values) {
+				formData.append(key, values[key]);
+			}
+
+			const { data, error } = await registerShop(formData);
+			if (error) {
+				console.error('Registration failed, error:', error);
+				if (error && 'status' in error && error.status === 409) {
+					formikHelpers.setFieldError('email', 'Email ya está en uso.');
+					setError('El email ya está en uso.');
+					setIsOpen(true);
+				}
+				return;
+			} else {
+				console.log('Registration successful, payload:', data);
+			}
+			// .unwrap()
+			// .then((payload) => {
+			// 	console.log('Registration successful, payload:', payload);
+			// })
+			// .catch((error) => {
+			// 	console.error('Registration failed, error:', error);
+			// 	if (error && error.status === 409) {
+			// 		formikHelpers.setFieldError('email', 'Email ya está en uso.');
+			// 		setError('El email ya está en uso.');
+			// 		setIsOpen(true);
+			// 	}
+			// });
+			// formikHelpers.resetForm();
 		},
 	});
 
@@ -449,6 +487,35 @@ const Login: FC<ILoginProps> = ({ isSignUp }) => {
 						</div>
 					</div>
 				</div>
+				<Modal
+					isOpen={isOpen}
+					setIsOpen={setIsOpen}
+					titleId='exampleModalLabel'
+					// isStaticBackdrop={staticBackdropStatus}
+					// isScrollable={scrollableStatus}
+					isCentered={true}
+					size='sm'
+					// fullScreen={fullScreenStatus}
+					isAnimation={true}>
+					<ModalHeader setIsOpen={() => setIsOpen(!isOpen)}>
+						<ModalTitle id='exampleModalLabel'>Advertencia</ModalTitle>
+					</ModalHeader>
+					<ModalBody>
+						<p>{error}</p>
+					</ModalBody>
+					<ModalFooter>
+						<Button
+							color='danger'
+							isOutline
+							className='border-0'
+							onClick={() => setIsOpen(false)}>
+							Close
+						</Button>
+						{/* <Button color='info' icon='Save'>
+							Save changes
+						</Button> */}
+					</ModalFooter>
+				</Modal>
 			</Page>
 		</PageWrapper>
 	);
