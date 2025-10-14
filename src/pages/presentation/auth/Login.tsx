@@ -13,7 +13,11 @@ import useDarkMode from '../../../hooks/useDarkMode';
 import AuthContext from '../../../contexts/authContext';
 import { getUserDataWithUsername } from '../../../common/data/userDummyData';
 // import Spinner from '../../../components/bootstrap/Spinner';
-import { useLazyCheckEmailQuery, useRegisterMutation } from '../../../store/api/authApi';
+import {
+	useLazyCheckEmailQuery,
+	useRegisterMutation,
+	useSendEmailVerificationMutation,
+} from '../../../store/api/authApi';
 import { File } from 'buffer';
 import LegalAgentInfo from './components/LegalAgentInfo';
 import BusinessInfo from './components/BusinessInfo';
@@ -26,6 +30,7 @@ import Modal, {
 	ModalTitle,
 } from '../../../components/bootstrap/Modal';
 import Spinner from '../../../components/bootstrap/Spinner';
+import VerifyCode from './components/VerifyCode';
 // import {Logo} from '../../../assets/logo.svg';
 
 export interface RegisterFormValues {
@@ -88,11 +93,13 @@ const Login: FC<ILoginProps> = ({ isSignUp }) => {
 	const [signInPassword, setSignInPassword] = useState<boolean>(false);
 	const [singUpStatus, setSingUpStatus] = useState<boolean>(!!isSignUp);
 	const [isOpen, setIsOpen] = useState(false);
+	const [showVerifyCode, setShowVerifyCode] = useState(false);
 	const [error, setError] = useState<string>('');
 
 	const navigate = useNavigate();
 	const handleOnClick = useCallback(() => navigate('/'), [navigate]);
 	const [registerShop] = useRegisterMutation();
+	const [checkEmailExists] = useSendEmailVerificationMutation();
 
 	const usernameCheck = (username: string) => {
 		return !!getUserDataWithUsername(username);
@@ -216,11 +223,11 @@ const Login: FC<ILoginProps> = ({ isSignUp }) => {
 			if (values.img === undefined) {
 				errors.img = 'Requerido';
 			}
-			if (!values.document) {
-				errors.document = 'Requerido';
+			if (!values.identificationBusiness) {
+				errors.identificationBusiness = 'Requerido';
 			}
-			if (values.document === undefined) {
-				errors.document = 'Requerido';
+			if (values.identificationBusiness === undefined) {
+				errors.identificationBusiness = 'Requerido';
 			}
 
 			// Location Info Validations
@@ -260,42 +267,53 @@ const Login: FC<ILoginProps> = ({ isSignUp }) => {
 		},
 
 		onSubmit: async (values, formikHelpers) => {
+			console.log('Registering user...', values);
 			setIsLoading(true);
 
-			console.log('Registering user...', values);
 			const formData = new FormData();
 
 			for (const key in values) {
 				formData.append(key, values[key]);
 			}
+			// setIsLoading(false);
 
-			const { data, error } = await registerShop(formData);
-			if (error) {
+			console.log({
+				email: values.email,
+				role: 'SHOP',
+			});
+
+			const { data: dataEmail, error: errorEmail } = await checkEmailExists({
+				email: values.email,
+				role: 'SHOP',
+			});
+
+			if (errorEmail) {
 				setIsLoading(false);
-				console.error('Registration failed, error:', error);
-				if (error && 'status' in error && error.status === 409) {
-					formikHelpers.setFieldError('email', 'Email ya está en uso.');
-					setError('El email ya está en uso.');
-					setIsOpen(true);
-				}
+				setError('Error al enviar el correo de verificación.');
+				setIsOpen(true);
 				return;
-			} else {
-				setIsLoading(false);
-				console.log('Registration successful, payload:', data);
 			}
-			// .unwrap()
-			// .then((payload) => {
-			// 	console.log('Registration successful, payload:', payload);
-			// })
-			// .catch((error) => {
+
+			if (dataEmail && dataEmail.statusCode === 201) {
+				setIsLoading(false);
+				console.log(dataEmail);
+				setShowVerifyCode(true);
+			}
+
+			// const { data, error } = await registerShop(formData);
+			// if (error) {
+			// 	setIsLoading(false);
 			// 	console.error('Registration failed, error:', error);
-			// 	if (error && error.status === 409) {
+			// 	if (error && 'status' in error && error.status === 409) {
 			// 		formikHelpers.setFieldError('email', 'Email ya está en uso.');
 			// 		setError('El email ya está en uso.');
 			// 		setIsOpen(true);
 			// 	}
-			// });
-			// formikHelpers.resetForm();
+			// 	return;
+			// } else {
+			// 	setIsLoading(false);
+			// 	console.log('Registration successful, payload:', data);
+			// }
 		},
 	});
 
@@ -398,6 +416,14 @@ const Login: FC<ILoginProps> = ({ isSignUp }) => {
 											<BusinessInfo formikRegister={formikRegister} />
 											<LocationInfo formikRegister={formikRegister} />
 											<SessionInfo formikRegister={formikRegister} />
+
+											{showVerifyCode && (
+												<VerifyCode
+													onComplete={(code) =>
+														console.log('Código verificado:', code)
+													}
+												/>
+											)}
 											<div className='col-12'>
 												<Button
 													color='primary'

@@ -30,7 +30,19 @@ export const authApi = createApi({
 				body,
 			}),
 		}),
+		sendEmailVerification: builder.mutation({
+			query: (body) => ({
+				url: 'api/v2/messages/validate/email',
+				method: 'POST',
+				body,
+			}),
+		}),
 	}),
 });
 
-export const { useLazyCheckEmailQuery, useLoginMutation, useRegisterMutation } = authApi;
+export const {
+	useLazyCheckEmailQuery,
+	useLoginMutation,
+	useRegisterMutation,
+	useSendEmailVerificationMutation,
+} = authApi;
