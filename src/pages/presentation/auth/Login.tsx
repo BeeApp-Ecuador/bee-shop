@@ -25,6 +25,7 @@ import Modal, {
 	ModalHeader,
 	ModalTitle,
 } from '../../../components/bootstrap/Modal';
+import Spinner from '../../../components/bootstrap/Spinner';
 // import {Logo} from '../../../assets/logo.svg';
 
 export interface RegisterFormValues {
@@ -259,6 +260,8 @@ const Login: FC<ILoginProps> = ({ isSignUp }) => {
 		},
 
 		onSubmit: async (values, formikHelpers) => {
+			setIsLoading(true);
+
 			console.log('Registering user...', values);
 			const formData = new FormData();
 
@@ -268,6 +271,7 @@ const Login: FC<ILoginProps> = ({ isSignUp }) => {
 
 			const { data, error } = await registerShop(formData);
 			if (error) {
+				setIsLoading(false);
 				console.error('Registration failed, error:', error);
 				if (error && 'status' in error && error.status === 409) {
 					formikHelpers.setFieldError('email', 'Email ya está en uso.');
@@ -276,6 +280,7 @@ const Login: FC<ILoginProps> = ({ isSignUp }) => {
 				}
 				return;
 			} else {
+				setIsLoading(false);
 				console.log('Registration successful, payload:', data);
 			}
 			// .unwrap()
@@ -397,7 +402,11 @@ const Login: FC<ILoginProps> = ({ isSignUp }) => {
 												<Button
 													color='primary'
 													className='w-100 py-3'
+													isDisable={isLoading}
 													onClick={formikRegister.handleSubmit}>
+													{isLoading && (
+														<Spinner isSmall inButton isGrow />
+													)}
 													Registrar
 												</Button>
 											</div>
