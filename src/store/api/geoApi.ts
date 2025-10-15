@@ -22,6 +22,7 @@ export const geoApi = createApi({
 			getCountries: builder.query({
 				query: () => ({
 					url: `api/v2/country`,
+					params: { available: 'shop' },
 				}),
 			}),
 			getStates: builder.query({
