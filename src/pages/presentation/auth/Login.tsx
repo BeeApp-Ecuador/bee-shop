@@ -202,6 +202,7 @@ const Login: FC<ILoginProps> = ({ isSignUp }) => {
 			prefixLegalAgent: '',
 			phoneLegalAgent: '',
 			addressLegalAgent: '',
+			identificationLegal: null,
 			// Bussiness Info
 			legalName: '',
 			businessName: '',
@@ -334,7 +335,8 @@ const Login: FC<ILoginProps> = ({ isSignUp }) => {
 
 			return errors;
 		},
-
+		validateOnChange: false,
+		validateOnBlur: true,
 		onSubmit: async (values, formikHelpers) => {
 			setIsLoading(true);
 			await handleSendCode(values.email);
