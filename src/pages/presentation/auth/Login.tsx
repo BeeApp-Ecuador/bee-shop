@@ -103,6 +103,12 @@ const Login: FC<ILoginProps> = ({ isSignUp }) => {
 	const handleSendCode = async (email: string) => {
 		const { data, error } = await sendCode({ email, role: 'SHOP' });
 		if (error) {
+			console.log(error);
+			if (error && 'status' in error && error.status === 409) {
+				setError('El email ya está en uso.');
+				setIsOpen(true);
+				return;
+			}
 			setError('Error al enviar el correo de verificación.');
 			setIsOpen(true);
 			return;
@@ -196,6 +202,7 @@ const Login: FC<ILoginProps> = ({ isSignUp }) => {
 			prefixLegalAgent: '',
 			phoneLegalAgent: '',
 			addressLegalAgent: '',
+			identificationLegal: null,
 			// Bussiness Info
 			legalName: '',
 			businessName: '',
@@ -328,7 +335,8 @@ const Login: FC<ILoginProps> = ({ isSignUp }) => {
 
 			return errors;
 		},
-
+		validateOnChange: false,
+		validateOnBlur: true,
 		onSubmit: async (values, formikHelpers) => {
 			setIsLoading(true);
 			await handleSendCode(values.email);
