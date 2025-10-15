@@ -1,7 +1,7 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { FormikProps } from 'formik';
 import Card, { CardBody } from '../../../../components/bootstrap/Card';
-import { getCountries } from '../../../../utils/getCountries';
+import { getCountries, getCountryByDialCode } from '../../../../utils/getCountries';
 import { RegisterFormValues } from '../Login';
 import FormGroup from '../../../../components/bootstrap/forms/FormGroup';
 import Input from '../../../../components/bootstrap/forms/Input';
@@ -17,6 +17,9 @@ const LegalAgentInfo = ({
 		label: `${country.flag} +${country.dialCode} ${country.name}`,
 		text: `+${country.dialCode} ${country.name}`,
 	}));
+	const [maxLength, setMaxLength] = useState(9);
+	const [minLength, setMinLength] = useState(0);
+
 	return (
 		<Card className='shadow-3d-dark p-4 mb-4'>
 			<CardBody className='g-2 row'>
@@ -49,7 +52,14 @@ const LegalAgentInfo = ({
 							isTouched={formikRegister.touched.prefixLegalAgent}
 							invalidFeedback={formikRegister.errors.prefixLegalAgent}
 							isValid={formikRegister.isValid}
-							onChange={formikRegister.handleChange}
+							onChange={(e) => {
+								formikRegister.setFieldValue('phoneLegalAgent', '');
+								formikRegister.handleChange(e);
+								const country = getCountryByDialCode(e.target.value);
+								console.log(country);
+								setMaxLength(country?.maxLength || 9);
+								setMinLength(country?.minLength || 0);
+							}}
 							onBlur={formikRegister.handleBlur}
 						/>
 					</FormGroup>
@@ -64,10 +74,16 @@ const LegalAgentInfo = ({
 							invalidFeedback={formikRegister.errors.phoneLegalAgent}
 							isValid={formikRegister.isValid}
 							onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
-								const val = e.target.value.replace(/\D/g, '');
+								let val = e.target.value.replace(/\D/g, '');
+
+								// Evita escribir más de lo permitido
+								if (val.length > maxLength) val = val.slice(0, maxLength);
+
 								formikRegister.setFieldValue('phoneLegalAgent', val);
 							}}
 							onBlur={formikRegister.handleBlur}
+							max={maxLength}
+							min={minLength}
 						/>
 					</FormGroup>
 				</div>

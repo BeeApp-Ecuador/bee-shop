@@ -1,4 +1,4 @@
-import React, { FC, useCallback, useContext, useEffect, useState } from 'react';
+import React, { FC, useCallback, useContext, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import classNames from 'classnames';
 import { FormikHelpers, useFormik } from 'formik';
@@ -8,16 +8,13 @@ import Card, { CardBody } from '../../../components/bootstrap/Card';
 import FormGroup from '../../../components/bootstrap/forms/FormGroup';
 import Input from '../../../components/bootstrap/forms/Input';
 import Button from '../../../components/bootstrap/Button';
-// import Logo from '../../../components/Logo';
 import useDarkMode from '../../../hooks/useDarkMode';
 import AuthContext from '../../../contexts/authContext';
 import { getUserDataWithUsername } from '../../../common/data/userDummyData';
-// import Spinner from '../../../components/bootstrap/Spinner';
 import {
 	useLazyCheckEmailQuery,
 	useRegisterMutation,
 	useSendEmailVerificationMutation,
-	useVerifyCodeMutation,
 } from '../../../store/api/authApi';
 import { File } from 'buffer';
 import LegalAgentInfo from './components/LegalAgentInfo';
@@ -32,7 +29,7 @@ import Modal, {
 } from '../../../components/bootstrap/Modal';
 import Spinner from '../../../components/bootstrap/Spinner';
 import VerifyCode from './components/VerifyCode';
-// import {Logo} from '../../../assets/logo.svg';
+import { getCountryByDialCode } from '../../../utils/getCountries';
 
 export interface RegisterFormValues {
 	nameLegalAgent: string;
@@ -233,6 +230,13 @@ const Login: FC<ILoginProps> = ({ isSignUp }) => {
 			}
 			if (!values.phoneLegalAgent) {
 				errors.phoneLegalAgent = 'Requerido';
+			}
+			console.log('prefix', values.prefixLegalAgent);
+			const country = getCountryByDialCode(values.prefixLegalAgent);
+			console.log(country);
+
+			if (values.phoneLegalAgent && values.phoneLegalAgent.length < country!.minLength!) {
+				errors.phoneLegalAgent = 'Número de teléfono muy corto';
 			}
 			if (!values.addressLegalAgent) {
 				errors.addressLegalAgent = 'Requerido';
