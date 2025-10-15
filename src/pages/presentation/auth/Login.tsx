@@ -263,6 +263,10 @@ const Login: FC<ILoginProps> = ({ isSignUp }) => {
 			if (!values.phone) {
 				errors.phone = 'Requerido';
 			}
+			const countryBusiness = getCountryByDialCode(values.prefix);
+			if (values.phone && values.phone.length < countryBusiness!.minLength!) {
+				errors.phone = 'Número de teléfono inválido';
+			}
 			if (!values.description) {
 				errors.description = 'Requerido';
 			}
