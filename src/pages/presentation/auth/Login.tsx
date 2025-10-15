@@ -231,12 +231,11 @@ const Login: FC<ILoginProps> = ({ isSignUp }) => {
 			if (!values.phoneLegalAgent) {
 				errors.phoneLegalAgent = 'Requerido';
 			}
-			console.log('prefix', values.prefixLegalAgent);
+
 			const country = getCountryByDialCode(values.prefixLegalAgent);
-			console.log(country);
 
 			if (values.phoneLegalAgent && values.phoneLegalAgent.length < country!.minLength!) {
-				errors.phoneLegalAgent = 'Número de teléfono muy corto';
+				errors.phoneLegalAgent = 'Número de teléfono inválido';
 			}
 			if (!values.addressLegalAgent) {
 				errors.addressLegalAgent = 'Requerido';
