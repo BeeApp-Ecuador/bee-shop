@@ -29,6 +29,7 @@ import Modal, {
 } from '../../../components/bootstrap/Modal';
 import Spinner from '../../../components/bootstrap/Spinner';
 import VerifyCode from './components/VerifyCode';
+import { getCountryByDialCode } from '../../../utils/getCountries';
 
 export interface RegisterFormValues {
 	nameLegalAgent: string;
@@ -229,6 +230,13 @@ const Login: FC<ILoginProps> = ({ isSignUp }) => {
 			}
 			if (!values.phoneLegalAgent) {
 				errors.phoneLegalAgent = 'Requerido';
+			}
+			console.log('prefix', values.prefixLegalAgent);
+			const country = getCountryByDialCode(values.prefixLegalAgent);
+			console.log(country);
+
+			if (values.phoneLegalAgent && values.phoneLegalAgent.length < country!.minLength!) {
+				errors.phoneLegalAgent = 'Número de teléfono muy corto';
 			}
 			if (!values.addressLegalAgent) {
 				errors.addressLegalAgent = 'Requerido';
