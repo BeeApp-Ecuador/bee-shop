@@ -179,7 +179,7 @@ const BusinessInfo = ({ formikRegister }: { formikRegister: FormikProps<Register
 				</div>
 
 				<div className='col-12 col-sm-6'>
-					<FormGroup id='document'>
+					<FormGroup id='identificationBusiness'>
 						<div className='d-flex flex-column align-items-center'>
 							<label htmlFor='document-upload' className='btn btn-outline-primary'>
 								Subir Documento
@@ -193,7 +193,7 @@ const BusinessInfo = ({ formikRegister }: { formikRegister: FormikProps<Register
 								onChange={(event) => {
 									if (event.currentTarget.files) {
 										formikRegister.setFieldValue(
-											'document',
+											'identificationBusiness',
 											event.currentTarget.files[0],
 										);
 									}
@@ -202,9 +202,10 @@ const BusinessInfo = ({ formikRegister }: { formikRegister: FormikProps<Register
 							/>
 
 							{/* Ícono del PDF */}
-							{formikRegister.values.document && (
+							{formikRegister.values.identificationBusiness && (
 								<div className='mt-2 text-center'>
-									{formikRegister.values.document.type === 'application/pdf' ? (
+									{formikRegister.values.identificationBusiness.type ===
+									'application/pdf' ? (
 										<img
 											className='img-fluid'
 											style={{
@@ -218,7 +219,7 @@ const BusinessInfo = ({ formikRegister }: { formikRegister: FormikProps<Register
 									) : (
 										<img
 											src={URL.createObjectURL(
-												formikRegister.values.document!,
+												formikRegister.values.identificationBusiness!,
 											)}
 											alt='Vista previa'
 											className='rounded'
@@ -233,15 +234,15 @@ const BusinessInfo = ({ formikRegister }: { formikRegister: FormikProps<Register
 									<div
 										className='mt-1 text-truncate'
 										style={{ maxWidth: '150px' }}>
-										{formikRegister.values.document!.name}
+										{formikRegister.values.identificationBusiness!.name}
 									</div>
 								</div>
 							)}
 
 							{/* Validación */}
-							{formikRegister.errors.document && (
+							{formikRegister.errors.identificationBusiness && (
 								<div className='invalid-feedback d-block text-center'>
-									{formikRegister.errors.document}
+									{formikRegister.errors.identificationBusiness}
 								</div>
 							)}
 						</div>

@@ -1,7 +1,7 @@
-import React, { FC, useCallback, useContext, useState } from 'react';
+import React, { FC, useCallback, useContext, useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import classNames from 'classnames';
-import { useFormik } from 'formik';
+import { FormikHelpers, useFormik } from 'formik';
 import PageWrapper from '../../../layout/PageWrapper/PageWrapper';
 import Page from '../../../layout/Page/Page';
 import Card, { CardBody } from '../../../components/bootstrap/Card';
@@ -13,12 +13,25 @@ import useDarkMode from '../../../hooks/useDarkMode';
 import AuthContext from '../../../contexts/authContext';
 import { getUserDataWithUsername } from '../../../common/data/userDummyData';
 // import Spinner from '../../../components/bootstrap/Spinner';
-import { useLazyCheckEmailQuery } from '../../../store/api/authApi';
+import {
+	useLazyCheckEmailQuery,
+	useRegisterMutation,
+	useSendEmailVerificationMutation,
+	useVerifyCodeMutation,
+} from '../../../store/api/authApi';
 import { File } from 'buffer';
 import LegalAgentInfo from './components/LegalAgentInfo';
 import BusinessInfo from './components/BusinessInfo';
 import LocationInfo from './components/LocationInfo';
 import SessionInfo from './components/SessionInfo';
+import Modal, {
+	ModalBody,
+	ModalFooter,
+	ModalHeader,
+	ModalTitle,
+} from '../../../components/bootstrap/Modal';
+import Spinner from '../../../components/bootstrap/Spinner';
+import VerifyCode from './components/VerifyCode';
 // import {Logo} from '../../../assets/logo.svg';
 
 export interface RegisterFormValues {
@@ -36,7 +49,7 @@ export interface RegisterFormValues {
 	prefix: string;
 	phone: string;
 	img: File | null;
-	document: File | null;
+	identificationBusiness: File | null;
 	// Location Info
 	country: string;
 	province: string;
@@ -80,9 +93,60 @@ const Login: FC<ILoginProps> = ({ isSignUp }) => {
 
 	const [signInPassword, setSignInPassword] = useState<boolean>(false);
 	const [singUpStatus, setSingUpStatus] = useState<boolean>(!!isSignUp);
+	const [isOpen, setIsOpen] = useState(false);
+	const [showVerifyCode, setShowVerifyCode] = useState(false);
+	const [error, setError] = useState<string>('');
 
 	const navigate = useNavigate();
 	const handleOnClick = useCallback(() => navigate('/'), [navigate]);
+	const [registerShop] = useRegisterMutation();
+	const [sendCode] = useSendEmailVerificationMutation();
+	const [showSuccess, setShowSuccess] = useState(false);
+
+	const handleSendCode = async (email: string) => {
+		const { data, error } = await sendCode({ email, role: 'SHOP' });
+		if (error) {
+			setError('Error al enviar el correo de verificación.');
+			setIsOpen(true);
+			return;
+		}
+		if (data && data.statusCode === 201) {
+			setShowVerifyCode(true);
+		}
+	};
+
+	const handleRegister = async (
+		values: RegisterFormValues,
+		formikHelpers: FormikHelpers<RegisterFormValues>,
+	) => {
+		const formData = new FormData();
+
+		for (const key in values) {
+			formData.append(key, values[key]);
+		}
+		const { data, error } = await registerShop(formData);
+		if (error) {
+			setIsLoading(false);
+			console.error('Registration failed, error:', error);
+			if (error && 'status' in error && error.status === 409) {
+				formikHelpers.setFieldError('email', 'Email ya está en uso.');
+				setError('El email ya está en uso.');
+				setIsOpen(true);
+			}
+			return;
+		} else {
+			setIsLoading(false);
+			if (data && data.statusCode === 201) {
+				setShowVerifyCode(false);
+				setShowSuccess(true);
+				formikRegister.resetForm();
+				// setTimeout(() => {
+				// 	setShowSuccess(false);
+				// 	setSingUpStatus(false);
+				// }, 2000);
+			}
+		}
+	};
 
 	const usernameCheck = (username: string) => {
 		return !!getUserDataWithUsername(username);
@@ -143,7 +207,7 @@ const Login: FC<ILoginProps> = ({ isSignUp }) => {
 			prefix: '',
 			phone: '',
 			img: null,
-			document: null,
+			identificationBusiness: null,
 			// Location Info
 			country: '',
 			province: '',
@@ -206,11 +270,11 @@ const Login: FC<ILoginProps> = ({ isSignUp }) => {
 			if (values.img === undefined) {
 				errors.img = 'Requerido';
 			}
-			if (!values.document) {
-				errors.document = 'Requerido';
+			if (!values.identificationBusiness) {
+				errors.identificationBusiness = 'Requerido';
 			}
-			if (values.document === undefined) {
-				errors.document = 'Requerido';
+			if (values.identificationBusiness === undefined) {
+				errors.identificationBusiness = 'Requerido';
 			}
 
 			// Location Info Validations
@@ -249,10 +313,10 @@ const Login: FC<ILoginProps> = ({ isSignUp }) => {
 			return errors;
 		},
 
-		onSubmit(values, formikHelpers) {
-			console.log('Registering user...', values);
-			// TODO: Implement registration logic here
-			formikHelpers.resetForm();
+		onSubmit: async (values, formikHelpers) => {
+			setIsLoading(true);
+			await handleSendCode(values.email);
+			setIsLoading(false);
 		},
 	});
 
@@ -355,11 +419,16 @@ const Login: FC<ILoginProps> = ({ isSignUp }) => {
 											<BusinessInfo formikRegister={formikRegister} />
 											<LocationInfo formikRegister={formikRegister} />
 											<SessionInfo formikRegister={formikRegister} />
+
 											<div className='col-12'>
 												<Button
 													color='primary'
 													className='w-100 py-3'
+													isDisable={isLoading}
 													onClick={formikRegister.handleSubmit}>
+													{isLoading && (
+														<Spinner isSmall inButton isGrow />
+													)}
 													Registrar
 												</Button>
 											</div>
@@ -449,6 +518,87 @@ const Login: FC<ILoginProps> = ({ isSignUp }) => {
 						</div>
 					</div>
 				</div>
+				<Modal
+					isOpen={isOpen}
+					setIsOpen={setIsOpen}
+					titleId='exampleModalLabel'
+					// isStaticBackdrop={staticBackdropStatus}
+					// isScrollable={scrollableStatus}
+					isCentered={true}
+					size='sm'
+					// fullScreen={fullScreenStatus}
+					isAnimation={true}>
+					<ModalHeader setIsOpen={() => setIsOpen(!isOpen)}>
+						<ModalTitle id='exampleModalLabel'>Advertencia</ModalTitle>
+					</ModalHeader>
+					<ModalBody>
+						<p>{error}</p>
+					</ModalBody>
+					<ModalFooter>
+						<Button
+							color='danger'
+							isOutline
+							className='border-0'
+							onClick={() => setIsOpen(false)}>
+							Close
+						</Button>
+						{/* <Button color='info' icon='Save'>
+							Save changes
+						</Button> */}
+					</ModalFooter>
+				</Modal>
+				<Modal
+					isOpen={showVerifyCode}
+					setIsOpen={setShowVerifyCode}
+					titleId='verifyCodeModalLabel'
+					// isStaticBackdrop={staticBackdropStatus}
+					// isScrollable={scrollableStatus}
+					isCentered={true}
+					size='lg'
+					// fullScreen={fullScreenStatus}
+					isAnimation={true}>
+					<ModalHeader setIsOpen={() => setShowVerifyCode(!showVerifyCode)}>
+						<ModalTitle id='verifyCodeModalLabel'>Verificar código</ModalTitle>
+					</ModalHeader>
+					<ModalBody>
+						<VerifyCode
+							email={formikRegister.values.email}
+							onComplete={async () =>
+								handleRegister(formikRegister.values, formikRegister)
+							}
+							resendCode={() => handleSendCode(formikRegister.values.email)}
+						/>
+					</ModalBody>
+				</Modal>
+				<Modal
+					isOpen={showSuccess}
+					setIsOpen={setShowSuccess}
+					titleId='successModalLabel'
+					// isStaticBackdrop={staticBackdropStatus}
+					// isScrollable={scrollableStatus}
+					isCentered={true}
+					size='sm'
+					// fullScreen={fullScreenStatus}
+					isAnimation={true}>
+					<ModalHeader setIsOpen={() => setShowSuccess(!showSuccess)}>
+						<ModalTitle id='successModalLabel'>Éxito</ModalTitle>
+					</ModalHeader>
+					<ModalBody>
+						<p>Registro completado con éxito. Por favor, inicia sesión.</p>
+					</ModalBody>
+					<ModalFooter>
+						<Button
+							color='success'
+							isOutline
+							className='border-0'
+							onClick={() => {
+								setSingUpStatus(false);
+								return setShowSuccess(false);
+							}}>
+							Ok
+						</Button>
+					</ModalFooter>
+				</Modal>
 			</Page>
 		</PageWrapper>
 	);
