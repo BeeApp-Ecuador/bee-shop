@@ -37,6 +37,13 @@ export const authApi = createApi({
 				body,
 			}),
 		}),
+		verifyCode: builder.mutation({
+			query: (body) => ({
+				url: 'api/v2/messages/validate/code',
+				method: 'POST',
+				body,
+			}),
+		}),
 	}),
 });
 
@@ -45,4 +52,5 @@ export const {
 	useLoginMutation,
 	useRegisterMutation,
 	useSendEmailVerificationMutation,
+	useVerifyCodeMutation,
 } = authApi;

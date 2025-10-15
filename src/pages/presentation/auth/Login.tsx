@@ -17,6 +17,7 @@ import {
 	useLazyCheckEmailQuery,
 	useRegisterMutation,
 	useSendEmailVerificationMutation,
+	useVerifyCodeMutation,
 } from '../../../store/api/authApi';
 import { File } from 'buffer';
 import LegalAgentInfo from './components/LegalAgentInfo';
@@ -100,6 +101,7 @@ const Login: FC<ILoginProps> = ({ isSignUp }) => {
 	const handleOnClick = useCallback(() => navigate('/'), [navigate]);
 	const [registerShop] = useRegisterMutation();
 	const [sendCode] = useSendEmailVerificationMutation();
+	const [verifyCode] = useVerifyCodeMutation();
 
 	const handleSendCode = async (email: string) => {
 		const { data, error } = await sendCode({ email, role: 'SHOP' });
@@ -552,9 +554,9 @@ const Login: FC<ILoginProps> = ({ isSignUp }) => {
 					</ModalHeader>
 					<ModalBody>
 						<VerifyCode
-							onComplete={(code) =>
-								handleRegister(formikRegister.values, formikRegister)
-							}
+							onComplete={async (code) => {
+								return handleRegister(formikRegister.values, formikRegister);
+							}}
 							resendCode={() => handleSendCode(formikRegister.values.email)}
 						/>
 					</ModalBody>
