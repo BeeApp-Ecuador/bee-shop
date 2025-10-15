@@ -310,6 +310,15 @@ const Login: FC<ILoginProps> = ({ isSignUp }) => {
 			} else if (values.password.length < 6) {
 				errors.password = 'La contraseña debe tener al menos 6 caracteres';
 			}
+			// password must contain at least one uppercase letter, one lowercase letter, one number and one special character
+			else if (
+				!/(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{6,}/.test(
+					values.password,
+				)
+			) {
+				errors.password =
+					'La contraseña debe contener al menos una letra mayúscula, una letra minúscula, un número y uno de estos caracteres especiales (@ $ ! % * ? &)';
+			}
 
 			if (!values.confirmPassword) {
 				errors.confirmPassword = 'Requerido';
