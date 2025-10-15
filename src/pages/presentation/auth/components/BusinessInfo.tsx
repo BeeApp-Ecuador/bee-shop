@@ -1,7 +1,7 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { FormikProps } from 'formik';
 import Card, { CardBody } from '../../../../components/bootstrap/Card';
-import { getCountries } from '../../../../utils/getCountries';
+import { getCountries, getCountryByDialCode } from '../../../../utils/getCountries';
 import { RegisterFormValues } from '../Login';
 import FormGroup from '../../../../components/bootstrap/forms/FormGroup';
 import Input from '../../../../components/bootstrap/forms/Input';
@@ -14,7 +14,8 @@ const BusinessInfo = ({ formikRegister }: { formikRegister: FormikProps<Register
 		label: `${country.flag} +${country.dialCode} ${country.name}`,
 		text: `+${country.dialCode} ${country.name}`,
 	}));
-
+	const [maxLength, setMaxLength] = useState(9);
+	const [minLength, setMinLength] = useState(0);
 	return (
 		<Card className='shadow-3d-dark p-4 mb-4'>
 			<CardBody className='g-2 row'>
@@ -66,7 +67,13 @@ const BusinessInfo = ({ formikRegister }: { formikRegister: FormikProps<Register
 							isTouched={formikRegister.touched.prefix}
 							invalidFeedback={formikRegister.errors.prefix}
 							isValid={formikRegister.isValid}
-							onChange={formikRegister.handleChange}
+							onChange={(e) => {
+								formikRegister.setFieldValue('phone', '');
+								formikRegister.handleChange(e);
+								const country = getCountryByDialCode(e.target.value);
+								setMaxLength(country?.maxLength || 9);
+								setMinLength(country?.minLength || 0);
+							}}
 							onBlur={formikRegister.handleBlur}
 						/>
 					</FormGroup>
@@ -82,7 +89,8 @@ const BusinessInfo = ({ formikRegister }: { formikRegister: FormikProps<Register
 							invalidFeedback={formikRegister.errors.phone}
 							isValid={formikRegister.isValid}
 							onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
-								const val = e.target.value.replace(/\D/g, '');
+								let val = e.target.value.replace(/\D/g, '');
+								if (val.length > maxLength) val = val.slice(0, maxLength);
 								formikRegister.setFieldValue('phone', val);
 							}}
 							onBlur={formikRegister.handleBlur}

@@ -56,7 +56,6 @@ const LegalAgentInfo = ({
 								formikRegister.setFieldValue('phoneLegalAgent', '');
 								formikRegister.handleChange(e);
 								const country = getCountryByDialCode(e.target.value);
-								console.log(country);
 								setMaxLength(country?.maxLength || 9);
 								setMinLength(country?.minLength || 0);
 							}}
@@ -75,10 +74,7 @@ const LegalAgentInfo = ({
 							isValid={formikRegister.isValid}
 							onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
 								let val = e.target.value.replace(/\D/g, '');
-
-								// Evita escribir más de lo permitido
 								if (val.length > maxLength) val = val.slice(0, maxLength);
-
 								formikRegister.setFieldValue('phoneLegalAgent', val);
 							}}
 							onBlur={formikRegister.handleBlur}
