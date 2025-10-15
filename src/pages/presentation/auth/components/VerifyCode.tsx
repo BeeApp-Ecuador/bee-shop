@@ -20,22 +20,24 @@ const VerifyCode = ({ onComplete, resendCode, email }: VerifyCodeProps) => {
 	const [isLoading, setIsLoading] = useState(false);
 
 	const [timeLeft, setTimeLeft] = useState(120);
-	const [isRunning, setIsRunning] = useState(true);
+	const [expired, setExpired] = useState(false);
 
-	// ✅ Timer corregido
 	useEffect(() => {
-		if (!isRunning) return;
-		if (timeLeft <= 0) {
-			setIsRunning(false);
-			return;
-		}
+		if (expired || timeLeft <= 0) return;
 
 		const interval = setInterval(() => {
-			setTimeLeft((prev) => prev - 1);
+			setTimeLeft((prev) => {
+				if (prev <= 1) {
+					clearInterval(interval);
+					setExpired(true);
+					return 0;
+				}
+				return prev - 1;
+			});
 		}, 1000);
 
 		return () => clearInterval(interval);
-	}, [isRunning]);
+	}, [expired]);
 
 	const handleChange = async (index: number, value: string) => {
 		if (!/^[0-9]?$/.test(value)) return; // Solo números
@@ -74,6 +76,16 @@ const VerifyCode = ({ onComplete, resendCode, email }: VerifyCodeProps) => {
 		}
 	};
 
+	const handleResend = () => {
+		resendCode();
+		setValues(['', '', '', '']);
+		setTimeLeft(120);
+		setExpired(false);
+		setError(null);
+		setSuccess(null);
+		inputRefs.current[0]?.focus();
+	};
+
 	return (
 		<Card className='shadow-3d-dark p-4 mb-4 text-center'>
 			<CardBody>
@@ -82,24 +94,22 @@ const VerifyCode = ({ onComplete, resendCode, email }: VerifyCodeProps) => {
 					Ingresa el código de 4 dígitos que te enviamos a tu correo
 				</p>
 				<p className='text-muted mb-4'>
-					{timeLeft > 0
-						? `El código expira en ${Math.floor(timeLeft / 60)
+					{!expired ? (
+						<>
+							El código expira en{' '}
+							{`${Math.floor(timeLeft / 60)
 								.toString()
-								.padStart(2, '0')}:${(timeLeft % 60).toString().padStart(2, '0')}`
-						: 'El código ha expirado. '}
-					{timeLeft === 0 && (
-						<button
-							className='btn btn-link p-0 ms-1 align-baseline'
-							onClick={() => {
-								resendCode();
-								setValues(['', '', '', '']);
-								setTimeLeft(120);
-								setIsRunning(true);
-								setError(null);
-								inputRefs.current[0]?.focus();
-							}}>
-							Reenviar código
-						</button>
+								.padStart(2, '0')}:${(timeLeft % 60).toString().padStart(2, '0')}`}
+						</>
+					) : (
+						<>
+							El código ha expirado.{' '}
+							<button
+								className='btn btn-link p-0 ms-1 align-baseline'
+								onClick={handleResend}>
+								Reenviar código
+							</button>
+						</>
 					)}
 				</p>
 
@@ -120,7 +130,7 @@ const VerifyCode = ({ onComplete, resendCode, email }: VerifyCodeProps) => {
 									borderRadius: '0.5rem',
 									fontWeight: 600,
 								}}
-								disabled={isLoading}
+								disabled={isLoading || expired}
 							/>
 						</FormGroup>
 					))}
