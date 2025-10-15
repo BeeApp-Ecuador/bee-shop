@@ -101,7 +101,7 @@ const Login: FC<ILoginProps> = ({ isSignUp }) => {
 	const handleOnClick = useCallback(() => navigate('/'), [navigate]);
 	const [registerShop] = useRegisterMutation();
 	const [sendCode] = useSendEmailVerificationMutation();
-	const [verifyCode] = useVerifyCodeMutation();
+	const [showSuccess, setShowSuccess] = useState(false);
 
 	const handleSendCode = async (email: string) => {
 		const { data, error } = await sendCode({ email, role: 'SHOP' });
@@ -136,7 +136,15 @@ const Login: FC<ILoginProps> = ({ isSignUp }) => {
 			return;
 		} else {
 			setIsLoading(false);
-			console.log('Registration successful, payload:', data);
+			if (data && data.statusCode === 201) {
+				setShowVerifyCode(false);
+				setShowSuccess(true);
+				formikRegister.resetForm();
+				// setTimeout(() => {
+				// 	setShowSuccess(false);
+				// 	setSingUpStatus(false);
+				// }, 2000);
+			}
 		}
 	};
 
@@ -554,12 +562,42 @@ const Login: FC<ILoginProps> = ({ isSignUp }) => {
 					</ModalHeader>
 					<ModalBody>
 						<VerifyCode
-							onComplete={async (code) => {
-								return handleRegister(formikRegister.values, formikRegister);
-							}}
+							email={formikRegister.values.email}
+							onComplete={async () =>
+								handleRegister(formikRegister.values, formikRegister)
+							}
 							resendCode={() => handleSendCode(formikRegister.values.email)}
 						/>
 					</ModalBody>
+				</Modal>
+				<Modal
+					isOpen={showSuccess}
+					setIsOpen={setShowSuccess}
+					titleId='successModalLabel'
+					// isStaticBackdrop={staticBackdropStatus}
+					// isScrollable={scrollableStatus}
+					isCentered={true}
+					size='sm'
+					// fullScreen={fullScreenStatus}
+					isAnimation={true}>
+					<ModalHeader setIsOpen={() => setShowSuccess(!showSuccess)}>
+						<ModalTitle id='successModalLabel'>Éxito</ModalTitle>
+					</ModalHeader>
+					<ModalBody>
+						<p>Registro completado con éxito. Por favor, inicia sesión.</p>
+					</ModalBody>
+					<ModalFooter>
+						<Button
+							color='success'
+							isOutline
+							className='border-0'
+							onClick={() => {
+								setSingUpStatus(false);
+								return setShowSuccess(false);
+							}}>
+							Ok
+						</Button>
+					</ModalFooter>
 				</Modal>
 			</Page>
 		</PageWrapper>

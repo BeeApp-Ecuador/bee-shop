@@ -2,18 +2,23 @@ import React, { useState, useRef, useEffect } from 'react';
 import Card, { CardBody } from '../../../../components/bootstrap/Card';
 import FormGroup from '../../../../components/bootstrap/forms/FormGroup';
 import Input from '../../../../components/bootstrap/forms/Input';
+import { useVerifyCodeMutation } from '../../../../store/api/authApi';
 
 interface VerifyCodeProps {
-	onComplete: (code: string) => void;
+	onComplete: () => void;
 	resendCode: () => void;
+	email: string;
 }
 
-const VerifyCode = ({ onComplete, resendCode }: VerifyCodeProps) => {
+const VerifyCode = ({ onComplete, resendCode, email }: VerifyCodeProps) => {
 	const [values, setValues] = useState(['', '', '', '']);
 	const inputRefs = useRef<(HTMLInputElement | null)[]>([]);
 
 	const [startTimer, setStartTimer] = useState(false);
 	const [timeLeft, setTimeLeft] = useState(120);
+
+	const [verifyCode] = useVerifyCodeMutation();
+	const [error, setError] = useState<string | null>(null);
 
 	useEffect(() => {
 		if (timeLeft <= 0) return; // detener cuando llegue a 0
@@ -26,7 +31,7 @@ const VerifyCode = ({ onComplete, resendCode }: VerifyCodeProps) => {
 		return () => clearInterval(interval);
 	}, [startTimer, timeLeft]);
 
-	const handleChange = (index: number, value: string) => {
+	const handleChange = async (index: number, value: string) => {
 		if (!/^[0-9]?$/.test(value)) return; // Solo números
 		const newValues = [...values];
 		newValues[index] = value;
@@ -38,7 +43,15 @@ const VerifyCode = ({ onComplete, resendCode }: VerifyCodeProps) => {
 
 		const code = newValues.join('');
 		if (code.length === 4 && !newValues.includes('')) {
-			onComplete(code);
+			const { data, error } = await verifyCode({ email, code });
+			if (error) {
+				setError('Código de verificación inválido.');
+				return;
+			}
+			if (data && data.statusCode === 200) {
+				setError(null);
+				onComplete();
+			}
 		}
 	};
 
