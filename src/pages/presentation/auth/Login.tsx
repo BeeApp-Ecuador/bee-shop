@@ -1,7 +1,7 @@
-import React, { FC, useCallback, useContext, useState } from 'react';
+import React, { FC, useCallback, useContext, useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import classNames from 'classnames';
-import { useFormik } from 'formik';
+import { FormikHelpers, useFormik } from 'formik';
 import PageWrapper from '../../../layout/PageWrapper/PageWrapper';
 import Page from '../../../layout/Page/Page';
 import Card, { CardBody } from '../../../components/bootstrap/Card';
@@ -99,7 +99,44 @@ const Login: FC<ILoginProps> = ({ isSignUp }) => {
 	const navigate = useNavigate();
 	const handleOnClick = useCallback(() => navigate('/'), [navigate]);
 	const [registerShop] = useRegisterMutation();
-	const [checkEmailExists] = useSendEmailVerificationMutation();
+	const [sendCode] = useSendEmailVerificationMutation();
+
+	const handleSendCode = async (email: string) => {
+		const { data, error } = await sendCode({ email, role: 'SHOP' });
+		if (error) {
+			setError('Error al enviar el correo de verificación.');
+			setIsOpen(true);
+			return;
+		}
+		if (data && data.statusCode === 201) {
+			setShowVerifyCode(true);
+		}
+	};
+
+	const handleRegister = async (
+		values: RegisterFormValues,
+		formikHelpers: FormikHelpers<RegisterFormValues>,
+	) => {
+		const formData = new FormData();
+
+		for (const key in values) {
+			formData.append(key, values[key]);
+		}
+		const { data, error } = await registerShop(formData);
+		if (error) {
+			setIsLoading(false);
+			console.error('Registration failed, error:', error);
+			if (error && 'status' in error && error.status === 409) {
+				formikHelpers.setFieldError('email', 'Email ya está en uso.');
+				setError('El email ya está en uso.');
+				setIsOpen(true);
+			}
+			return;
+		} else {
+			setIsLoading(false);
+			console.log('Registration successful, payload:', data);
+		}
+	};
 
 	const usernameCheck = (username: string) => {
 		return !!getUserDataWithUsername(username);
@@ -267,53 +304,9 @@ const Login: FC<ILoginProps> = ({ isSignUp }) => {
 		},
 
 		onSubmit: async (values, formikHelpers) => {
-			console.log('Registering user...', values);
 			setIsLoading(true);
-
-			const formData = new FormData();
-
-			for (const key in values) {
-				formData.append(key, values[key]);
-			}
-			// setIsLoading(false);
-
-			console.log({
-				email: values.email,
-				role: 'SHOP',
-			});
-
-			const { data: dataEmail, error: errorEmail } = await checkEmailExists({
-				email: values.email,
-				role: 'SHOP',
-			});
-
-			if (errorEmail) {
-				setIsLoading(false);
-				setError('Error al enviar el correo de verificación.');
-				setIsOpen(true);
-				return;
-			}
-
-			if (dataEmail && dataEmail.statusCode === 201) {
-				setIsLoading(false);
-				console.log(dataEmail);
-				setShowVerifyCode(true);
-			}
-
-			// const { data, error } = await registerShop(formData);
-			// if (error) {
-			// 	setIsLoading(false);
-			// 	console.error('Registration failed, error:', error);
-			// 	if (error && 'status' in error && error.status === 409) {
-			// 		formikHelpers.setFieldError('email', 'Email ya está en uso.');
-			// 		setError('El email ya está en uso.');
-			// 		setIsOpen(true);
-			// 	}
-			// 	return;
-			// } else {
-			// 	setIsLoading(false);
-			// 	console.log('Registration successful, payload:', data);
-			// }
+			await handleSendCode(values.email);
+			setIsLoading(false);
 		},
 	});
 
@@ -417,13 +410,6 @@ const Login: FC<ILoginProps> = ({ isSignUp }) => {
 											<LocationInfo formikRegister={formikRegister} />
 											<SessionInfo formikRegister={formikRegister} />
 
-											{showVerifyCode && (
-												<VerifyCode
-													onComplete={(code) =>
-														console.log('Código verificado:', code)
-													}
-												/>
-											)}
 											<div className='col-12'>
 												<Button
 													color='primary'
@@ -550,6 +536,28 @@ const Login: FC<ILoginProps> = ({ isSignUp }) => {
 							Save changes
 						</Button> */}
 					</ModalFooter>
+				</Modal>
+				<Modal
+					isOpen={showVerifyCode}
+					setIsOpen={setShowVerifyCode}
+					titleId='verifyCodeModalLabel'
+					// isStaticBackdrop={staticBackdropStatus}
+					// isScrollable={scrollableStatus}
+					isCentered={true}
+					size='lg'
+					// fullScreen={fullScreenStatus}
+					isAnimation={true}>
+					<ModalHeader setIsOpen={() => setShowVerifyCode(!showVerifyCode)}>
+						<ModalTitle id='verifyCodeModalLabel'>Verificar código</ModalTitle>
+					</ModalHeader>
+					<ModalBody>
+						<VerifyCode
+							onComplete={(code) =>
+								handleRegister(formikRegister.values, formikRegister)
+							}
+							resendCode={() => handleSendCode(formikRegister.values.email)}
+						/>
+					</ModalBody>
 				</Modal>
 			</Page>
 		</PageWrapper>
