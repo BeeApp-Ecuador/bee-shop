@@ -13,23 +13,29 @@ interface VerifyCodeProps {
 const VerifyCode = ({ onComplete, resendCode, email }: VerifyCodeProps) => {
 	const [values, setValues] = useState(['', '', '', '']);
 	const inputRefs = useRef<(HTMLInputElement | null)[]>([]);
-
-	const [startTimer, setStartTimer] = useState(false);
-	const [timeLeft, setTimeLeft] = useState(120);
-
 	const [verifyCode] = useVerifyCodeMutation();
-	const [error, setError] = useState<string | null>(null);
 
+	const [error, setError] = useState<string | null>(null);
+	const [success, setSuccess] = useState<string | null>(null);
+	const [isLoading, setIsLoading] = useState(false);
+
+	const [timeLeft, setTimeLeft] = useState(120);
+	const [isRunning, setIsRunning] = useState(true);
+
+	// ✅ Timer corregido
 	useEffect(() => {
-		if (timeLeft <= 0) return; // detener cuando llegue a 0
+		if (!isRunning) return;
+		if (timeLeft <= 0) {
+			setIsRunning(false);
+			return;
+		}
 
 		const interval = setInterval(() => {
 			setTimeLeft((prev) => prev - 1);
 		}, 1000);
 
-		// limpiar el intervalo al desmontar o al reiniciar
 		return () => clearInterval(interval);
-	}, [startTimer, timeLeft]);
+	}, [isRunning]);
 
 	const handleChange = async (index: number, value: string) => {
 		if (!/^[0-9]?$/.test(value)) return; // Solo números
@@ -38,18 +44,25 @@ const VerifyCode = ({ onComplete, resendCode, email }: VerifyCodeProps) => {
 		setValues(newValues);
 
 		if (value && index < 3) {
-			inputRefs.current[index + 1]?.focus(); // Pasa al siguiente input
+			inputRefs.current[index + 1]?.focus();
 		}
 
 		const code = newValues.join('');
 		if (code.length === 4 && !newValues.includes('')) {
+			setIsLoading(true);
+			setError(null);
+
 			const { data, error } = await verifyCode({ email, code });
+
+			setIsLoading(false);
+
 			if (error) {
 				setError('Código de verificación inválido.');
 				return;
 			}
+
 			if (data && data.statusCode === 200) {
-				setError(null);
+				setSuccess('Un momento, estamos creando tu cuenta...');
 				onComplete();
 			}
 		}
@@ -79,8 +92,11 @@ const VerifyCode = ({ onComplete, resendCode, email }: VerifyCodeProps) => {
 							className='btn btn-link p-0 ms-1 align-baseline'
 							onClick={() => {
 								resendCode();
+								setValues(['', '', '', '']);
 								setTimeLeft(120);
-								setStartTimer(true);
+								setIsRunning(true);
+								setError(null);
+								inputRefs.current[0]?.focus();
 							}}>
 							Reenviar código
 						</button>
@@ -93,7 +109,7 @@ const VerifyCode = ({ onComplete, resendCode, email }: VerifyCodeProps) => {
 							<Input
 								type='text'
 								maxLength={1}
-								value={values[index]} // 👈 se controla el valor
+								value={values[index]}
 								onChange={(e) => handleChange(index, e.target.value)}
 								onKeyDown={(e) => handleKeyDown(e, index)}
 								ref={(el) => (inputRefs.current[index] = el)}
@@ -102,12 +118,26 @@ const VerifyCode = ({ onComplete, resendCode, email }: VerifyCodeProps) => {
 									width: '3rem',
 									height: '3rem',
 									borderRadius: '0.5rem',
-									textAlign: 'center',
 									fontWeight: 600,
 								}}
+								disabled={isLoading}
 							/>
 						</FormGroup>
 					))}
+				</div>
+
+				<div className='mt-3'>
+					{isLoading && <p className='text-primary'>Verificando código...</p>}
+					{error && (
+						<p className='text-danger' role='alert'>
+							{error}
+						</p>
+					)}
+					{success && (
+						<p className='text-success' role='alert'>
+							{success}
+						</p>
+					)}
 				</div>
 			</CardBody>
 		</Card>

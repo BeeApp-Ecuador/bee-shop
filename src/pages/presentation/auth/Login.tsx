@@ -103,6 +103,12 @@ const Login: FC<ILoginProps> = ({ isSignUp }) => {
 	const handleSendCode = async (email: string) => {
 		const { data, error } = await sendCode({ email, role: 'SHOP' });
 		if (error) {
+			console.log(error);
+			if (error && 'status' in error && error.status === 409) {
+				setError('El email ya está en uso.');
+				setIsOpen(true);
+				return;
+			}
 			setError('Error al enviar el correo de verificación.');
 			setIsOpen(true);
 			return;
