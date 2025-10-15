@@ -17,7 +17,7 @@ export const authApi = createApi({
 
 		login: builder.mutation({
 			query: (body) => ({
-				url: 'auth/login',
+				url: 'api/v2/shop/login',
 				method: 'POST',
 				body,
 			}),
