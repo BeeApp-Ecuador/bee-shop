@@ -13,6 +13,8 @@ const LANDING = {
 	DASHBOARD: lazy(() => import('../pages/presentation/dashboard/DashboardPage')),
 	DASHBOARD_BOOKING: lazy(() => import('../pages/presentation/dashboard/DashboardBookingPage')),
 	SUMMARY: lazy(() => import('../pages/presentation/SummaryPage')),
+	PROFILE: lazy(() => import('../pages/presentation/profile/ProfilePage')),
+	CATEGORIES: lazy(() => import('../pages/presentation/categories/CategoriesPage')),
 };
 const SINGLE = {
 	BOXED: lazy(() => import('../pages/presentation/single-pages/SingleBoxedPage')),
@@ -193,6 +195,14 @@ const presentation: RouteProps[] = [
 	/**
 	 * Landing
 	 */
+	{
+		path: dashboardPagesMenu.profile.path,
+		element: <LANDING.PROFILE />,
+	},
+	{
+		path: dashboardPagesMenu.categories.path,
+		element: <LANDING.CATEGORIES />,
+	},
 	{
 		path: dashboardPagesMenu.dashboard.path,
 		element: <LANDING.DASHBOARD />,

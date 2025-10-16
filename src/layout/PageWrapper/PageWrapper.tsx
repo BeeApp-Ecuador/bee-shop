@@ -30,11 +30,10 @@ const PageWrapper = forwardRef<HTMLDivElement, IPageWrapperProps>(
 		});
 
 		const { user: shop } = useContext(AuthContext);
-		console.log('shop wrapper', shop);
 
 		const navigate = useNavigate();
 		useEffect(() => {
-			if (isProtected || !shop) {
+			if (isProtected && !shop) {
 				navigate(`../${demoPagesMenu.login.path}`);
 			}
 			return () => {};
