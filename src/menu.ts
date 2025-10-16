@@ -37,6 +37,12 @@ export const dashboardPagesMenu = {
 		path: 'profile',
 		icon: 'Person',
 	},
+	categories: {
+		id: 'CategoriesPage',
+		text: 'Categorías',
+		path: 'categories',
+		icon: 'Category',
+	},
 	dashboard: {
 		id: 'dashboard',
 		text: 'Dashboard',
