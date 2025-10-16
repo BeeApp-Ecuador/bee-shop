@@ -100,168 +100,12 @@ const CategoriesPage = () => {
 
 	return (
 		<PageWrapper title={demoPagesMenu.listPages.subMenu.listBoxed.text}>
-			<SubHeader>
-				<SubHeaderLeft>
-					<Avatar srcSet={UserImageWebp} src={UserImage} size={32} />
-					<span>
-						<strong>Report by</strong> Timothy J. Doe
-					</span>
-				</SubHeaderLeft>
-				<SubHeaderRight>
-					{(!!formik.values.minPrice || !!formik.values.maxPrice) && (
-						<CommonFilterTag
-							title='Price'
-							text={`${formik.values.minPrice || '0'} to ${
-								formik.values.maxPrice || 'no limit'
-							}`}
-						/>
-					)}
-
-					{!!formik.values.categoryName && (
-						<CommonFilterTag title='Category' text={formik.values.categoryName} />
-					)}
-
-					{(formik.values.companyA ||
-						formik.values.companyB ||
-						formik.values.companyC ||
-						formik.values.companyD) && (
-						<CommonFilterTag
-							title='Store'
-							text={
-								(formik.values.companyA ? 'Company A, ' : '') +
-								(formik.values.companyB ? 'Company B, ' : '') +
-								(formik.values.companyC ? 'Company C, ' : '') +
-								(formik.values.companyD ? 'Company D ' : '')
-							}
-						/>
-					)}
-					<SubheaderSeparator />
-					<Dropdown isOpen={filterMenu} setIsOpen={setFilterMenu}>
-						<DropdownToggle hasIcon={false}>
-							<Button icon='Filter' color='primary' isLight data-tour='filter'>
-								Filter
-								<span
-									className={classNames(
-										'position-absolute',
-										'top-0 start-95',
-										'translate-middle',
-										'badge',
-										'rounded-pill',
-										'bg-danger',
-										'border border-2',
-										{
-											'border-white': !darkModeStatus,
-											'border-dark': darkModeStatus,
-										},
-									)}>
-									2/3
-									<span className='visually-hidden'>filter</span>
-								</span>
-							</Button>
-						</DropdownToggle>
-						<DropdownMenu
-							isAlignmentEnd
-							size='lg'
-							isCloseAfterLeave={false}
-							data-tour='filter-menu'>
-							<div className='container py-2'>
-								<form className='row g-3' onSubmit={formik.handleSubmit}>
-									<div className='col-12'>
-										<FormGroup>
-											<Label htmlFor='minPrice'>Price</Label>
-											<InputGroup>
-												<Input
-													id='minPrice'
-													ariaLabel='Minimum price'
-													placeholder='Min.'
-													onChange={formik.handleChange}
-													value={formik.values.minPrice}
-												/>
-												<InputGroupText>to</InputGroupText>
-												<Input
-													id='maxPrice'
-													ariaLabel='Maximum price'
-													placeholder='Max.'
-													onChange={formik.handleChange}
-													value={formik.values.maxPrice}
-												/>
-											</InputGroup>
-										</FormGroup>
-									</div>
-									<div className='col-12'>
-										<FormGroup>
-											<Label htmlFor='categoryName'>Category</Label>
-											<Select
-												id='categoryName'
-												ariaLabel='Category'
-												placeholder='Category Name'
-												list={[
-													{ value: '3D Shapes', text: '3D Shapes' },
-													{ value: 'Illustrator', text: 'Illustrator' },
-													{ value: 'Photo', text: 'Photo' },
-												]}
-												onChange={formik.handleChange}
-												value={formik.values.categoryName}
-											/>
-										</FormGroup>
-									</div>
-									<div className='col-12'>
-										<FormGroup>
-											<Label htmlFor='company'>Store</Label>
-											<ChecksGroup>
-												<Checks
-													id='companyA'
-													label='Company A'
-													onChange={formik.handleChange}
-													checked={formik.values.companyA}
-												/>
-												<Checks
-													id='companyB'
-													label='Company B'
-													onChange={formik.handleChange}
-													checked={formik.values.companyB}
-												/>
-												<Checks
-													id='companyC'
-													label='Company C'
-													onChange={formik.handleChange}
-													checked={formik.values.companyC}
-												/>
-												<Checks
-													id='companyD'
-													label='Company D'
-													onChange={formik.handleChange}
-													checked={formik.values.companyD}
-												/>
-											</ChecksGroup>
-										</FormGroup>
-									</div>
-									<div className='col-6'>
-										<Button
-											color='primary'
-											isOutline
-											className='w-100'
-											onClick={formik.resetForm}>
-											Reset
-										</Button>
-									</div>
-									<div className='col-6'>
-										<Button color='primary' className='w-100' type='submit'>
-											Filter
-										</Button>
-									</div>
-								</form>
-							</div>
-						</DropdownMenu>
-					</Dropdown>
-				</SubHeaderRight>
-			</SubHeader>
 			<Page>
 				<Card stretch data-tour='list'>
 					<CardHeader>
-						<CardLabel icon='ShoppingCart' iconColor='info'>
+						<CardLabel icon='Category' iconColor='primary'>
 							<CardTitle tag='div' className='h5'>
-								Top Seller{' '}
+								Categorías
 								<small className='ms-2'>
 									Item:{' '}
 									{selectTable.values.selectedList.length
@@ -352,10 +196,9 @@ const CategoriesPage = () => {
 											icon='FilterList'
 										/>
 									</th>
-									<th scope='col'>Image</th>
-									<th scope='col'>Name</th>
-									<th scope='col'>Sales</th>
-									<th
+									<th scope='col'>Nombre</th>
+									<th scope='col'>Descripción</th>
+									{/* <th
 										scope='col'
 										onClick={() => requestSort('stock')}
 										className='cursor-pointer text-decoration-underline'>
@@ -365,8 +208,8 @@ const CategoriesPage = () => {
 											className={getClassNamesFor('stock')}
 											icon='FilterList'
 										/>
-									</th>
-									<th
+									</th> */}
+									{/* <th
 										scope='col'
 										onClick={() => requestSort('price')}
 										className='cursor-pointer text-decoration-underline'>
@@ -376,10 +219,10 @@ const CategoriesPage = () => {
 											className={getClassNamesFor('price')}
 											icon='FilterList'
 										/>
-									</th>
-									<th scope='col'>Store</th>
+									</th> */}
+									{/* <th scope='col'>Store</th> */}
 									<th scope='col' className='text-end'>
-										Actions
+										Acciones
 									</th>
 								</tr>
 							</thead>
