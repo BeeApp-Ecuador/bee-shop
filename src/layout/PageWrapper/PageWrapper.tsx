@@ -29,11 +29,12 @@ const PageWrapper = forwardRef<HTMLDivElement, IPageWrapperProps>(
 				.setAttribute('content', description || import.meta.env.VITE_META_DESC || '');
 		});
 
-		const { user } = useContext(AuthContext);
+		const { user: shop } = useContext(AuthContext);
+		console.log('shop wrapper', shop);
 
 		const navigate = useNavigate();
 		useEffect(() => {
-			if (isProtected && user === '') {
+			if (isProtected || !shop) {
 				navigate(`../${demoPagesMenu.login.path}`);
 			}
 			return () => {};

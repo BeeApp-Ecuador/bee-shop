@@ -12,7 +12,7 @@ import useDarkMode from '../../../hooks/useDarkMode';
 import AuthContext from '../../../contexts/authContext';
 import { getUserDataWithUsername } from '../../../common/data/userDummyData';
 import {
-	useLazyCheckEmailQuery,
+	useLoginMutation,
 	useRegisterMutation,
 	useSendEmailVerificationMutation,
 } from '../../../store/api/authApi';
@@ -30,6 +30,7 @@ import Modal, {
 import Spinner from '../../../components/bootstrap/Spinner';
 import VerifyCode from './components/VerifyCode';
 import { getCountryByDialCode } from '../../../utils/getCountries';
+import LoginInfo from './components/LoginInfo';
 
 export interface RegisterFormValues {
 	nameLegalAgent: string;
@@ -58,6 +59,11 @@ export interface RegisterFormValues {
 	confirmPassword: string;
 }
 
+export interface LoginFormValues {
+	email: string;
+	password: string;
+}
+
 interface ILoginHeaderProps {
 	isNewUser?: boolean;
 }
@@ -82,13 +88,10 @@ interface ILoginProps {
 	isSignUp?: boolean;
 }
 const Login: FC<ILoginProps> = ({ isSignUp }) => {
-	const [checkEmail] = useLazyCheckEmailQuery();
-
 	const { setUser } = useContext(AuthContext);
 
 	const { darkModeStatus } = useDarkMode();
 
-	const [signInPassword, setSignInPassword] = useState<boolean>(false);
 	const [singUpStatus, setSingUpStatus] = useState<boolean>(!!isSignUp);
 	const [isOpen, setIsOpen] = useState(false);
 	const [showVerifyCode, setShowVerifyCode] = useState(false);
@@ -99,6 +102,8 @@ const Login: FC<ILoginProps> = ({ isSignUp }) => {
 	const [registerShop] = useRegisterMutation();
 	const [sendCode] = useSendEmailVerificationMutation();
 	const [showSuccess, setShowSuccess] = useState(false);
+
+	const [login] = useLoginMutation();
 
 	const handleSendCode = async (email: string) => {
 		const { data, error } = await sendCode({ email, role: 'SHOP' });
@@ -150,52 +155,57 @@ const Login: FC<ILoginProps> = ({ isSignUp }) => {
 			}
 		}
 	};
-
-	const usernameCheck = (username: string) => {
-		return !!getUserDataWithUsername(username);
+	const handleLogin = async (values: LoginFormValues) => {
+		setIsLoading(true);
+		const { data, error } = await login(values);
+		if (error) {
+			setIsLoading(false);
+			console.log(error);
+			if (error && 'status' in error && error.status === 401) {
+				setError('Credenciales inválidas.');
+				setIsOpen(true);
+				return;
+			} else {
+				setError('Error al iniciar sesión. Inténtalo de nuevo más tarde.');
+				setIsOpen(true);
+				return;
+			}
+		}
+		if (data && data.statusCode === 200) {
+			console.log(data.shop);
+			setIsLoading(false);
+			setUser(data.shop);
+			handleOnClick();
+		}
 	};
-
-	const passwordCheck = (username: string, password: string) => {
-		return getUserDataWithUsername(username).password === password;
-	};
-
-	const formik = useFormik({
-		enableReinitialize: true,
+	const formikLogin = useFormik<LoginFormValues>({
+		// enableReinitialize: true,
 		initialValues: {
-			loginUsername: 'tenesaca.999@gmail.co',
-			loginPassword: '12345',
+			email: '',
+			password: '',
 		},
 		validate: (values) => {
-			const errors: { loginUsername?: string; loginPassword?: string } = {};
-
-			if (!values.loginUsername) {
-				errors.loginUsername = 'Required';
+			const errors: Partial<Record<keyof LoginFormValues, string>> = {};
+			if (!values.email) {
+				errors.email = 'Requerido';
+			} else if (!/^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i.test(values.email)) {
+				errors.email = 'Email inválido';
 			}
 
-			if (!values.loginPassword) {
-				errors.loginPassword = 'Required';
+			if (!values.password) {
+				errors.password = 'Requerido';
 			}
 
 			return errors;
 		},
 		validateOnChange: false,
-		onSubmit: (values) => {
-			if (usernameCheck(values.loginUsername)) {
-				if (passwordCheck(values.loginUsername, values.loginPassword)) {
-					if (setUser) {
-						setUser(values.loginUsername);
-					}
-
-					handleOnClick();
-				} else {
-					formik.setFieldError('loginPassword', 'Username and password do not match.');
-				}
-			}
+		validateOnBlur: true,
+		onSubmit: async (values) => {
+			await handleLogin(values);
 		},
 	});
 
 	const formikRegister = useFormik<RegisterFormValues>({
-		// enableReinitialize: true,
 		initialValues: {
 			nameLegalAgent: '',
 			ciLegalAgent: '',
@@ -345,21 +355,6 @@ const Login: FC<ILoginProps> = ({ isSignUp }) => {
 	});
 
 	const [isLoading, setIsLoading] = useState<boolean>(false);
-	const handleContinue = () => {
-		console.log('Checking user... handleContinue', formik.values.loginUsername);
-		setIsLoading(true);
-		setTimeout(async () => {
-			const [respExists] = await checkEmail(formik.values.loginUsername).unwrap();
-			console.log('respExists', respExists);
-
-			if (respExists.exists) {
-				// 	formik.setFieldError('loginUsername', 'No such user found in the system.');
-				// } else {
-				// 	setSignInPassword(true);
-			}
-			setIsLoading(false);
-		}, 1000);
-	};
 
 	return (
 		<PageWrapper
@@ -412,7 +407,6 @@ const Login: FC<ILoginProps> = ({ isSignUp }) => {
 												className='rounded-1 w-100'
 												size='lg'
 												onClick={() => {
-													setSignInPassword(false);
 													setSingUpStatus(!singUpStatus);
 												}}>
 												Login
@@ -425,7 +419,6 @@ const Login: FC<ILoginProps> = ({ isSignUp }) => {
 												className='rounded-1 w-100'
 												size='lg'
 												onClick={() => {
-													setSignInPassword(false);
 													setSingUpStatus(!singUpStatus);
 												}}>
 												Registro
@@ -459,62 +452,17 @@ const Login: FC<ILoginProps> = ({ isSignUp }) => {
 										</>
 									) : (
 										<>
-											<div className='col-12'>
-												<FormGroup
-													id='loginUsername'
-													isFloating
-													label='Your email or username'
-													className={classNames({
-														'd-none': signInPassword,
-													})}>
-													<Input
-														autoComplete='username'
-														value={formik.values.loginUsername}
-														isTouched={formik.touched.loginUsername}
-														invalidFeedback={
-															formik.errors.loginUsername
-														}
-														isValid={formik.isValid}
-														onChange={formik.handleChange}
-														onBlur={formik.handleBlur}
-														onFocus={() => {
-															formik.setErrors({});
-														}}
-													/>
-												</FormGroup>
-												{signInPassword && (
-													<div className='text-center h4 mb-3 fw-bold'>
-														Hi, {formik.values.loginUsername}.
-													</div>
-												)}
-												<FormGroup
-													id='loginPassword'
-													isFloating
-													label='Password'
-													className={classNames({
-														'd-none': !signInPassword,
-													})}>
-													<Input
-														type='password'
-														autoComplete='current-password'
-														value={formik.values.loginPassword}
-														isTouched={formik.touched.loginPassword}
-														invalidFeedback={
-															formik.errors.loginPassword
-														}
-														validFeedback='Looks good!'
-														isValid={formik.isValid}
-														onChange={formik.handleChange}
-														onBlur={formik.handleBlur}
-													/>
-												</FormGroup>
-											</div>
+											<LoginInfo formikLogin={formikLogin} />
 											<div className='col-12'>
 												<Button
-													color='warning'
+													color='primary'
 													className='w-100 py-3'
-													onClick={formik.handleSubmit}>
-													Login
+													isDisable={isLoading}
+													onClick={formikLogin.handleSubmit}>
+													{isLoading && (
+														<Spinner isSmall inButton isGrow />
+													)}
+													Ingresar
 												</Button>
 											</div>
 										</>

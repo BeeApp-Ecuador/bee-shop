@@ -12,19 +12,18 @@ import { Provider } from 'react-redux';
 import { store } from './store';
 
 const children = (
-  <AuthContextProvider>
-    <ThemeContextProvider>
-      <Provider store={store}>
-        <Router>
-          <React.StrictMode>
-            <App />
-          </React.StrictMode>
-        </Router>
-      </Provider>
-    </ThemeContextProvider>
-  </AuthContextProvider>
+	<AuthContextProvider>
+		<ThemeContextProvider>
+			<Provider store={store}>
+				<Router>
+					<React.StrictMode>
+						<App />
+					</React.StrictMode>
+				</Router>
+			</Provider>
+		</ThemeContextProvider>
+	</AuthContextProvider>
 );
-
 
 const container = document.getElementById('root');
 

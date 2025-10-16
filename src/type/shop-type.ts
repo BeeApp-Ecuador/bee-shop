@@ -1,0 +1,37 @@
+export interface ShopType {
+	address: string;
+	addressLegalAgent: string;
+	businessName: string;
+	category?: [];
+	ciLegalAgent: string;
+	city: string;
+	country: string;
+	createdAt: string;
+	description: string;
+	email: string;
+	expiredInvoice: any;
+	haveDeliveryBee: boolean;
+	havePickup: boolean;
+	haveReservation: boolean;
+	identificationBusiness: string;
+	identificationLegal: string;
+	img: string;
+	isInvoice: boolean;
+	legalName: string;
+	maxPeoplePerReservation: number;
+	nameLegalAgent: string;
+	notifyInvoice: boolean;
+	open: boolean;
+	openShopSchedule: [];
+	phone: string;
+	phoneLegalAgent: string;
+	prefix: string;
+	prefixLegalAgent: string;
+	province: string;
+	qrShop: string;
+	resetPassword: boolean;
+	ruc: string;
+	status: string;
+	tags: [];
+	_id: string;
+}
