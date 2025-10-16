@@ -31,6 +31,12 @@ export const summaryPageTopMenu = {
 };
 
 export const dashboardPagesMenu = {
+	profile: {
+		id: 'ProfilePage',
+		text: 'Perfil',
+		path: 'profile',
+		icon: 'Person',
+	},
 	dashboard: {
 		id: 'dashboard',
 		text: 'Dashboard',
@@ -401,7 +407,7 @@ export const demoPagesMenu = {
 	login: {
 		id: 'login',
 		text: 'Login',
-		path: 'auth-pages/login',
+		path: 'login',
 		icon: 'Login',
 	},
 	signUp: {

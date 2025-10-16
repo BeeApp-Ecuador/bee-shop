@@ -16,6 +16,7 @@ import { getOS } from '../helpers/helpers';
 import steps, { styles } from '../steps';
 import AsideRoutes from '../layout/Aside/AsideRoutes';
 import { ToastCloseButton } from '../components/bootstrap/Toasts';
+import AuthContext from '../contexts/authContext';
 
 const App = () => {
 	getOS();
@@ -69,26 +70,27 @@ const App = () => {
 			document.body.classList.remove('modern-design');
 		}
 	});
+	const { user: shop } = useContext(AuthContext);
 
 	return (
 		<ThemeProvider theme={theme}>
-			<TourProvider steps={steps} styles={styles} showNavigation={false} showBadge={false}>
-				<div
-					ref={ref}
-					className='app'
-					style={{
-						backgroundColor: fullScreenStatus ? 'var(--bs-body-bg)' : undefined,
-						zIndex: fullScreenStatus ? 1 : undefined,
-						overflow: fullScreenStatus ? 'scroll' : undefined,
-					}}>
-					<AsideRoutes />
-					<Wrapper />
-				</div>
-				<Portal id='portal-notification'>
-					<ReactNotifications />
-				</Portal>
-				<ToastContainer closeButton={ToastCloseButton} toastClassName='toast show' />
-			</TourProvider>
+			{/* <TourProvider steps={steps} styles={styles} showNavigation={false} showBadge={false}> */}
+			<div
+				ref={ref}
+				className='app'
+				style={{
+					backgroundColor: fullScreenStatus ? 'var(--bs-body-bg)' : undefined,
+					zIndex: fullScreenStatus ? 1 : undefined,
+					overflow: fullScreenStatus ? 'scroll' : undefined,
+				}}>
+				{shop.status !== 'PENDING' && <AsideRoutes />}
+				<Wrapper />
+			</div>
+			<Portal id='portal-notification'>
+				<ReactNotifications />
+			</Portal>
+			<ToastContainer closeButton={ToastCloseButton} toastClassName='toast show' />
+			{/* </TourProvider> */}
 		</ThemeProvider>
 	);
 };
