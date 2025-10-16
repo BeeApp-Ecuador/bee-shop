@@ -13,6 +13,7 @@ import Icon from '../../components/icon/Icon';
 import useNavigationItemHandle from '../../hooks/useNavigationItemHandle';
 import AuthContext from '../../contexts/authContext';
 import ThemeContext from '../../contexts/themeContext';
+import { ShopType } from '../../type/shop-type';
 
 const User = () => {
 	const { width } = useWindowSize();
@@ -126,7 +127,7 @@ const User = () => {
 							className='navigation-item cursor-pointer'
 							onClick={() => {
 								if (setUser) {
-									setUser('');
+									setUser({} as ShopType);
 								}
 								if (width < Number(import.meta.env.VITE_MOBILE_BREAKPOINT_SIZE)) {
 									setAsideStatus(false);

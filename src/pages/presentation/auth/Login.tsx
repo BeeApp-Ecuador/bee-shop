@@ -172,10 +172,9 @@ const Login: FC<ILoginProps> = ({ isSignUp }) => {
 			}
 		}
 		if (data && data.statusCode === 200) {
-			console.log(data);
+			console.log(data.shop);
 			setIsLoading(false);
-			const userData = getUserDataWithUsername('john');
-			setUser(userData);
+			setUser(data.shop);
 			handleOnClick();
 		}
 	};
@@ -202,7 +201,7 @@ const Login: FC<ILoginProps> = ({ isSignUp }) => {
 		validateOnChange: false,
 		validateOnBlur: true,
 		onSubmit: async (values) => {
-			handleLogin(values);
+			await handleLogin(values);
 		},
 	});
 
