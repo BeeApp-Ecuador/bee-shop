@@ -64,6 +64,28 @@ const ProfilePage = () => {
 			newPassword: '',
 			confirmNewPassword: '',
 		},
+		validate: (values) => {
+			const errors: { [key: string]: string } = {};
+			if (!values.currentPassword) {
+				errors.currentPassword = 'Requerido';
+			}
+			if (!values.newPassword) {
+				errors.newPassword = 'Requerido';
+			} else if (values.newPassword.length < 6) {
+				errors.newPassword = 'La contraseña debe tener al menos 6 caracteres';
+			} else if (
+				!/(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{6,}/.test(
+					values.newPassword,
+				)
+			) {
+				errors.newPassword =
+					'La contraseña debe contener al menos una letra mayúscula, una letra minúscula, un número y uno de estos caracteres especiales (@ $ ! % * ? &)';
+			}
+			if (values.newPassword !== values.confirmNewPassword) {
+				errors.confirmNewPassword = 'Las contraseñas no coinciden';
+			}
+			return errors;
+		},
 		onSubmit: async (values) => {
 			const { confirmNewPassword, ...body } = values;
 			const { data, error } = await changePassword(body);
@@ -314,10 +336,19 @@ const ProfilePage = () => {
 												id='currentPassword'
 												label='Contraseña Actual'>
 												<Input
-													type='password'
 													placeholder='Contraseña Actual'
-													onChange={formikPassword.handleChange}
+													type='password'
 													value={formikPassword.values.currentPassword}
+													isTouched={
+														formikPassword.touched.currentPassword
+													}
+													invalidFeedback={
+														formikPassword.errors.currentPassword
+													}
+													isValid={formikPassword.isValid}
+													onChange={formikPassword.handleChange}
+													onBlur={formikPassword.handleBlur}
+													id='currentPassword'
 												/>
 											</FormGroup>
 											<div className='w-100 m-0' />
@@ -326,11 +357,17 @@ const ProfilePage = () => {
 												id='newPassword'
 												label='Nueva Contraseña'>
 												<Input
-													type='password'
 													placeholder='Nueva Contraseña'
-													autoComplete='newPassword'
-													onChange={formikPassword.handleChange}
+													type='password'
 													value={formikPassword.values.newPassword}
+													isTouched={formikPassword.touched.newPassword}
+													invalidFeedback={
+														formikPassword.errors.newPassword
+													}
+													isValid={formikPassword.isValid}
+													onChange={formikPassword.handleChange}
+													onBlur={formikPassword.handleBlur}
+													id='newPassword'
 												/>
 											</FormGroup>
 											<div className='w-100 m-0' />
@@ -339,11 +376,19 @@ const ProfilePage = () => {
 												id='confirmNewPassword'
 												label='Confirmar Nueva Contraseña'>
 												<Input
-													type='password'
 													placeholder='Confirmar Nueva Contraseña'
-													autoComplete='confirmNewPassword'
-													onChange={formikPassword.handleChange}
+													type='password'
 													value={formikPassword.values.confirmNewPassword}
+													isTouched={
+														formikPassword.touched.confirmNewPassword
+													}
+													invalidFeedback={
+														formikPassword.errors.confirmNewPassword
+													}
+													isValid={formikPassword.isValid}
+													onChange={formikPassword.handleChange}
+													onBlur={formikPassword.handleBlur}
+													id='confirmNewPassword'
 												/>
 											</FormGroup>
 										</div>
