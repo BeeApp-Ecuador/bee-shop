@@ -89,15 +89,28 @@ const ProfilePage = () => {
 		onSubmit: async (values) => {
 			const { confirmNewPassword, ...body } = values;
 			const { data, error } = await changePassword(body);
-
-			showNotification(
-				<span className='d-flex align-items-center'>
-					<Icon icon='Success' size='lg' className='me-1' />
-					<span>Éxito</span>
-				</span>,
-				'Contraseña actualizada correctamente',
-				'success',
-			);
+			if (error) {
+				console.log('error');
+				console.log(error);
+				showNotification(
+					<span className='d-flex align-items-center'>
+						<Icon icon='Error' size='lg' className='me-1' />
+						<span>Error</span>
+					</span>,
+					'Ocurrió un error al actualizar la contraseña, intenta nuevamente',
+					'danger',
+				);
+			}
+			if (data) {
+				showNotification(
+					<span className='d-flex align-items-center'>
+						<Icon icon='Success' size='lg' className='me-1' />
+						<span>Éxito</span>
+					</span>,
+					'Contraseña actualizada correctamente',
+					'success',
+				);
+			}
 		},
 	});
 	const [ref, { height }] = useMeasure<HTMLDivElement>();
