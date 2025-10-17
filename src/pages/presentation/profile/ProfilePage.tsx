@@ -30,6 +30,7 @@ import AuthContext from '../../../contexts/authContext';
 import MapCard, { MapCardRef } from '../../../components/profile/MapCard';
 import { useChangePasswordMutation } from '../../../store/api/authApi';
 import Spinner from '../../../components/bootstrap/Spinner';
+import LegalAgentInfo from '../../../components/profile/LegalAgentInfo';
 
 const ProfilePage = () => {
 	const { user: shop } = useContext(AuthContext);
@@ -216,56 +217,7 @@ const ProfilePage = () => {
 									La información que se muestra aquí no es compartida con
 									terceros.
 								</Alert>
-								<Card
-									className='rounded-2'
-									tag='form'
-									// onSubmit={formik.handleSubmit}
-								>
-									<CardHeader>
-										<CardLabel icon='Person'>
-											<CardTitle>Representante Legal</CardTitle>
-										</CardLabel>
-									</CardHeader>
-									<CardBody>
-										<div className='row g-4'>
-											<FormGroup
-												className='col-md-12'
-												id='formName'
-												label='Nombre'>
-												<Input disabled value={shop.nameLegalAgent} />
-											</FormGroup>
-											<FormGroup
-												className='col-md-12'
-												id='formAddress'
-												label='Dirección'>
-												<Input disabled value={shop.addressLegalAgent} />
-											</FormGroup>
-
-											<FormGroup
-												className='col-lg-6'
-												id='formEmailAddress'
-												label='Identificación'>
-												<Input
-													type='text'
-													disabled
-													value={shop.ciLegalAgent}
-												/>
-											</FormGroup>
-											<FormGroup
-												className='col-lg-6'
-												id='formPhone'
-												label='Teléfono'>
-												<Input
-													type='tel'
-													disabled
-													value={
-														shop.prefixLegalAgent + shop.phoneLegalAgent
-													}
-												/>
-											</FormGroup>
-										</div>
-									</CardBody>
-								</Card>
+								<LegalAgentInfo shop={shop} />
 							</CardTabItem>
 							<CardTabItem id='address' title='Dirección' icon='HolidayVillage'>
 								<Card
