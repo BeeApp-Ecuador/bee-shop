@@ -29,6 +29,7 @@ import { demoPagesMenu } from '../../../menu';
 import AuthContext from '../../../contexts/authContext';
 import MapCard, { MapCardRef } from '../../../components/profile/MapCard';
 import { useChangePasswordMutation } from '../../../store/api/authApi';
+import Spinner from '../../../components/bootstrap/Spinner';
 
 const ProfilePage = () => {
 	const { user: shop } = useContext(AuthContext);
@@ -36,6 +37,7 @@ const ProfilePage = () => {
 	const [coords, setCoords] = useState<{ lat: number; lng: number } | null>(null);
 	const [error, setError] = useState<string | null>(null);
 	const [changePassword] = useChangePasswordMutation();
+	const [isUpdatingPassword, setIsUpdatingPassword] = useState(false);
 
 	useEffect(() => {
 		if ('geolocation' in navigator) {
@@ -88,10 +90,10 @@ const ProfilePage = () => {
 		},
 		onSubmit: async (values) => {
 			const { confirmNewPassword, ...body } = values;
+			setIsUpdatingPassword(true);
 			const { data, error } = await changePassword(body);
+			setIsUpdatingPassword(false);
 			if (error) {
-				console.log('error');
-				console.log(error);
 				showNotification(
 					<span className='d-flex align-items-center'>
 						<Icon icon='Error' size='lg' className='me-1' />
@@ -411,7 +413,11 @@ const ProfilePage = () => {
 											<Button
 												color='primary'
 												icon='Save'
+												isDisable={isUpdatingPassword}
 												onClick={formikPassword.handleSubmit}>
+												{isUpdatingPassword && (
+													<Spinner isSmall inButton isGrow />
+												)}
 												Cambiar Contraseña
 											</Button>
 										</CardFooterRight>
