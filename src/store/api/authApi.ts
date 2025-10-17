@@ -51,7 +51,7 @@ export const authApi = createApi({
 				body,
 				headers: {
 					'Content-Type': 'application/json',
-					Authorization: JSON.parse(localStorage.getItem('token')!),
+					Authorization: localStorage.getItem('token')!,
 				},
 			}),
 		}),
@@ -64,4 +64,5 @@ export const {
 	useRegisterMutation,
 	useSendEmailVerificationMutation,
 	useVerifyCodeMutation,
+	useChangePasswordMutation,
 } = authApi;
