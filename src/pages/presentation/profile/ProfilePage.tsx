@@ -81,7 +81,7 @@ const SingleFluidPage = () => {
 			formSurName: 'Doe',
 			formEmailAddress: 'tjohndoe@site.com',
 			formPhone: '2575637401',
-			formAddressLine: '711-2880 Nulla St.',
+			formAddressLine: '',
 			formAddressLine2: 'Mankato',
 			formCity: 'Mississippi',
 			formState: 'USA',
@@ -505,6 +505,16 @@ const SingleFluidPage = () => {
 												id='formAddressLine'
 												label='Dirección'>
 												<Input disabled value={shop.address} />
+											</FormGroup>
+											<FormGroup
+												className='col-12'
+												id='formAddressLine'
+												label='Buscar en el mapa'>
+												<Input
+													id='formAddressLine'
+													value={formik.values.formAddressLine}
+													onChange={formik.handleChange}
+												/>
 											</FormGroup>
 											<MapCard
 												lat={coords?.lat ?? '-2.90055'}
