@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useRef, useState } from 'react';
+import React, { useContext, useState } from 'react';
 import { useFormik } from 'formik';
 
 import { useMeasure } from 'react-use';
@@ -27,39 +27,15 @@ import Progress from '../../../components/bootstrap/Progress';
 import Modal, { ModalBody, ModalHeader, ModalTitle } from '../../../components/bootstrap/Modal';
 import { demoPagesMenu } from '../../../menu';
 import AuthContext from '../../../contexts/authContext';
-import MapCard, { MapCardRef } from '../../../components/profile/MapCard';
 import { useChangePasswordMutation } from '../../../store/api/authApi';
 import Spinner from '../../../components/bootstrap/Spinner';
 import LegalAgentInfo from '../../../components/profile/LegalAgentInfo';
+import AddressInfo from '../../../components/profile/AddressInfo';
 
 const ProfilePage = () => {
 	const { user: shop } = useContext(AuthContext);
-
-	const [coords, setCoords] = useState<{ lat: number; lng: number } | null>(null);
-	const [error, setError] = useState<string | null>(null);
 	const [changePassword] = useChangePasswordMutation();
 	const [isUpdatingPassword, setIsUpdatingPassword] = useState(false);
-
-	useEffect(() => {
-		if ('geolocation' in navigator) {
-			navigator.geolocation.getCurrentPosition(
-				(position) => {
-					setCoords({
-						lat: position.coords.latitude,
-						lng: position.coords.longitude,
-					});
-				},
-				(err) => {
-					setError('No se pudo obtener la ubicación. Activa los permisos de ubicación.');
-					console.error(err);
-				},
-			);
-		} else {
-			setError('Tu navegador no soporta geolocalización.');
-		}
-	}, []);
-
-	const [searchAddress, setSearchAddress] = useState<string>('');
 
 	const formikPassword = useFormik({
 		initialValues: {
@@ -90,6 +66,7 @@ const ProfilePage = () => {
 			return errors;
 		},
 		onSubmit: async (values) => {
+			// eslint-disable-next-line @typescript-eslint/no-unused-vars
 			const { confirmNewPassword, ...body } = values;
 			setIsUpdatingPassword(true);
 			const { data, error } = await changePassword(body);
@@ -116,13 +93,8 @@ const ProfilePage = () => {
 			}
 		},
 	});
-	const [ref, { height }] = useMeasure<HTMLDivElement>();
-	const mapRef = useRef<MapCardRef>(null);
+	const [ref] = useMeasure<HTMLDivElement>();
 	const [selectedImage, setSelectedImage] = useState<string | undefined>(undefined);
-
-	const handleCoordsChange = (coords: { lat: number; lng: number }) => {
-		console.log('Nuevas coordenadas:', coords);
-	};
 
 	return (
 		<PageWrapper title={demoPagesMenu.singlePages.subMenu.fluidSingle.text}>
@@ -198,7 +170,6 @@ const ProfilePage = () => {
 								<Progress value={70} />
 							</CardBody>
 						</Card>
-
 						<Card>
 							<CardHeader>
 								<CardLabel>
@@ -220,71 +191,7 @@ const ProfilePage = () => {
 								<LegalAgentInfo shop={shop} />
 							</CardTabItem>
 							<CardTabItem id='address' title='Dirección' icon='HolidayVillage'>
-								<Card
-									className='rounded-2'
-									tag='form'
-									// onSubmit={formik.handleSubmit}
-								>
-									<CardHeader>
-										<CardLabel icon='HolidayVillage'>
-											<CardTitle>Dirección del local</CardTitle>
-										</CardLabel>
-									</CardHeader>
-									<CardBody>
-										<div className='row g-4'>
-											<FormGroup
-												className='col-md-4'
-												id='formCountry'
-												label='País'>
-												<Input disabled value={shop.country} />
-											</FormGroup>
-											<FormGroup
-												className='col-md-4'
-												id='formState'
-												label='Provincia'>
-												<Input disabled value={shop.province} />
-											</FormGroup>
-											<FormGroup
-												className='col-md-4'
-												id='formCity'
-												label='Ciudad'>
-												<Input disabled value={shop.city} />
-											</FormGroup>
-											<FormGroup
-												className='col-12'
-												id='formAddressLine'
-												label='Dirección'>
-												<Input disabled value={shop.address} />
-											</FormGroup>
-											<FormGroup
-												className='col-12'
-												id='formAddressLine'
-												label='Buscar en el mapa'>
-												<Input
-													id='formAddressLine'
-													value={searchAddress}
-													onChange={(e) =>
-														setSearchAddress(e.target.value)
-													}
-												/>
-											</FormGroup>
-											<MapCard
-												lat={coords?.lat ?? '-2.90055'}
-												lng={coords?.lng ?? '-79.00454'}
-												heightE='300px'
-												onCoordsChange={handleCoordsChange}
-												ref={mapRef}
-											/>
-										</div>
-									</CardBody>
-									<CardFooter>
-										<CardFooterRight>
-											<Button type='submit' color='primary' icon='Save'>
-												Guardar
-											</Button>
-										</CardFooterRight>
-									</CardFooter>
-								</Card>
+								<AddressInfo shop={shop} />
 							</CardTabItem>
 							<CardTabItem id='profile2' title='Contraseña' icon='Lock'>
 								<Card
