@@ -1,6 +1,6 @@
-import React, { useContext, useState } from 'react';
+import React, { useContext, useEffect, useRef, useState } from 'react';
 import { useFormik } from 'formik';
-import dayjs from 'dayjs';
+
 import classNames from 'classnames';
 import { useMeasure } from 'react-use';
 import { useNavigate } from 'react-router-dom';
@@ -8,7 +8,6 @@ import Button from '../../../components/bootstrap/Button';
 import Page from '../../../layout/Page/Page';
 import PageWrapper from '../../../layout/PageWrapper/PageWrapper';
 import Card, {
-	CardActions,
 	CardBody,
 	CardFooter,
 	CardFooterRight,
@@ -45,10 +44,33 @@ import Carousel from '../../../components/bootstrap/Carousel';
 import CarouselSlide from '../../../components/bootstrap/CarouselSlide';
 import useDarkMode from '../../../hooks/useDarkMode';
 import AuthContext from '../../../contexts/authContext';
+import MapCard, { MapCardRef } from '../../../components/profile/MapCard';
 
 const SingleFluidPage = () => {
 	const { darkModeStatus } = useDarkMode();
 	const { user: shop } = useContext(AuthContext);
+
+	const [coords, setCoords] = useState<{ lat: number; lng: number } | null>(null);
+	const [error, setError] = useState<string | null>(null);
+
+	useEffect(() => {
+		if ('geolocation' in navigator) {
+			navigator.geolocation.getCurrentPosition(
+				(position) => {
+					setCoords({
+						lat: position.coords.latitude,
+						lng: position.coords.longitude,
+					});
+				},
+				(err) => {
+					setError('No se pudo obtener la ubicación. Activa los permisos de ubicación.');
+					console.error(err);
+				},
+			);
+		} else {
+			setError('Tu navegador no soporta geolocalización.');
+		}
+	}, []);
 
 	const navigate = useNavigate();
 	const formik = useFormik({
@@ -79,7 +101,7 @@ const SingleFluidPage = () => {
 		},
 	});
 	const [ref, { height }] = useMeasure<HTMLDivElement>();
-
+	const mapRef = useRef<MapCardRef>(null);
 	const colors = ['primary', 'secondary', 'success', 'info', 'warning', 'danger', 'dark'];
 	const [selectedImage, setSelectedImage] = useState<string | undefined>(undefined);
 	const [gallerySeeAll, setGallerySeeAll] = useState(false);
@@ -94,6 +116,14 @@ const SingleFluidPage = () => {
 		{ id: 'Pic7', img: Pic7 },
 		{ id: 'Pic8', img: Pic8 },
 	];
+
+	const handleCoordsChange = (coords: { lat: number; lng: number }) => {
+		console.log('Nuevas coordenadas:', coords);
+	};
+
+	const centerToCuenca = () => {
+		mapRef.current?.centerMap(-79.00454, -2.90055, 15);
+	};
 
 	const GALLERY = (
 		<div className='row g-4'>
@@ -476,6 +506,13 @@ const SingleFluidPage = () => {
 												label='Dirección'>
 												<Input disabled value={shop.address} />
 											</FormGroup>
+											<MapCard
+												lat={coords?.lat ?? '-2.90055'}
+												lng={coords?.lng ?? '-79.00454'}
+												heightE='300px'
+												onCoordsChange={handleCoordsChange}
+												ref={mapRef}
+											/>
 										</div>
 									</CardBody>
 									<CardFooter>
