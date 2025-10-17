@@ -36,12 +36,6 @@ import Pic7 from '../../../assets/img/wanna/richie/richie7.png';
 import Pic8 from '../../../assets/img/wanna/richie/richie8.png';
 import Modal, { ModalBody, ModalHeader, ModalTitle } from '../../../components/bootstrap/Modal';
 import { demoPagesMenu } from '../../../menu';
-import WannaImg1 from '../../../assets/img/wanna/slide/scene-1.png';
-import WannaImg2 from '../../../assets/img/wanna/slide/scene-2.png';
-import WannaImg5 from '../../../assets/img/wanna/slide/scene-5.png';
-import WannaImg6 from '../../../assets/img/wanna/slide/scene-6.png';
-import Carousel from '../../../components/bootstrap/Carousel';
-import CarouselSlide from '../../../components/bootstrap/CarouselSlide';
 import useDarkMode from '../../../hooks/useDarkMode';
 import AuthContext from '../../../contexts/authContext';
 import MapCard, { MapCardRef } from '../../../components/profile/MapCard';
@@ -72,7 +66,7 @@ const SingleFluidPage = () => {
 		}
 	}, []);
 
-	const navigate = useNavigate();
+	// const navigate = useNavigate();
 	const formik = useFormik({
 		initialValues: {
 			formPrefix: 'Prof.',
@@ -119,10 +113,6 @@ const SingleFluidPage = () => {
 
 	const handleCoordsChange = (coords: { lat: number; lng: number }) => {
 		console.log('Nuevas coordenadas:', coords);
-	};
-
-	const centerToCuenca = () => {
-		mapRef.current?.centerMap(-79.00454, -2.90055, 15);
 	};
 
 	const GALLERY = (
