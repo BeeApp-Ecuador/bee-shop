@@ -421,10 +421,7 @@ const SingleFluidPage = () => {
 												label='Teléfono'>
 												<Input
 													type='tel'
-													placeholder='+1 (999) 999-9999'
-													autoComplete='tel'
 													disabled
-													onChange={formik.handleChange}
 													value={
 														shop.prefixLegalAgent + shop.phoneLegalAgent
 													}
@@ -456,66 +453,35 @@ const SingleFluidPage = () => {
 									<CardBody>
 										<div className='row g-4'>
 											<FormGroup
-												className='col-12'
-												id='formAddressLine'
-												label='Dirección'>
-												<Input
-													placeholder='Dirección'
-													autoComplete='address-line1'
-													onChange={formik.handleChange}
-													value={shop.address}
-												/>
-											</FormGroup>
-											{/* <FormGroup
-												className='col-12'
-												id='formAddressLine2'
-												label='Address Line 2'>
-												<Input
-													placeholder='Address Line 2'
-													autoComplete='address-line2'
-													onChange={formik.handleChange}
-													value={formik.values.formAddressLine2}
-												/>
-											</FormGroup> */}
-											<FormGroup
-												className='col-md-6'
-												id='formCity'
-												label='City'>
-												<Input
-													placeholder='City'
-													autoComplete='address-level2'
-													onChange={formik.handleChange}
-													value={formik.values.formCity}
-												/>
+												className='col-md-4'
+												id='formCountry'
+												label='País'>
+												<Input disabled value={shop.country} />
 											</FormGroup>
 											<FormGroup
 												className='col-md-4'
 												id='formState'
-												label='State'>
-												<Input
-													placeholder='State'
-													autoComplete='country-name'
-													onChange={formik.handleChange}
-													value={formik.values.formState}
-												/>
+												label='Provincia'>
+												<Input disabled value={shop.province} />
 											</FormGroup>
 											<FormGroup
-												className='col-md-2'
-												id='formZIP'
-												label='ZIP Code'>
-												<Input
-													placeholder='ZIP'
-													autoComplete='postal-code'
-													onChange={formik.handleChange}
-													value={formik.values.formZIP}
-												/>
+												className='col-md-4'
+												id='formCity'
+												label='Ciudad'>
+												<Input disabled value={shop.city} />
+											</FormGroup>
+											<FormGroup
+												className='col-12'
+												id='formAddressLine'
+												label='Dirección'>
+												<Input disabled value={shop.address} />
 											</FormGroup>
 										</div>
 									</CardBody>
 									<CardFooter>
 										<CardFooterRight>
-											<Button type='submit' color='info' icon='Save'>
-												Save
+											<Button type='submit' color='primary' icon='Save'>
+												Guardar
 											</Button>
 										</CardFooterRight>
 									</CardFooter>
