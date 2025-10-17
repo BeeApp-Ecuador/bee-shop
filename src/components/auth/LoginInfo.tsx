@@ -1,10 +1,8 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { FormikProps } from 'formik';
-import { LoginFormValues } from '../Login';
-import FormGroup from '../../../../components/bootstrap/forms/FormGroup';
-import Input from '../../../../components/bootstrap/forms/Input';
-import Icon from '../../../../components/icon/Icon';
-import Button from '../../../../components/bootstrap/Button';
+import FormGroup from '../bootstrap/forms/FormGroup';
+import Input from '../bootstrap/forms/Input';
+import { LoginFormValues } from '../../pages/presentation/auth/Login';
 
 const LoginInfo = ({ formikLogin }: { formikLogin: FormikProps<LoginFormValues> }) => {
 	// const [showPassword, setShowPassword] = useState<boolean>(false);

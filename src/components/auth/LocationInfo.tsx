@@ -1,18 +1,19 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import { FormikProps } from 'formik';
-import Card, { CardBody } from '../../../../components/bootstrap/Card';
-import { RegisterFormValues } from '../Login';
-import FormGroup from '../../../../components/bootstrap/forms/FormGroup';
-import Input from '../../../../components/bootstrap/forms/Input';
-import Select from '../../../../components/bootstrap/forms/Select';
 import {
 	useGetCountriesQuery,
 	useLazyGetCitiesQuery,
 	useLazyGetStatesQuery,
-} from '../../../../store/api/geoApi';
-import { CountryType } from '../../../../type/country-type';
-import { StateType } from '../../../../type/state-type';
-import { CityType } from '../../../../type/city-type';
+} from '../../store/api/geoApi';
+import { CountryType } from '../../type/country-type';
+import { RegisterFormValues } from '../../pages/presentation/auth/Login';
+import { StateType } from '../../type/state-type';
+import { CityType } from '../../type/city-type';
+import Card, { CardBody } from '../bootstrap/Card';
+import FormGroup from '../bootstrap/forms/FormGroup';
+import Select from '../bootstrap/forms/Select';
+import Input from '../bootstrap/forms/Input';
+
 const LocationInfo = ({ formikRegister }: { formikRegister: FormikProps<RegisterFormValues> }) => {
 	const { data } = useGetCountriesQuery({});
 	const [getStatesByCountryId] = useLazyGetStatesQuery();

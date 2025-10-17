@@ -1,8 +1,8 @@
 import React, { useState, useRef, useEffect } from 'react';
-import Card, { CardBody } from '../../../../components/bootstrap/Card';
-import FormGroup from '../../../../components/bootstrap/forms/FormGroup';
-import Input from '../../../../components/bootstrap/forms/Input';
-import { useVerifyCodeMutation } from '../../../../store/api/authApi';
+import { useVerifyCodeMutation } from '../../store/api/authApi';
+import Card, { CardBody } from '../bootstrap/Card';
+import FormGroup from '../bootstrap/forms/FormGroup';
+import Input from '../bootstrap/forms/Input';
 
 interface VerifyCodeProps {
 	onComplete: () => void;

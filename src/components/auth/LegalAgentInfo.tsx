@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
 import { FormikProps } from 'formik';
-import Card, { CardBody } from '../../../../components/bootstrap/Card';
-import { getCountries, getCountryByDialCode } from '../../../../utils/getCountries';
-import { RegisterFormValues } from '../Login';
-import FormGroup from '../../../../components/bootstrap/forms/FormGroup';
-import Input from '../../../../components/bootstrap/forms/Input';
-import Select from '../../../../components/bootstrap/forms/Select';
+import { RegisterFormValues } from '../../pages/presentation/auth/Login';
+import { getCountries, getCountryByDialCode } from '../../utils/getCountries';
+import Card, { CardBody } from '../bootstrap/Card';
+import FormGroup from '../bootstrap/forms/FormGroup';
+import Input from '../bootstrap/forms/Input';
+import Select from '../bootstrap/forms/Select';
 
 const LegalAgentInfo = ({
 	formikRegister,
