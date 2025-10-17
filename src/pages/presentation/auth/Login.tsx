@@ -5,22 +5,16 @@ import { FormikHelpers, useFormik } from 'formik';
 import PageWrapper from '../../../layout/PageWrapper/PageWrapper';
 import Page from '../../../layout/Page/Page';
 import Card, { CardBody } from '../../../components/bootstrap/Card';
-import FormGroup from '../../../components/bootstrap/forms/FormGroup';
-import Input from '../../../components/bootstrap/forms/Input';
 import Button from '../../../components/bootstrap/Button';
 import useDarkMode from '../../../hooks/useDarkMode';
 import AuthContext from '../../../contexts/authContext';
-import { getUserDataWithUsername } from '../../../common/data/userDummyData';
 import {
 	useLoginMutation,
 	useRegisterMutation,
 	useSendEmailVerificationMutation,
 } from '../../../store/api/authApi';
 import { File } from 'buffer';
-import LegalAgentInfo from './components/LegalAgentInfo';
-import BusinessInfo from './components/BusinessInfo';
-import LocationInfo from './components/LocationInfo';
-import SessionInfo from './components/SessionInfo';
+
 import Modal, {
 	ModalBody,
 	ModalFooter,
@@ -28,9 +22,15 @@ import Modal, {
 	ModalTitle,
 } from '../../../components/bootstrap/Modal';
 import Spinner from '../../../components/bootstrap/Spinner';
-import VerifyCode from './components/VerifyCode';
 import { getCountryByDialCode } from '../../../utils/getCountries';
-import LoginInfo from './components/LoginInfo';
+import {
+	BusinessInfo,
+	LegalAgentInfo,
+	LocationInfo,
+	LoginInfo,
+	SessionInfo,
+	VerifyCode,
+} from '../../../components/auth';
 
 export interface RegisterFormValues {
 	nameLegalAgent: string;
@@ -348,7 +348,7 @@ const Login: FC<ILoginProps> = ({ isSignUp }) => {
 		},
 		validateOnChange: false,
 		validateOnBlur: true,
-		onSubmit: async (values, formikHelpers) => {
+		onSubmit: async (values) => {
 			setIsLoading(true);
 			await handleSendCode(values.email);
 			setIsLoading(false);

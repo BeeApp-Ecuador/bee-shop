@@ -1,10 +1,10 @@
 import React, { useState } from 'react';
 import { FormikProps } from 'formik';
-import Card, { CardBody } from '../../../../components/bootstrap/Card';
-import { RegisterFormValues } from '../Login';
-import FormGroup from '../../../../components/bootstrap/forms/FormGroup';
-import Input from '../../../../components/bootstrap/forms/Input';
-import Icon from '../../../../components/icon/Icon';
+import { RegisterFormValues } from '../../pages/presentation/auth/Login';
+import Card, { CardBody } from '../bootstrap/Card';
+import FormGroup from '../bootstrap/forms/FormGroup';
+import Input from '../bootstrap/forms/Input';
+import Icon from '../icon/Icon';
 
 const SessionInfo = ({ formikRegister }: { formikRegister: FormikProps<RegisterFormValues> }) => {
 	const [showPassword, setShowPassword] = useState<boolean>(false);

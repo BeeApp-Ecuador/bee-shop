@@ -29,6 +29,8 @@ import { demoPagesMenu } from '../../../menu';
 import AuthContext from '../../../contexts/authContext';
 import MapCard, { MapCardRef } from '../../../components/profile/MapCard';
 import { useChangePasswordMutation } from '../../../store/api/authApi';
+import Spinner from '../../../components/bootstrap/Spinner';
+import LegalAgentInfo from '../../../components/profile/LegalAgentInfo';
 
 const ProfilePage = () => {
 	const { user: shop } = useContext(AuthContext);
@@ -36,6 +38,7 @@ const ProfilePage = () => {
 	const [coords, setCoords] = useState<{ lat: number; lng: number } | null>(null);
 	const [error, setError] = useState<string | null>(null);
 	const [changePassword] = useChangePasswordMutation();
+	const [isUpdatingPassword, setIsUpdatingPassword] = useState(false);
 
 	useEffect(() => {
 		if ('geolocation' in navigator) {
@@ -88,16 +91,29 @@ const ProfilePage = () => {
 		},
 		onSubmit: async (values) => {
 			const { confirmNewPassword, ...body } = values;
+			setIsUpdatingPassword(true);
 			const { data, error } = await changePassword(body);
-
-			showNotification(
-				<span className='d-flex align-items-center'>
-					<Icon icon='Success' size='lg' className='me-1' />
-					<span>Éxito</span>
-				</span>,
-				'Contraseña actualizada correctamente',
-				'success',
-			);
+			setIsUpdatingPassword(false);
+			if (error) {
+				showNotification(
+					<span className='d-flex align-items-center'>
+						<Icon icon='Error' size='lg' className='me-1' />
+						<span>Error</span>
+					</span>,
+					'Ocurrió un error al actualizar la contraseña, intenta nuevamente',
+					'danger',
+				);
+			}
+			if (data) {
+				showNotification(
+					<span className='d-flex align-items-center'>
+						<Icon icon='Success' size='lg' className='me-1' />
+						<span>Éxito</span>
+					</span>,
+					'Contraseña actualizada correctamente',
+					'success',
+				);
+			}
 		},
 	});
 	const [ref, { height }] = useMeasure<HTMLDivElement>();
@@ -201,56 +217,7 @@ const ProfilePage = () => {
 									La información que se muestra aquí no es compartida con
 									terceros.
 								</Alert>
-								<Card
-									className='rounded-2'
-									tag='form'
-									// onSubmit={formik.handleSubmit}
-								>
-									<CardHeader>
-										<CardLabel icon='Person'>
-											<CardTitle>Representante Legal</CardTitle>
-										</CardLabel>
-									</CardHeader>
-									<CardBody>
-										<div className='row g-4'>
-											<FormGroup
-												className='col-md-12'
-												id='formName'
-												label='Nombre'>
-												<Input disabled value={shop.nameLegalAgent} />
-											</FormGroup>
-											<FormGroup
-												className='col-md-12'
-												id='formAddress'
-												label='Dirección'>
-												<Input disabled value={shop.addressLegalAgent} />
-											</FormGroup>
-
-											<FormGroup
-												className='col-lg-6'
-												id='formEmailAddress'
-												label='Identificación'>
-												<Input
-													type='text'
-													disabled
-													value={shop.ciLegalAgent}
-												/>
-											</FormGroup>
-											<FormGroup
-												className='col-lg-6'
-												id='formPhone'
-												label='Teléfono'>
-												<Input
-													type='tel'
-													disabled
-													value={
-														shop.prefixLegalAgent + shop.phoneLegalAgent
-													}
-												/>
-											</FormGroup>
-										</div>
-									</CardBody>
-								</Card>
+								<LegalAgentInfo shop={shop} />
 							</CardTabItem>
 							<CardTabItem id='address' title='Dirección' icon='HolidayVillage'>
 								<Card
@@ -398,7 +365,11 @@ const ProfilePage = () => {
 											<Button
 												color='primary'
 												icon='Save'
+												isDisable={isUpdatingPassword}
 												onClick={formikPassword.handleSubmit}>
+												{isUpdatingPassword && (
+													<Spinner isSmall inButton isGrow />
+												)}
 												Cambiar Contraseña
 											</Button>
 										</CardFooterRight>
