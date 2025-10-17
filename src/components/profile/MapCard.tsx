@@ -62,6 +62,8 @@ const MapCard = forwardRef<MapCardRef, MapCardProps>(
 							source: new XYZ({
 								url: 'https://mt0.google.com/vt/lyrs=m&hl=en&x={x}&y={y}&z={z}&s=Ga',
 							}),
+							opacity: 1,
+							visible: true,
 						}),
 					],
 					view: new View({
@@ -71,6 +73,11 @@ const MapCard = forwardRef<MapCardRef, MapCardProps>(
 						minZoom: 7,
 					}),
 				});
+				map.getViewport().style.width = '100%';
+				map.getViewport().style.height = '100%';
+				map.getViewport().style.overflow = 'hidden'; // recorta todo
+				map.getViewport().style.borderRadius = '30px'; // coincide con tu div
+				map.getViewport().style.background = 'transparent';
 
 				mapInstance.current = map;
 				setMarker(defaultLng, defaultLat);
@@ -146,7 +153,7 @@ const MapCard = forwardRef<MapCardRef, MapCardProps>(
 				style={{
 					width: '100%',
 					height: heightE || '300px',
-					borderRadius: '8px',
+					borderRadius: '30px',
 					overflow: 'hidden',
 				}}
 			/>
