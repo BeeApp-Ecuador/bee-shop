@@ -1,9 +1,7 @@
 import React, { useContext, useEffect, useRef, useState } from 'react';
 import { useFormik } from 'formik';
 
-import classNames from 'classnames';
 import { useMeasure } from 'react-use';
-import { useNavigate } from 'react-router-dom';
 import Button from '../../../components/bootstrap/Button';
 import Page from '../../../layout/Page/Page';
 import PageWrapper from '../../../layout/PageWrapper/PageWrapper';
@@ -26,22 +24,12 @@ import Alert from '../../../components/bootstrap/Alert';
 import Avatar from '../../../components/Avatar';
 import Progress from '../../../components/bootstrap/Progress';
 
-import Pic from '../../../assets/img/wanna/richie/richie.png';
-import Pic2 from '../../../assets/img/wanna/richie/richie2.png';
-import Pic3 from '../../../assets/img/wanna/richie/richie3.png';
-import Pic4 from '../../../assets/img/wanna/richie/richie4.png';
-import Pic5 from '../../../assets/img/wanna/richie/richie5.png';
-import Pic6 from '../../../assets/img/wanna/richie/richie6.png';
-import Pic7 from '../../../assets/img/wanna/richie/richie7.png';
-import Pic8 from '../../../assets/img/wanna/richie/richie8.png';
 import Modal, { ModalBody, ModalHeader, ModalTitle } from '../../../components/bootstrap/Modal';
 import { demoPagesMenu } from '../../../menu';
-import useDarkMode from '../../../hooks/useDarkMode';
 import AuthContext from '../../../contexts/authContext';
 import MapCard, { MapCardRef } from '../../../components/profile/MapCard';
 
 const SingleFluidPage = () => {
-	const { darkModeStatus } = useDarkMode();
 	const { user: shop } = useContext(AuthContext);
 
 	const [coords, setCoords] = useState<{ lat: number; lng: number } | null>(null);
@@ -66,81 +54,32 @@ const SingleFluidPage = () => {
 		}
 	}, []);
 
-	// const navigate = useNavigate();
-	const formik = useFormik({
+	const [searchAddress, setSearchAddress] = useState<string>('');
+
+	const formikPassword = useFormik({
 		initialValues: {
-			formPrefix: 'Prof.',
-			formName: 'Timothy',
-			formMiddleName: 'John',
-			formSurName: 'Doe',
-			formEmailAddress: 'tjohndoe@site.com',
-			formPhone: '2575637401',
-			formAddressLine: '',
-			formAddressLine2: 'Mankato',
-			formCity: 'Mississippi',
-			formState: 'USA',
-			formZIP: '96522',
-			formCurrentPassword: '',
-			formNewPassword: '',
-			formConfirmNewPassword: '',
+			currentPassword: '',
+			newPassword: '',
+			confirmNewPassword: '',
 		},
 		onSubmit: (values) => {
 			showNotification(
 				<span className='d-flex align-items-center'>
-					<Icon icon='Info' size='lg' className='me-1' />
-					<span>Updated Information</span>
+					<Icon icon='Success' size='lg' className='me-1' />
+					<span>Éxito</span>
 				</span>,
-				JSON.stringify(values, null, 2),
+				'Contraseña actualizada correctamente',
+				'success',
 			);
 		},
 	});
 	const [ref, { height }] = useMeasure<HTMLDivElement>();
 	const mapRef = useRef<MapCardRef>(null);
-	const colors = ['primary', 'secondary', 'success', 'info', 'warning', 'danger', 'dark'];
 	const [selectedImage, setSelectedImage] = useState<string | undefined>(undefined);
-	const [gallerySeeAll, setGallerySeeAll] = useState(false);
-
-	const images: { id: string; img: string }[] = [
-		{ id: 'Pic', img: Pic },
-		{ id: 'Pic2', img: Pic2 },
-		{ id: 'Pic3', img: Pic3 },
-		{ id: 'Pic4', img: Pic4 },
-		{ id: 'Pic5', img: Pic5 },
-		{ id: 'Pic6', img: Pic6 },
-		{ id: 'Pic7', img: Pic7 },
-		{ id: 'Pic8', img: Pic8 },
-	];
 
 	const handleCoordsChange = (coords: { lat: number; lng: number }) => {
 		console.log('Nuevas coordenadas:', coords);
 	};
-
-	const GALLERY = (
-		<div className='row g-4'>
-			{images.map((item, index) => (
-				<div key={item.id} className='col-xxl-2 col-lg-3 col-md-6'>
-					<button
-						type='button'
-						onClick={() => setSelectedImage(item.img)}
-						className={classNames(
-							'ratio ratio-1x1',
-							'rounded-2',
-							'border-0',
-							`bg-l${darkModeStatus ? 'o25' : '25'}-${colors[index % 7]}`,
-							`bg-l${darkModeStatus ? 'o50' : '10'}-${colors[index % 7]}-hover`,
-						)}>
-						<img
-							src={item.img}
-							alt={item.id}
-							width='100%'
-							height='auto'
-							className='object-fit-contain p-4'
-						/>
-					</button>
-				</div>
-			))}
-		</div>
-	);
 
 	return (
 		<PageWrapper title={demoPagesMenu.singlePages.subMenu.fluidSingle.text}>
@@ -162,11 +101,6 @@ const SingleFluidPage = () => {
 											<div className='flex-grow-1 ms-3'>
 												<div className='h2 fw-bold'>
 													{shop.businessName}
-													{/* {formik.values.formMiddleName &&
-														` ${formik.values.formMiddleName.charAt(
-															0,
-														)}.`}{' '} */}
-													{/* {formik.values.formSurName || 'Surname'} */}
 												</div>
 												<div className='h5 text-muted'>Founder</div>
 											</div>
@@ -221,96 +155,7 @@ const SingleFluidPage = () => {
 								<Progress value={70} />
 							</CardBody>
 						</Card>
-						{/* <Card>
-							<CardHeader>
-								<CardLabel icon='ShowChart' iconColor='secondary'>
-									<CardTitle>Statics</CardTitle>
-								</CardLabel>
-								<CardActions>
-									Only in <strong>{dayjs().format('MMM')}</strong>.
-								</CardActions>
-							</CardHeader>
-							<CardBody>
-								<div className='row g-4 align-items-center'>
-									<div className='col-xl-6'>
-										<div
-											className={classNames(
-												'd-flex align-items-center rounded-2 p-3',
-												{
-													'bg-l10-warning': !darkModeStatus,
-													'bg-lo25-warning': darkModeStatus,
-												},
-											)}>
-											<div className='flex-shrink-0'>
-												<Icon
-													icon='MonetizationOn'
-													size='3x'
-													color='warning'
-												/>
-											</div>
-											<div className='flex-grow-1 ms-3'>
-												<div className='fw-bold fs-3 mb-0'>183K</div>
-												<div className='text-muted mt-n2'>Sales</div>
-											</div>
-										</div>
-									</div>
-									<div className='col-xl-6'>
-										<div
-											className={classNames(
-												'd-flex align-items-center rounded-2 p-3',
-												{
-													'bg-l10-info': !darkModeStatus,
-													'bg-lo25-info': darkModeStatus,
-												},
-											)}>
-											<div className='flex-shrink-0'>
-												<Icon icon='Person' size='3x' color='info' />
-											</div>
-											<div className='flex-grow-1 ms-3'>
-												<div className='fw-bold fs-3 mb-0'>1247</div>
-												<div className='text-muted mt-n2'>Customers</div>
-											</div>
-										</div>
-									</div>
-									<div className='col-xl-6'>
-										<div
-											className={classNames(
-												'd-flex align-items-center rounded-2 p-3',
-												{
-													'bg-l10-primary': !darkModeStatus,
-													'bg-lo25-primary': darkModeStatus,
-												},
-											)}>
-											<div className='flex-shrink-0'>
-												<Icon icon='Inventory2' size='3x' color='primary' />
-											</div>
-											<div className='flex-grow-1 ms-3'>
-												<div className='fw-bold fs-3 mb-0'>500+</div>
-												<div className='text-muted mt-n2'>Products</div>
-											</div>
-										</div>
-									</div>
-									<div className='col-xl-6'>
-										<div
-											className={classNames(
-												'd-flex align-items-center rounded-2 p-3',
-												{
-													'bg-l10-success': !darkModeStatus,
-													'bg-lo25-success': darkModeStatus,
-												},
-											)}>
-											<div className='flex-shrink-0'>
-												<Icon icon='Money' size='3x' color='success' />
-											</div>
-											<div className='flex-grow-1 ms-3'>
-												<div className='fw-bold fs-3 mb-0'>112,458</div>
-												<div className='text-muted mt-n2'>Profits</div>
-											</div>
-										</div>
-									</div>
-								</div>
-							</CardBody>
-						</Card> */}
+
 						<Card>
 							<CardHeader>
 								<CardLabel>
@@ -323,78 +168,6 @@ const SingleFluidPage = () => {
 						</Card>
 					</div>
 					<div className='col-xxl-8 col-xl-6'>
-						{/* <Card
-							className={classNames('shadow-3d-info', 'mb-5', {
-								'bg-lo10-info': darkModeStatus,
-								'bg-l25-info': !darkModeStatus,
-							})}>
-							<Carousel
-								isHoverPause
-								isRide
-								height={height || 305}
-								isDark={darkModeStatus}>
-								<CarouselSlide>
-									<div className='row align-items-center h-100'>
-										<div
-											className='col-6 carousel-slide-bg'
-											style={{ backgroundImage: `url(${WannaImg1})` }}
-										/>
-										<div className='col-6'>
-											<h2>New Products</h2>
-											<p className='lead'>New products ready for sale.</p>
-											<Button
-												color={darkModeStatus ? 'light' : 'dark'}
-												onClick={() =>
-													navigate(
-														`../${demoPagesMenu.sales.subMenu.productsGrid.path}`,
-													)
-												}>
-												Click
-											</Button>
-										</div>
-									</div>
-								</CarouselSlide>
-								<CarouselSlide background={WannaImg5} />
-								<CarouselSlide>
-									<div className='row align-items-center h-100'>
-										<div className='col-6 text-end'>
-											<h2>Customize</h2>
-											<h5>You can design your own screens</h5>
-											<Button
-												color={darkModeStatus ? 'light' : 'dark'}
-												onClick={() =>
-													navigate(
-														`../${demoPagesMenu.sales.subMenu.dashboard.path}`,
-													)
-												}>
-												Click
-											</Button>
-										</div>
-										<div
-											className='col-6 carousel-slide-bg'
-											style={{ backgroundImage: `url(${WannaImg2})` }}
-										/>
-									</div>
-								</CarouselSlide>
-								<CarouselSlide background={WannaImg6} />
-							</Carousel>
-						</Card> */}
-						{/* <Card>
-							<CardHeader>
-								<CardLabel icon='PhotoSizeSelectActual' iconColor='info'>
-									<CardTitle>Photos and Videos</CardTitle>
-								</CardLabel>
-								<CardActions>
-									<Button
-										color='info'
-										isLight
-										onClick={() => setGallerySeeAll(true)}>
-										See All
-									</Button>
-								</CardActions>
-							</CardHeader>
-							<CardBody>{GALLERY}</CardBody>
-						</Card> */}
 						<Card hasTab>
 							<CardTabItem id='profile' title='Representante' icon='Contacts'>
 								<Alert isLight className='border-0' shadow='md' icon='LocalPolice'>
@@ -404,7 +177,8 @@ const SingleFluidPage = () => {
 								<Card
 									className='rounded-2'
 									tag='form'
-									onSubmit={formik.handleSubmit}>
+									// onSubmit={formik.handleSubmit}
+								>
 									<CardHeader>
 										<CardLabel icon='Person'>
 											<CardTitle>Representante Legal</CardTitle>
@@ -450,21 +224,13 @@ const SingleFluidPage = () => {
 										</div>
 									</CardBody>
 								</Card>
-								{/* <Alert
-									isLight
-									className='border-0'
-									shadow='md'
-									icon='Public'
-									color='warning'>
-									As soon as you save the information, it will be shown to
-									everyone automatically.
-								</Alert> */}
 							</CardTabItem>
 							<CardTabItem id='address' title='Dirección' icon='HolidayVillage'>
 								<Card
 									className='rounded-2'
 									tag='form'
-									onSubmit={formik.handleSubmit}>
+									// onSubmit={formik.handleSubmit}
+								>
 									<CardHeader>
 										<CardLabel icon='HolidayVillage'>
 											<CardTitle>Dirección del local</CardTitle>
@@ -502,8 +268,10 @@ const SingleFluidPage = () => {
 												label='Buscar en el mapa'>
 												<Input
 													id='formAddressLine'
-													value={formik.values.formAddressLine}
-													onChange={formik.handleChange}
+													value={searchAddress}
+													onChange={(e) =>
+														setSearchAddress(e.target.value)
+													}
 												/>
 											</FormGroup>
 											<MapCard
@@ -528,7 +296,7 @@ const SingleFluidPage = () => {
 								<Card
 									className='rounded-2'
 									tag='form'
-									onSubmit={formik.handleSubmit}>
+									onSubmit={formikPassword.handleSubmit}>
 									<CardHeader>
 										<CardLabel icon='Lock'>
 											<CardTitle>Cambiar Contraseña</CardTitle>
@@ -544,8 +312,8 @@ const SingleFluidPage = () => {
 													type='password'
 													placeholder='Contraseña Actual'
 													autoComplete='current-password'
-													onChange={formik.handleChange}
-													value={formik.values.formCurrentPassword}
+													onChange={formikPassword.handleChange}
+													value={formikPassword.values.currentPassword}
 												/>
 											</FormGroup>
 											<div className='w-100 m-0' />
@@ -557,8 +325,8 @@ const SingleFluidPage = () => {
 													type='password'
 													placeholder='Nueva Contraseña'
 													autoComplete='new-password'
-													onChange={formik.handleChange}
-													value={formik.values.formNewPassword}
+													onChange={formikPassword.handleChange}
+													value={formikPassword.values.newPassword}
 												/>
 											</FormGroup>
 											<div className='w-100 m-0' />
@@ -570,16 +338,19 @@ const SingleFluidPage = () => {
 													type='password'
 													placeholder='Confirmar Nueva Contraseña'
 													autoComplete='new-password'
-													onChange={formik.handleChange}
-													value={formik.values.formConfirmNewPassword}
+													onChange={formikPassword.handleChange}
+													value={formikPassword.values.confirmNewPassword}
 												/>
 											</FormGroup>
 										</div>
 									</CardBody>
 									<CardFooter>
 										<CardFooterRight>
-											<Button type='submit' color='info' icon='Save'>
-												Change Password
+											<Button
+												color='primary'
+												icon='Save'
+												onClick={formikPassword.handleSubmit}>
+												Cambiar Contraseña
 											</Button>
 										</CardFooterRight>
 									</CardFooter>
@@ -596,17 +367,6 @@ const SingleFluidPage = () => {
 					<ModalBody>
 						<img src={selectedImage} alt='eneme' />
 					</ModalBody>
-				</Modal>
-
-				<Modal
-					setIsOpen={setGallerySeeAll}
-					isOpen={gallerySeeAll}
-					fullScreen
-					titleId='gallery-full'>
-					<ModalHeader setIsOpen={setGallerySeeAll}>
-						<ModalTitle id='gallery-full'>Gallery</ModalTitle>
-					</ModalHeader>
-					<ModalBody>{GALLERY}</ModalBody>
 				</Modal>
 			</Page>
 		</PageWrapper>
