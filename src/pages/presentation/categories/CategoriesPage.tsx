@@ -48,6 +48,7 @@ import useSelectTable from '../../../hooks/useSelectTable';
 import useDarkMode from '../../../hooks/useDarkMode';
 import useTourStep from '../../../hooks/useTourStep';
 import { enUS } from 'date-fns/locale';
+import CategoryRow from '../../../components/categories/CategoryRow';
 
 const CategoriesPage = () => {
 	/**
@@ -185,17 +186,7 @@ const CategoriesPage = () => {
 							<thead>
 								<tr>
 									<th scope='col'>{SelectAllCheck}</th>
-									<th
-										scope='col'
-										onClick={() => requestSort('id')}
-										className='cursor-pointer text-decoration-underline'>
-										#{' '}
-										<Icon
-											size='lg'
-											className={getClassNamesFor('id')}
-											icon='FilterList'
-										/>
-									</th>
+
 									<th scope='col'>Nombre</th>
 									<th scope='col'>Descripción</th>
 									{/* <th
@@ -228,10 +219,22 @@ const CategoriesPage = () => {
 							</thead>
 							<tbody>
 								{onCurrentPageItems.map((i) => (
-									<CommonTableRow
+									// <CommonTableRow
+									// 	key={i.id}
+									// 	// eslint-disable-next-line react/jsx-props-no-spreading
+									// 	{...i}
+									// 	selectName='selectedList'
+									// 	selectOnChange={selectTable.handleChange}
+									// 	selectChecked={selectTable.values.selectedList.includes(
+									// 		// @ts-ignore
+									// 		i.id.toString(),
+									// 	)}
+									// />
+									<CategoryRow
 										key={i.id}
-										// eslint-disable-next-line react/jsx-props-no-spreading
-										{...i}
+										id={i.id}
+										name={i.name}
+										description='Descripción de la categoría'
 										selectName='selectedList'
 										selectOnChange={selectTable.handleChange}
 										selectChecked={selectTable.values.selectedList.includes(

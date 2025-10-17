@@ -35,19 +35,7 @@ const CategoryRow: FC<ICategoryRowProps> = ({
 					ariaLabel={selectName}
 				/>
 			</th>
-			<th scope='row'>{id}</th>
-			<td>
-				<div>
-					<Link
-						to={`../${demoPagesMenu.sales.subMenu.productID.path}/${id}`}
-						className={classNames('fw-bold', {
-							'link-dark': !darkModeStatus,
-							'link-light': darkModeStatus,
-						})}>
-						{name}
-					</Link>
-				</div>
-			</td>
+			<td className='fw-bold'>{name}</td>
 			<td>{description}</td>
 			<td className='text-end'>
 				<Button

@@ -1,6 +1,6 @@
-import React, { useContext, useState } from 'react';
+import React, { useContext, useEffect, useRef, useState } from 'react';
 import { useFormik } from 'formik';
-import dayjs from 'dayjs';
+
 import classNames from 'classnames';
 import { useMeasure } from 'react-use';
 import { useNavigate } from 'react-router-dom';
@@ -8,7 +8,6 @@ import Button from '../../../components/bootstrap/Button';
 import Page from '../../../layout/Page/Page';
 import PageWrapper from '../../../layout/PageWrapper/PageWrapper';
 import Card, {
-	CardActions,
 	CardBody,
 	CardFooter,
 	CardFooterRight,
@@ -45,10 +44,33 @@ import Carousel from '../../../components/bootstrap/Carousel';
 import CarouselSlide from '../../../components/bootstrap/CarouselSlide';
 import useDarkMode from '../../../hooks/useDarkMode';
 import AuthContext from '../../../contexts/authContext';
+import MapCard, { MapCardRef } from '../../../components/profile/MapCard';
 
 const SingleFluidPage = () => {
 	const { darkModeStatus } = useDarkMode();
 	const { user: shop } = useContext(AuthContext);
+
+	const [coords, setCoords] = useState<{ lat: number; lng: number } | null>(null);
+	const [error, setError] = useState<string | null>(null);
+
+	useEffect(() => {
+		if ('geolocation' in navigator) {
+			navigator.geolocation.getCurrentPosition(
+				(position) => {
+					setCoords({
+						lat: position.coords.latitude,
+						lng: position.coords.longitude,
+					});
+				},
+				(err) => {
+					setError('No se pudo obtener la ubicación. Activa los permisos de ubicación.');
+					console.error(err);
+				},
+			);
+		} else {
+			setError('Tu navegador no soporta geolocalización.');
+		}
+	}, []);
 
 	const navigate = useNavigate();
 	const formik = useFormik({
@@ -79,7 +101,7 @@ const SingleFluidPage = () => {
 		},
 	});
 	const [ref, { height }] = useMeasure<HTMLDivElement>();
-
+	const mapRef = useRef<MapCardRef>(null);
 	const colors = ['primary', 'secondary', 'success', 'info', 'warning', 'danger', 'dark'];
 	const [selectedImage, setSelectedImage] = useState<string | undefined>(undefined);
 	const [gallerySeeAll, setGallerySeeAll] = useState(false);
@@ -94,6 +116,14 @@ const SingleFluidPage = () => {
 		{ id: 'Pic7', img: Pic7 },
 		{ id: 'Pic8', img: Pic8 },
 	];
+
+	const handleCoordsChange = (coords: { lat: number; lng: number }) => {
+		console.log('Nuevas coordenadas:', coords);
+	};
+
+	const centerToCuenca = () => {
+		mapRef.current?.centerMap(-79.00454, -2.90055, 15);
+	};
 
 	const GALLERY = (
 		<div className='row g-4'>
@@ -396,12 +426,13 @@ const SingleFluidPage = () => {
 												className='col-md-12'
 												id='formName'
 												label='Nombre'>
-												<Input
-													placeholder='Timothy'
-													autoComplete='given-name'
-													onChange={formik.handleChange}
-													value={shop.nameLegalAgent}
-												/>
+												<Input disabled value={shop.nameLegalAgent} />
+											</FormGroup>
+											<FormGroup
+												className='col-md-12'
+												id='formAddress'
+												label='Dirección'>
+												<Input disabled value={shop.addressLegalAgent} />
 											</FormGroup>
 
 											<FormGroup
@@ -410,9 +441,6 @@ const SingleFluidPage = () => {
 												label='Identificación'>
 												<Input
 													type='text'
-													// placeholder='john@domain.com'
-													// autoComplete='email'
-													// onChange={formik.handleChange}
 													disabled
 													value={shop.ciLegalAgent}
 												/>
@@ -423,10 +451,7 @@ const SingleFluidPage = () => {
 												label='Teléfono'>
 												<Input
 													type='tel'
-													placeholder='+1 (999) 999-9999'
-													autoComplete='tel'
-													mask='+1 (999) 999-9999'
-													onChange={formik.handleChange}
+													disabled
 													value={
 														shop.prefixLegalAgent + shop.phoneLegalAgent
 													}
@@ -434,15 +459,8 @@ const SingleFluidPage = () => {
 											</FormGroup>
 										</div>
 									</CardBody>
-									<CardFooter>
-										<CardFooterRight>
-											<Button type='submit' color='primary' icon='Save'>
-												Save
-											</Button>
-										</CardFooterRight>
-									</CardFooter>
 								</Card>
-								<Alert
+								{/* <Alert
 									isLight
 									className='border-0'
 									shadow='md'
@@ -450,7 +468,7 @@ const SingleFluidPage = () => {
 									color='warning'>
 									As soon as you save the information, it will be shown to
 									everyone automatically.
-								</Alert>
+								</Alert> */}
 							</CardTabItem>
 							<CardTabItem id='address' title='Dirección' icon='HolidayVillage'>
 								<Card
@@ -465,66 +483,42 @@ const SingleFluidPage = () => {
 									<CardBody>
 										<div className='row g-4'>
 											<FormGroup
-												className='col-12'
-												id='formAddressLine'
-												label='Dirección'>
-												<Input
-													placeholder='Dirección'
-													autoComplete='address-line1'
-													onChange={formik.handleChange}
-													value={shop.address}
-												/>
-											</FormGroup>
-											{/* <FormGroup
-												className='col-12'
-												id='formAddressLine2'
-												label='Address Line 2'>
-												<Input
-													placeholder='Address Line 2'
-													autoComplete='address-line2'
-													onChange={formik.handleChange}
-													value={formik.values.formAddressLine2}
-												/>
-											</FormGroup> */}
-											<FormGroup
-												className='col-md-6'
-												id='formCity'
-												label='City'>
-												<Input
-													placeholder='City'
-													autoComplete='address-level2'
-													onChange={formik.handleChange}
-													value={formik.values.formCity}
-												/>
+												className='col-md-4'
+												id='formCountry'
+												label='País'>
+												<Input disabled value={shop.country} />
 											</FormGroup>
 											<FormGroup
 												className='col-md-4'
 												id='formState'
-												label='State'>
-												<Input
-													placeholder='State'
-													autoComplete='country-name'
-													onChange={formik.handleChange}
-													value={formik.values.formState}
-												/>
+												label='Provincia'>
+												<Input disabled value={shop.province} />
 											</FormGroup>
 											<FormGroup
-												className='col-md-2'
-												id='formZIP'
-												label='ZIP Code'>
-												<Input
-													placeholder='ZIP'
-													autoComplete='postal-code'
-													onChange={formik.handleChange}
-													value={formik.values.formZIP}
-												/>
+												className='col-md-4'
+												id='formCity'
+												label='Ciudad'>
+												<Input disabled value={shop.city} />
 											</FormGroup>
+											<FormGroup
+												className='col-12'
+												id='formAddressLine'
+												label='Dirección'>
+												<Input disabled value={shop.address} />
+											</FormGroup>
+											<MapCard
+												lat={coords?.lat ?? '-2.90055'}
+												lng={coords?.lng ?? '-79.00454'}
+												heightE='300px'
+												onCoordsChange={handleCoordsChange}
+												ref={mapRef}
+											/>
 										</div>
 									</CardBody>
 									<CardFooter>
 										<CardFooterRight>
-											<Button type='submit' color='info' icon='Save'>
-												Save
+											<Button type='submit' color='primary' icon='Save'>
+												Guardar
 											</Button>
 										</CardFooterRight>
 									</CardFooter>

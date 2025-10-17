@@ -33,7 +33,7 @@ const PageWrapper = forwardRef<HTMLDivElement, IPageWrapperProps>(
 
 		const navigate = useNavigate();
 		useEffect(() => {
-			if (isProtected && !shop) {
+			if ((isProtected && !shop) || Object.keys(shop).length === 0) {
 				navigate(`../${demoPagesMenu.login.path}`);
 			}
 			return () => {};
