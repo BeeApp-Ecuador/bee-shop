@@ -28,12 +28,14 @@ import Modal, { ModalBody, ModalHeader, ModalTitle } from '../../../components/b
 import { demoPagesMenu } from '../../../menu';
 import AuthContext from '../../../contexts/authContext';
 import MapCard, { MapCardRef } from '../../../components/profile/MapCard';
+import { useChangePasswordMutation } from '../../../store/api/authApi';
 
-const SingleFluidPage = () => {
+const ProfilePage = () => {
 	const { user: shop } = useContext(AuthContext);
 
 	const [coords, setCoords] = useState<{ lat: number; lng: number } | null>(null);
 	const [error, setError] = useState<string | null>(null);
+	const [changePassword] = useChangePasswordMutation();
 
 	useEffect(() => {
 		if ('geolocation' in navigator) {
@@ -62,7 +64,32 @@ const SingleFluidPage = () => {
 			newPassword: '',
 			confirmNewPassword: '',
 		},
-		onSubmit: (values) => {
+		validate: (values) => {
+			const errors: { [key: string]: string } = {};
+			if (!values.currentPassword) {
+				errors.currentPassword = 'Requerido';
+			}
+			if (!values.newPassword) {
+				errors.newPassword = 'Requerido';
+			} else if (values.newPassword.length < 6) {
+				errors.newPassword = 'La contraseña debe tener al menos 6 caracteres';
+			} else if (
+				!/(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{6,}/.test(
+					values.newPassword,
+				)
+			) {
+				errors.newPassword =
+					'La contraseña debe contener al menos una letra mayúscula, una letra minúscula, un número y uno de estos caracteres especiales (@ $ ! % * ? &)';
+			}
+			if (values.newPassword !== values.confirmNewPassword) {
+				errors.confirmNewPassword = 'Las contraseñas no coinciden';
+			}
+			return errors;
+		},
+		onSubmit: async (values) => {
+			const { confirmNewPassword, ...body } = values;
+			const { data, error } = await changePassword(body);
+
 			showNotification(
 				<span className='d-flex align-items-center'>
 					<Icon icon='Success' size='lg' className='me-1' />
@@ -306,40 +333,62 @@ const SingleFluidPage = () => {
 										<div className='row g-4'>
 											<FormGroup
 												className='col-lg-6'
-												id='formCurrentPassword'
+												id='currentPassword'
 												label='Contraseña Actual'>
 												<Input
-													type='password'
 													placeholder='Contraseña Actual'
-													autoComplete='current-password'
-													onChange={formikPassword.handleChange}
+													type='password'
 													value={formikPassword.values.currentPassword}
+													isTouched={
+														formikPassword.touched.currentPassword
+													}
+													invalidFeedback={
+														formikPassword.errors.currentPassword
+													}
+													isValid={formikPassword.isValid}
+													onChange={formikPassword.handleChange}
+													onBlur={formikPassword.handleBlur}
+													id='currentPassword'
 												/>
 											</FormGroup>
 											<div className='w-100 m-0' />
 											<FormGroup
 												className='col-lg-6'
-												id='formNewPassword'
+												id='newPassword'
 												label='Nueva Contraseña'>
 												<Input
-													type='password'
 													placeholder='Nueva Contraseña'
-													autoComplete='new-password'
-													onChange={formikPassword.handleChange}
+													type='password'
 													value={formikPassword.values.newPassword}
+													isTouched={formikPassword.touched.newPassword}
+													invalidFeedback={
+														formikPassword.errors.newPassword
+													}
+													isValid={formikPassword.isValid}
+													onChange={formikPassword.handleChange}
+													onBlur={formikPassword.handleBlur}
+													id='newPassword'
 												/>
 											</FormGroup>
 											<div className='w-100 m-0' />
 											<FormGroup
 												className='col-lg-6'
-												id='formConfirmNewPassword'
+												id='confirmNewPassword'
 												label='Confirmar Nueva Contraseña'>
 												<Input
-													type='password'
 													placeholder='Confirmar Nueva Contraseña'
-													autoComplete='new-password'
-													onChange={formikPassword.handleChange}
+													type='password'
 													value={formikPassword.values.confirmNewPassword}
+													isTouched={
+														formikPassword.touched.confirmNewPassword
+													}
+													invalidFeedback={
+														formikPassword.errors.confirmNewPassword
+													}
+													isValid={formikPassword.isValid}
+													onChange={formikPassword.handleChange}
+													onBlur={formikPassword.handleBlur}
+													id='confirmNewPassword'
 												/>
 											</FormGroup>
 										</div>
@@ -373,4 +422,4 @@ const SingleFluidPage = () => {
 	);
 };
 
-export default SingleFluidPage;
+export default ProfilePage;

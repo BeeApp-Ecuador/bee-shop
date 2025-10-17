@@ -6,6 +6,8 @@ export interface IAuthContextProps {
 	user: ShopType;
 	setUser?: React.Dispatch<React.SetStateAction<ShopType>>;
 	userData: Partial<IUserProps>;
+	token: string | null;
+	setToken?: React.Dispatch<React.SetStateAction<string | null>>;
 }
 
 const AuthContext = createContext<IAuthContextProps>({} as IAuthContextProps);
@@ -19,13 +21,18 @@ export const AuthContextProvider: FC<IAuthContextProviderProps> = ({ children })
 		const saved = localStorage.getItem('facit_authUsername');
 		return saved ? (JSON.parse(saved) as ShopType) : ({} as ShopType);
 	});
+	const [token, setToken] = useState<string | null>(() => {
+		const savedToken = localStorage.getItem('token');
+		return savedToken ? savedToken : null;
+	});
 
 	const [userData, setUserData] = useState<Partial<IUserProps>>({});
 
 	// 🔹 Guarda el valor en localStorage cuando cambia
 	useEffect(() => {
 		localStorage.setItem('facit_authUsername', JSON.stringify(shop));
-	}, [shop]);
+		localStorage.setItem('token', token ?? '');
+	}, [shop, token]);
 
 	// 🔹 Actualiza los datos del usuario cuando cambia shop
 	useEffect(() => {
@@ -40,9 +47,11 @@ export const AuthContextProvider: FC<IAuthContextProviderProps> = ({ children })
 		() => ({
 			user: shop,
 			setUser: setShop,
+			token,
+			setToken,
 			userData,
 		}),
-		[shop, userData],
+		[shop, token, userData],
 	);
 
 	return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
