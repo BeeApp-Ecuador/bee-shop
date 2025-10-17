@@ -44,6 +44,17 @@ export const authApi = createApi({
 				body,
 			}),
 		}),
+		changePassword: builder.mutation({
+			query: (body) => ({
+				url: 'api/v2/shop/change/password',
+				method: 'POST',
+				body,
+				headers: {
+					'Content-Type': 'application/json',
+					Authorization: JSON.parse(localStorage.getItem('token')!),
+				},
+			}),
+		}),
 	}),
 });
 

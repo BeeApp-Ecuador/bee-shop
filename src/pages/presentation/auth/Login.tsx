@@ -88,7 +88,7 @@ interface ILoginProps {
 	isSignUp?: boolean;
 }
 const Login: FC<ILoginProps> = ({ isSignUp }) => {
-	const { setUser } = useContext(AuthContext);
+	const { setUser, setToken } = useContext(AuthContext);
 
 	const { darkModeStatus } = useDarkMode();
 
@@ -174,7 +174,8 @@ const Login: FC<ILoginProps> = ({ isSignUp }) => {
 		if (data && data.statusCode === 200) {
 			console.log(data.shop);
 			setIsLoading(false);
-			setUser(data.shop);
+			setUser(data.shop!);
+			setToken(data.token!);
 			handleOnClick();
 		}
 	};
