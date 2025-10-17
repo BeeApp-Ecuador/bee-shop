@@ -396,12 +396,13 @@ const SingleFluidPage = () => {
 												className='col-md-12'
 												id='formName'
 												label='Nombre'>
-												<Input
-													placeholder='Timothy'
-													autoComplete='given-name'
-													onChange={formik.handleChange}
-													value={shop.nameLegalAgent}
-												/>
+												<Input disabled value={shop.nameLegalAgent} />
+											</FormGroup>
+											<FormGroup
+												className='col-md-12'
+												id='formAddress'
+												label='Dirección'>
+												<Input disabled value={shop.addressLegalAgent} />
 											</FormGroup>
 
 											<FormGroup
@@ -410,9 +411,6 @@ const SingleFluidPage = () => {
 												label='Identificación'>
 												<Input
 													type='text'
-													// placeholder='john@domain.com'
-													// autoComplete='email'
-													// onChange={formik.handleChange}
 													disabled
 													value={shop.ciLegalAgent}
 												/>
@@ -425,7 +423,7 @@ const SingleFluidPage = () => {
 													type='tel'
 													placeholder='+1 (999) 999-9999'
 													autoComplete='tel'
-													mask='+1 (999) 999-9999'
+													disabled
 													onChange={formik.handleChange}
 													value={
 														shop.prefixLegalAgent + shop.phoneLegalAgent
@@ -434,15 +432,8 @@ const SingleFluidPage = () => {
 											</FormGroup>
 										</div>
 									</CardBody>
-									<CardFooter>
-										<CardFooterRight>
-											<Button type='submit' color='primary' icon='Save'>
-												Save
-											</Button>
-										</CardFooterRight>
-									</CardFooter>
 								</Card>
-								<Alert
+								{/* <Alert
 									isLight
 									className='border-0'
 									shadow='md'
@@ -450,7 +441,7 @@ const SingleFluidPage = () => {
 									color='warning'>
 									As soon as you save the information, it will be shown to
 									everyone automatically.
-								</Alert>
+								</Alert> */}
 							</CardTabItem>
 							<CardTabItem id='address' title='Dirección' icon='HolidayVillage'>
 								<Card
