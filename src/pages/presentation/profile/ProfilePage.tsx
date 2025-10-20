@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useRef, useState } from 'react';
+import React, { useContext, useState } from 'react';
 import { useFormik } from 'formik';
 
 import { useMeasure } from 'react-use';
@@ -14,8 +14,6 @@ import Card, {
 	CardTabItem,
 	CardTitle,
 } from '../../../components/bootstrap/Card';
-import UserImageWebp from '../../../assets/img/wanna/wanna1.webp';
-import UserImage from '../../../assets/img/wanna/wanna1.png';
 import FormGroup from '../../../components/bootstrap/forms/FormGroup';
 import Input from '../../../components/bootstrap/forms/Input';
 import showNotification from '../../../components/extras/showNotification';
@@ -27,39 +25,16 @@ import Progress from '../../../components/bootstrap/Progress';
 import Modal, { ModalBody, ModalHeader, ModalTitle } from '../../../components/bootstrap/Modal';
 import { demoPagesMenu } from '../../../menu';
 import AuthContext from '../../../contexts/authContext';
-import MapCard, { MapCardRef } from '../../../components/profile/MapCard';
 import { useChangePasswordMutation } from '../../../store/api/authApi';
 import Spinner from '../../../components/bootstrap/Spinner';
 import LegalAgentInfo from '../../../components/profile/LegalAgentInfo';
+import AddressInfo from '../../../components/profile/AddressInfo';
+import FillProfile from '../../../components/profile/FillProfile';
 
 const ProfilePage = () => {
 	const { user: shop } = useContext(AuthContext);
-
-	const [coords, setCoords] = useState<{ lat: number; lng: number } | null>(null);
-	const [error, setError] = useState<string | null>(null);
 	const [changePassword] = useChangePasswordMutation();
 	const [isUpdatingPassword, setIsUpdatingPassword] = useState(false);
-
-	useEffect(() => {
-		if ('geolocation' in navigator) {
-			navigator.geolocation.getCurrentPosition(
-				(position) => {
-					setCoords({
-						lat: position.coords.latitude,
-						lng: position.coords.longitude,
-					});
-				},
-				(err) => {
-					setError('No se pudo obtener la ubicación. Activa los permisos de ubicación.');
-					console.error(err);
-				},
-			);
-		} else {
-			setError('Tu navegador no soporta geolocalización.');
-		}
-	}, []);
-
-	const [searchAddress, setSearchAddress] = useState<string>('');
 
 	const formikPassword = useFormik({
 		initialValues: {
@@ -90,6 +65,7 @@ const ProfilePage = () => {
 			return errors;
 		},
 		onSubmit: async (values) => {
+			// eslint-disable-next-line @typescript-eslint/no-unused-vars
 			const { confirmNewPassword, ...body } = values;
 			setIsUpdatingPassword(true);
 			const { data, error } = await changePassword(body);
@@ -116,13 +92,9 @@ const ProfilePage = () => {
 			}
 		},
 	});
-	const [ref, { height }] = useMeasure<HTMLDivElement>();
-	const mapRef = useRef<MapCardRef>(null);
+	const [ref] = useMeasure<HTMLDivElement>();
 	const [selectedImage, setSelectedImage] = useState<string | undefined>(undefined);
-
-	const handleCoordsChange = (coords: { lat: number; lng: number }) => {
-		console.log('Nuevas coordenadas:', coords);
-	};
+	const [isFillingProfile, setIsFillingProfile] = useState(false);
 
 	return (
 		<PageWrapper title={demoPagesMenu.singlePages.subMenu.fluidSingle.text}>
@@ -136,8 +108,8 @@ const ProfilePage = () => {
 										<div className='d-flex align-items-center'>
 											<div className='flex-shrink-0'>
 												<Avatar
-													srcSet={UserImageWebp}
-													src={UserImage}
+													// srcSet={shop.img}
+													src={shop.img}
 													className='rounded-circle'
 												/>
 											</div>
@@ -146,6 +118,17 @@ const ProfilePage = () => {
 													{shop.businessName}
 												</div>
 												<div className='h5 text-muted'>Founder</div>
+											</div>
+											<div className='flex-shrink-0'>
+												<Button
+													color='primary'
+													onClick={() => setIsFillingProfile(true)}>
+													<Icon
+														icon='IncompleteCircle'
+														className='me-2'
+													/>
+													Completar Perfil
+												</Button>
 											</div>
 										</div>
 									</div>
@@ -198,7 +181,6 @@ const ProfilePage = () => {
 								<Progress value={70} />
 							</CardBody>
 						</Card>
-
 						<Card>
 							<CardHeader>
 								<CardLabel>
@@ -220,71 +202,7 @@ const ProfilePage = () => {
 								<LegalAgentInfo shop={shop} />
 							</CardTabItem>
 							<CardTabItem id='address' title='Dirección' icon='HolidayVillage'>
-								<Card
-									className='rounded-2'
-									tag='form'
-									// onSubmit={formik.handleSubmit}
-								>
-									<CardHeader>
-										<CardLabel icon='HolidayVillage'>
-											<CardTitle>Dirección del local</CardTitle>
-										</CardLabel>
-									</CardHeader>
-									<CardBody>
-										<div className='row g-4'>
-											<FormGroup
-												className='col-md-4'
-												id='formCountry'
-												label='País'>
-												<Input disabled value={shop.country} />
-											</FormGroup>
-											<FormGroup
-												className='col-md-4'
-												id='formState'
-												label='Provincia'>
-												<Input disabled value={shop.province} />
-											</FormGroup>
-											<FormGroup
-												className='col-md-4'
-												id='formCity'
-												label='Ciudad'>
-												<Input disabled value={shop.city} />
-											</FormGroup>
-											<FormGroup
-												className='col-12'
-												id='formAddressLine'
-												label='Dirección'>
-												<Input disabled value={shop.address} />
-											</FormGroup>
-											<FormGroup
-												className='col-12'
-												id='formAddressLine'
-												label='Buscar en el mapa'>
-												<Input
-													id='formAddressLine'
-													value={searchAddress}
-													onChange={(e) =>
-														setSearchAddress(e.target.value)
-													}
-												/>
-											</FormGroup>
-											<MapCard
-												lat={coords?.lat ?? '-2.90055'}
-												lng={coords?.lng ?? '-79.00454'}
-												heightE='300px'
-												onCoordsChange={handleCoordsChange}
-												ref={mapRef}
-											/>
-										</div>
-									</CardBody>
-									<CardFooter>
-										<CardFooterRight>
-											<Button type='submit' color='primary' icon='Save'>
-												Guardar
-											</Button>
-										</CardFooterRight>
-									</CardFooter>
-								</Card>
+								<AddressInfo shop={shop} />
 							</CardTabItem>
 							<CardTabItem id='profile2' title='Contraseña' icon='Lock'>
 								<Card
@@ -380,12 +298,24 @@ const ProfilePage = () => {
 					</div>
 				</div>
 
-				<Modal setIsOpen={setSelectedImage} isOpen={!!selectedImage} isCentered>
+				{/* <Modal setIsOpen={setSelectedImage} isOpen={!!selectedImage} isCentered>
 					<ModalHeader setIsOpen={setSelectedImage}>
 						<ModalTitle id='preview'>Preview</ModalTitle>
 					</ModalHeader>
 					<ModalBody>
 						<img src={selectedImage} alt='eneme' />
+					</ModalBody>
+				</Modal> */}
+				<Modal
+					setIsOpen={setIsFillingProfile}
+					isOpen={isFillingProfile}
+					isCentered
+					size='xl'>
+					<ModalHeader setIsOpen={setIsFillingProfile}>
+						<ModalTitle id='preview'>Completar Perfil</ModalTitle>
+					</ModalHeader>
+					<ModalBody>
+						<FillProfile />
 					</ModalBody>
 				</Modal>
 			</Page>
