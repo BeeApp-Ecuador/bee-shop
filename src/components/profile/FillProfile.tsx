@@ -8,10 +8,9 @@ import Select from '../bootstrap/forms/Select';
 
 const FillProfile = () => {
 	return (
-		<div className='col-lg-12'>
+		<div className='col-lg-12 h-100'>
 			<Wizard
 				isHeader
-				stretch
 				color='info'
 				noValidate
 				// onSubmit={formik.handleSubmit}
@@ -127,6 +126,64 @@ const FillProfile = () => {
 					</Card>
 				</WizardItem>
 				<WizardItem id='step2' title='Address'>
+					<div className='row g-4'>
+						<div className='col-lg-12'>
+							<FormGroup id='addressLine' label='Address Line' isFloating>
+								<Input validFeedback='Looks good!' />
+							</FormGroup>
+						</div>
+						<div className='col-lg-12'>
+							<FormGroup id='addressLine2' label='Address Line 2' isFloating>
+								<Input validFeedback='Looks good!' />
+							</FormGroup>
+						</div>
+
+						<div className='col-lg-6'>
+							<FormGroup id='city' label='City' isFloating>
+								<Input
+									// onChange={formik.handleChange}
+									// onBlur={formik.handleBlur}
+									// value={formik.values.city}
+									// isValid={formik.isValid}
+									// isTouched={formik.touched.city}
+									// invalidFeedback={formik.errors.city}
+									validFeedback='Looks good!'
+								/>
+							</FormGroup>
+						</div>
+						<div className='col-md-3'>
+							<FormGroup id='state' label='State' isFloating>
+								<Select
+									ariaLabel='State'
+									placeholder='Choose...'
+									list={[
+										{ value: 'usa', text: 'USA' },
+										{ value: 'ca', text: 'Canada' },
+									]}
+									// onChange={formik.handleChange}
+									// onBlur={formik.handleBlur}
+									// value={formik.values.state}
+									// isValid={formik.isValid}
+									// isTouched={formik.touched.state}
+									// invalidFeedback={formik.errors.state}
+								/>
+							</FormGroup>
+						</div>
+						<div className='col-md-3'>
+							<FormGroup id='zip' label='Zip' isFloating>
+								<Input
+								// onChange={formik.handleChange}
+								// onBlur={formik.handleBlur}
+								// value={formik.values.zip}
+								// isValid={formik.isValid}
+								// isTouched={formik.touched.zip}
+								// invalidFeedback={formik.errors.zip}
+								/>
+							</FormGroup>
+						</div>
+					</div>
+				</WizardItem>
+				<WizardItem id='step3' title='Test'>
 					<div className='row g-4'>
 						<div className='col-lg-12'>
 							<FormGroup id='addressLine' label='Address Line' isFloating>
