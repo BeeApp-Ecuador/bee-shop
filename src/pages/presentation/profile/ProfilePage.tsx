@@ -14,8 +14,6 @@ import Card, {
 	CardTabItem,
 	CardTitle,
 } from '../../../components/bootstrap/Card';
-import UserImageWebp from '../../../assets/img/wanna/wanna1.webp';
-import UserImage from '../../../assets/img/wanna/wanna1.png';
 import FormGroup from '../../../components/bootstrap/forms/FormGroup';
 import Input from '../../../components/bootstrap/forms/Input';
 import showNotification from '../../../components/extras/showNotification';
@@ -31,6 +29,7 @@ import { useChangePasswordMutation } from '../../../store/api/authApi';
 import Spinner from '../../../components/bootstrap/Spinner';
 import LegalAgentInfo from '../../../components/profile/LegalAgentInfo';
 import AddressInfo from '../../../components/profile/AddressInfo';
+import FillProfile from '../../../components/profile/FillProfile';
 
 const ProfilePage = () => {
 	const { user: shop } = useContext(AuthContext);
@@ -95,6 +94,7 @@ const ProfilePage = () => {
 	});
 	const [ref] = useMeasure<HTMLDivElement>();
 	const [selectedImage, setSelectedImage] = useState<string | undefined>(undefined);
+	const [isFillingProfile, setIsFillingProfile] = useState(false);
 
 	return (
 		<PageWrapper title={demoPagesMenu.singlePages.subMenu.fluidSingle.text}>
@@ -118,6 +118,17 @@ const ProfilePage = () => {
 													{shop.businessName}
 												</div>
 												<div className='h5 text-muted'>Founder</div>
+											</div>
+											<div className='flex-shrink-0'>
+												<Button
+													color='primary'
+													onClick={() => setIsFillingProfile(true)}>
+													<Icon
+														icon='IncompleteCircle'
+														className='me-2'
+													/>
+													Completar Perfil
+												</Button>
 											</div>
 										</div>
 									</div>
@@ -287,12 +298,20 @@ const ProfilePage = () => {
 					</div>
 				</div>
 
-				<Modal setIsOpen={setSelectedImage} isOpen={!!selectedImage} isCentered>
+				{/* <Modal setIsOpen={setSelectedImage} isOpen={!!selectedImage} isCentered>
 					<ModalHeader setIsOpen={setSelectedImage}>
 						<ModalTitle id='preview'>Preview</ModalTitle>
 					</ModalHeader>
 					<ModalBody>
 						<img src={selectedImage} alt='eneme' />
+					</ModalBody>
+				</Modal> */}
+				<Modal setIsOpen={setIsFillingProfile} isOpen={isFillingProfile} isCentered>
+					<ModalHeader setIsOpen={setIsFillingProfile}>
+						<ModalTitle id='preview'>Completar Perfil</ModalTitle>
+					</ModalHeader>
+					<ModalBody>
+						<FillProfile />
 					</ModalBody>
 				</Modal>
 			</Page>
