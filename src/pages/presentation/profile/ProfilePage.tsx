@@ -306,7 +306,11 @@ const ProfilePage = () => {
 						<img src={selectedImage} alt='eneme' />
 					</ModalBody>
 				</Modal> */}
-				<Modal setIsOpen={setIsFillingProfile} isOpen={isFillingProfile} isCentered>
+				<Modal
+					setIsOpen={setIsFillingProfile}
+					isOpen={isFillingProfile}
+					isCentered
+					size='xl'>
 					<ModalHeader setIsOpen={setIsFillingProfile}>
 						<ModalTitle id='preview'>Completar Perfil</ModalTitle>
 					</ModalHeader>
