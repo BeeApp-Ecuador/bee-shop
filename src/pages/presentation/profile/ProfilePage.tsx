@@ -108,8 +108,8 @@ const ProfilePage = () => {
 										<div className='d-flex align-items-center'>
 											<div className='flex-shrink-0'>
 												<Avatar
-													srcSet={UserImageWebp}
-													src={UserImage}
+													// srcSet={shop.img}
+													src={shop.img}
 													className='rounded-circle'
 												/>
 											</div>
