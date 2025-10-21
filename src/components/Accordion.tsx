@@ -49,7 +49,7 @@ export const AccordionItem = forwardRef<HTMLDivElement, IAccordionItemProps>(
 		};
 
 		return (
-			<TagWrapper tag={tag} ref={ref} className={classNames('accordion-item')}>
+			<TagWrapper tag={tag} ref={ref} className={classNames('')}>
 				<TagWrapper tag={headerTag} className='accordion-header' id={id}>
 					<button
 						className={classNames('accordion-button', {
@@ -185,7 +185,10 @@ export const DayAccordionItem: React.FC<IDayAccordionItemProps> = ({
 	activeItems,
 	setActiveItems,
 }) => {
-	const handleTitleClick = (e: React.MouseEvent<HTMLDivElement, MouseEvent>, toggle: () => void) => {
+	const handleTitleClick = (
+		e: React.MouseEvent<HTMLDivElement, MouseEvent>,
+		toggle: () => void,
+	) => {
 		const target = e.target as HTMLElement;
 		// Si el click es sobre el input o el span del day, no toggle
 		if (target.tagName === 'INPUT' || target.tagName === 'SPAN') {
@@ -204,15 +207,16 @@ export const DayAccordionItem: React.FC<IDayAccordionItemProps> = ({
 			title={
 				<div
 					style={{ display: 'flex', alignItems: 'center', cursor: 'pointer' }}
-					onClick={(e) => handleTitleClick(e, () => {
-						if (!setActiveItems || !activeItems) return;
-						if (activeItems.includes(id)) {
-							setActiveItems(activeItems.filter((item) => item !== id));
-						} else {
-							setActiveItems([...activeItems, id]);
-						}
-					})}
-				>
+					onClick={(e) =>
+						handleTitleClick(e, () => {
+							if (!setActiveItems || !activeItems) return;
+							if (activeItems.includes(id)) {
+								setActiveItems(activeItems.filter((item) => item !== id));
+							} else {
+								setActiveItems([...activeItems, id]);
+							}
+						})
+					}>
 					<div className='form-check form-switch'>
 						<input
 							className='form-check-input'
@@ -224,8 +228,7 @@ export const DayAccordionItem: React.FC<IDayAccordionItemProps> = ({
 					</div>
 					<span className='fw-bold ms-2'>{day}</span>
 				</div>
-			}
-		>
+			}>
 			{children}
 		</AccordionItem>
 	);

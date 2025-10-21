@@ -340,6 +340,22 @@ const FillProfile = () => {
 										id='monday'>
 										<div>Contenido del Lunes</div>
 									</DayAccordionItem>
+									<DayAccordionItem
+										day='Martes'
+										checked={enableTuesday}
+										onChange={setEnableTuesday}
+										id='tuesday'>
+										<div>Contenido del Martes</div>
+										<div>Contenido del Martes</div>
+										<div>Contenido del Martes</div>
+									</DayAccordionItem>
+									<DayAccordionItem
+										day='Miércoles'
+										checked={enableWednesday}
+										onChange={setEnableWednesday}
+										id='wednesday'>
+										<div>Contenido del Miércoles</div>
+									</DayAccordionItem>
 								</Accordion>
 							</CardBody>
 						</Card>
