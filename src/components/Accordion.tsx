@@ -49,6 +49,7 @@ export const AccordionItem = forwardRef<HTMLDivElement, IAccordionItemProps>(
 		};
 
 		return (
+			// <TagWrapper tag={tag} ref={ref} className={classNames('accordion-item')}>
 			<TagWrapper tag={tag} ref={ref} className={classNames('')}>
 				<TagWrapper tag={headerTag} className='accordion-header' id={id}>
 					<button
@@ -60,12 +61,7 @@ export const AccordionItem = forwardRef<HTMLDivElement, IAccordionItemProps>(
 						aria-expanded={ACTIVE}
 						aria-controls={`${id}Collapse`}
 						onClick={handleToggle}
-						style={{
-							display: 'flex',
-							alignItems: 'center',
-							justifyContent: 'space-between',
-							width: '100%',
-						}}>
+						style={{ display: 'flex', alignItems: 'center', width: '100%' }}>
 						{icon && <Icon icon={icon} className='accordion-icon' />}
 						<div style={{ flex: 1 }}>{title}</div>
 					</button>
@@ -113,12 +109,11 @@ const Accordion = forwardRef<HTMLDivElement, IAccordionProps>(
 		},
 		ref,
 	) => {
-		const initialActive =
-			Array.isArray(activeItemId) && activeItemId.length > 0
-				? activeItemId
-				: activeItemId
-					? [activeItemId]
-					: [];
+		const initialActive = Array.isArray(activeItemId)
+			? activeItemId
+			: activeItemId
+				? [activeItemId]
+				: [];
 
 		const [activeItems, setActiveItems] = useState<TActiveItemId>(initialActive);
 
@@ -164,7 +159,7 @@ Accordion.displayName = 'Accordion';
 export default Accordion;
 
 // ---------------------------------------------------
-// DayAccordionItem (especializado para los días de la semana)
+// DayAccordionItem
 // ---------------------------------------------------
 interface IDayAccordionItemProps {
 	day: string;
@@ -174,6 +169,7 @@ interface IDayAccordionItemProps {
 	id: string | number;
 	activeItems?: TActiveItemId;
 	setActiveItems?: (items: TActiveItemId) => void;
+	overWriteColor?: TColor;
 }
 
 export const DayAccordionItem: React.FC<IDayAccordionItemProps> = ({
@@ -184,18 +180,17 @@ export const DayAccordionItem: React.FC<IDayAccordionItemProps> = ({
 	id,
 	activeItems,
 	setActiveItems,
+	overWriteColor,
 }) => {
 	const handleTitleClick = (
 		e: React.MouseEvent<HTMLDivElement, MouseEvent>,
 		toggle: () => void,
 	) => {
 		const target = e.target as HTMLElement;
-		// Si el click es sobre el input o el span del day, no toggle
 		if (target.tagName === 'INPUT' || target.tagName === 'SPAN') {
 			e.stopPropagation();
 			return;
 		}
-		// Sino, toggle collapse
 		toggle();
 	};
 
@@ -204,9 +199,15 @@ export const DayAccordionItem: React.FC<IDayAccordionItemProps> = ({
 			id={id}
 			activeItems={activeItems}
 			setActiveItems={setActiveItems}
+			overWriteColor={overWriteColor}
 			title={
 				<div
-					style={{ display: 'flex', alignItems: 'center', cursor: 'pointer' }}
+					style={{
+						display: 'flex',
+						alignItems: 'center',
+						cursor: 'pointer',
+						width: '100%',
+					}}
 					onClick={(e) =>
 						handleTitleClick(e, () => {
 							if (!setActiveItems || !activeItems) return;
@@ -217,16 +218,17 @@ export const DayAccordionItem: React.FC<IDayAccordionItemProps> = ({
 							}
 						})
 					}>
-					<div className='form-check form-switch'>
+					<div className='form-check form-switch me-2'>
 						<input
 							className='form-check-input'
 							type='checkbox'
 							id={`switch-${id}`}
 							checked={checked}
 							onChange={(e) => onChange(e.target.checked)}
+							onClick={(e) => e.stopPropagation()}
 						/>
 					</div>
-					<span className='fw-bold ms-2'>{day}</span>
+					<span className='fw-bold'>{day}</span>
 				</div>
 			}>
 			{children}

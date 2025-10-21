@@ -332,7 +332,7 @@ const FillProfile = () => {
 								{/* <CardHeader>
 									<CardLabel>
 										<CardTitle> */}
-								<Accordion id='weekly-schedule'>
+								<Accordion id='weekly-schedule' color='info'>
 									<DayAccordionItem
 										day='Lunes'
 										checked={enableMonday}
