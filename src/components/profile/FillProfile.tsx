@@ -13,6 +13,32 @@ const FillProfile = () => {
 	const [categories, setCategories] = useState<ShopCategoryType[]>([]);
 	const [selectedCategories, setSelectedCategories] = useState<ShopCategoryType[]>([]);
 
+	const [tags, setTags] = useState(['Fresco', 'Orgánico', 'Artesanal', 'Rápido', 'Económico']);
+	const [newTag, setNewTag] = useState('');
+
+	const handleAddTag = () => {
+		const trimmed = newTag.trim();
+		if (trimmed && !tags.includes(trimmed)) {
+			setTags([...tags, trimmed]);
+			setNewTag('');
+		}
+	};
+
+	const handleRemoveTag = (tagToRemove: string) => {
+		setTags(tags.filter((tag) => tag !== tagToRemove));
+	};
+
+	const handleKeyPress = (e: React.KeyboardEvent<HTMLInputElement>) => {
+		if (e.key === 'Enter') {
+			e.preventDefault();
+			handleAddTag();
+		}
+	};
+	const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+		const value = e.target.value.replace(/\s/g, ''); // elimina todos los espacios
+		setNewTag(value);
+	};
+
 	useEffect(() => {
 		if (data) {
 			console.log(data.list);
@@ -31,7 +57,6 @@ const FillProfile = () => {
 				<WizardItem id='step1' title='Categoría y Tags'>
 					<Card>
 						<CardBody>
-							{/* Poner tiulo */}
 							<CardHeader>
 								<CardLabel icon='Category' iconColor='warning'>
 									<CardTitle>¡Cuéntanos un poco sobre tu comercio!</CardTitle>
@@ -68,8 +93,65 @@ const FillProfile = () => {
 							</div>
 						</CardBody>
 					</Card>
-
 					<Card>
+						<CardBody>
+							<CardHeader>
+								<CardLabel icon='Label' iconColor='warning'>
+									<CardTitle>
+										Etiquetas que describen tu comercio y productos
+									</CardTitle>
+									<CardSubTitle>
+										Agrega etiquetas para ayudar a los clientes a encontrar tu
+										comercio y productos.
+									</CardSubTitle>
+								</CardLabel>
+							</CardHeader>
+
+							<div className='d-flex flex-wrap justify-content-center align-items-center gap-2 mt-3'>
+								{tags.map((tag) => (
+									<Button
+										key={tag}
+										color='info'
+										isOutline
+										className='d-flex align-items-center gap-1'>
+										<span>{tag}</span>
+										<span
+											onClick={() => handleRemoveTag(tag)}
+											style={{
+												color: '#dc3545',
+												cursor: 'pointer',
+												fontWeight: 'bold',
+											}}>
+											✕
+										</span>
+									</Button>
+								))}
+
+								<Input
+									type='text'
+									value={newTag}
+									onChange={handleInputChange}
+									onKeyDown={(e) => {
+										if (e.key === 'Enter') {
+											e.preventDefault();
+											handleAddTag();
+										}
+									}}
+									placeholder='+'
+									style={{
+										// border: 'none',
+										// boxShadow: 'none',
+										width: '100px',
+										height: '35px',
+										textAlign: 'center',
+										// padding: '0 6px',
+									}}
+								/>
+							</div>
+						</CardBody>
+					</Card>
+
+					{/* <Card>
 						<CardHeader>
 							<CardLabel icon='Edit' iconColor='warning'>
 								<CardTitle>Personal Information</CardTitle>
@@ -148,7 +230,7 @@ const FillProfile = () => {
 								</div>
 							</div>
 						</CardBody>
-					</Card>
+					</Card> */}
 				</WizardItem>
 				<WizardItem id='step2' title='Address'>
 					<div className='row g-4'>
