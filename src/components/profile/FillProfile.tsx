@@ -13,7 +13,7 @@ const FillProfile = () => {
 	const [categories, setCategories] = useState<ShopCategoryType[]>([]);
 	const [selectedCategories, setSelectedCategories] = useState<ShopCategoryType[]>([]);
 
-	const [tags, setTags] = useState(['Fresco', 'Orgánico', 'Artesanal', 'Rápido', 'Económico']);
+	const [tags, setTags] = useState(['Comida', 'Bebidas']);
 	const [newTag, setNewTag] = useState('');
 
 	const handleAddTag = () => {
@@ -28,12 +28,6 @@ const FillProfile = () => {
 		setTags(tags.filter((tag) => tag !== tagToRemove));
 	};
 
-	const handleKeyPress = (e: React.KeyboardEvent<HTMLInputElement>) => {
-		if (e.key === 'Enter') {
-			e.preventDefault();
-			handleAddTag();
-		}
-	};
 	const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
 		const value = e.target.value.replace(/\s/g, ''); // elimina todos los espacios
 		setNewTag(value);
@@ -112,15 +106,16 @@ const FillProfile = () => {
 									<Button
 										key={tag}
 										color='info'
-										isOutline
+										// isOutline
 										className='d-flex align-items-center gap-1'>
 										<span>{tag}</span>
 										<span
 											onClick={() => handleRemoveTag(tag)}
 											style={{
-												color: '#dc3545',
+												color: 'red',
 												cursor: 'pointer',
 												fontWeight: 'bold',
+												marginLeft: '8px',
 											}}>
 											✕
 										</span>
