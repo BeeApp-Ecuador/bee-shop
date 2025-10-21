@@ -109,11 +109,20 @@ const Accordion = forwardRef<HTMLDivElement, IAccordionProps>(
 		},
 		ref,
 	) => {
-		const initialActive = Array.isArray(activeItemId)
-			? activeItemId
-			: activeItemId
-				? [activeItemId]
-				: [];
+		// Si no hay activeItemId, usar el id del primer child válido
+		let initialActive: TActiveItemId = [];
+		const validChildren = Children.toArray(children).filter(
+			(child: any) =>
+				child &&
+				child.type &&
+				(child.type.displayName || child.type.name) === 'AccordionItem',
+		) as ReactElement<IAccordionItemProps>[];
+
+		if (activeItemId) {
+			initialActive = Array.isArray(activeItemId) ? activeItemId : [activeItemId];
+		} else if (validChildren.length > 0) {
+			initialActive = [validChildren[0].props.id]; // primer item activo por defecto
+		}
 
 		const [activeItems, setActiveItems] = useState<TActiveItemId>(initialActive);
 
