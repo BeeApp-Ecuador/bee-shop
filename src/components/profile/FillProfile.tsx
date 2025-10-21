@@ -268,27 +268,40 @@ const FillProfile = () => {
 									</small>
 								</div>
 
-								{haveReservation && (
-									<div className='mt-2'>
-										<label htmlFor='maxPeople' className='form-label fw-bold'>
-											Número máximo de personas por reserva
-										</label>
-										<input
-											type='number'
-											className='form-control'
-											id='maxPeople'
-											min='1'
-											value={maxPeoplePerReservation}
-											onChange={(e) =>
-												setMaxPeoplePerReservation(e.target.value)
-											}
-											placeholder='Ejemplo: 5'
-										/>
-										<small className='text-muted'>
-											Define cuántas personas puede incluir cada reserva.
-										</small>
-									</div>
-								)}
+								<div
+									style={{
+										overflow: 'hidden',
+										opacity: haveReservation ? 1 : 0,
+										height: haveReservation ? 'auto' : 0,
+										transform: haveReservation
+											? 'translateY(0)'
+											: 'translateY(-10px)',
+										transition: 'all 0.4s ease',
+									}}>
+									{haveReservation && (
+										<div className='mt-2'>
+											<label
+												htmlFor='maxPeople'
+												className='form-label fw-bold'>
+												Número máximo de personas por reserva
+											</label>
+											<input
+												type='number'
+												className='form-control'
+												id='maxPeople'
+												min='1'
+												value={maxPeoplePerReservation}
+												onChange={(e) =>
+													setMaxPeoplePerReservation(e.target.value)
+												}
+												placeholder='Ejemplo: 5'
+											/>
+											<small className='text-muted'>
+												Define cuántas personas puede incluir cada reserva.
+											</small>
+										</div>
+									)}
+								</div>
 							</div>
 						</div>
 					</Card>
