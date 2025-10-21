@@ -8,6 +8,7 @@ import Select from '../bootstrap/forms/Select';
 import { useGetCategoriesQuery } from '../../store/api/profileApi';
 import { ShopCategoryType } from '../../type/shop-category-type';
 import MapCard, { MapCardRef } from './MapCard';
+import Accordion, { DayAccordionItem } from '../Accordion';
 
 const FillProfile = () => {
 	const { data } = useGetCategoriesQuery({});
@@ -24,6 +25,13 @@ const FillProfile = () => {
 	const [haveDeliveryBee, setHaveDeliveryBee] = useState(false);
 	const [haveReservation, setHaveReservation] = useState(false);
 	const [maxPeoplePerReservation, setMaxPeoplePerReservation] = useState('');
+	const [enableMonday, setEnableMonday] = useState(true);
+	const [enableTuesday, setEnableTuesday] = useState(false);
+	const [enableWednesday, setEnableWednesday] = useState(false);
+	const [enableThursday, setEnableThursday] = useState(false);
+	const [enableFriday, setEnableFriday] = useState(false);
+	const [enableSaturday, setEnableSaturday] = useState(false);
+	const [enableSunday, setEnableSunday] = useState(false);
 
 	const handleCoordsChange = (coords: { lat: number; lng: number }) => {
 		console.log('Nuevas coordenadas:', coords);
@@ -306,63 +314,36 @@ const FillProfile = () => {
 						</div>
 					</Card>
 				</WizardItem>
-				<WizardItem id='step3' title='Test'>
-					<div className='row g-4'>
-						<div className='col-lg-12'>
-							<FormGroup id='addressLine' label='Address Line' isFloating>
-								<Input validFeedback='Looks good!' />
-							</FormGroup>
-						</div>
-						<div className='col-lg-12'>
-							<FormGroup id='addressLine2' label='Address Line 2' isFloating>
-								<Input validFeedback='Looks good!' />
-							</FormGroup>
-						</div>
-
-						<div className='col-lg-6'>
-							<FormGroup id='city' label='City' isFloating>
-								<Input
-									// onChange={formik.handleChange}
-									// onBlur={formik.handleBlur}
-									// value={formik.values.city}
-									// isValid={formik.isValid}
-									// isTouched={formik.touched.city}
-									// invalidFeedback={formik.errors.city}
-									validFeedback='Looks good!'
-								/>
-							</FormGroup>
-						</div>
-						<div className='col-md-3'>
-							<FormGroup id='state' label='State' isFloating>
-								<Select
-									ariaLabel='State'
-									placeholder='Choose...'
-									list={[
-										{ value: 'usa', text: 'USA' },
-										{ value: 'ca', text: 'Canada' },
-									]}
-									// onChange={formik.handleChange}
-									// onBlur={formik.handleBlur}
-									// value={formik.values.state}
-									// isValid={formik.isValid}
-									// isTouched={formik.touched.state}
-									// invalidFeedback={formik.errors.state}
-								/>
-							</FormGroup>
-						</div>
-						<div className='col-md-3'>
-							<FormGroup id='zip' label='Zip' isFloating>
-								<Input
-								// onChange={formik.handleChange}
-								// onBlur={formik.handleBlur}
-								// value={formik.values.zip}
-								// isValid={formik.isValid}
-								// isTouched={formik.touched.zip}
-								// invalidFeedback={formik.errors.zip}
-								/>
-							</FormGroup>
-						</div>
-					</div>
+				<WizardItem id='step3' title='Horarios'>
+					<Card>
+						<CardBody>
+							<CardHeader>
+								<CardLabel icon='Schedule' iconColor='info'>
+									<CardTitle>Horarios de atención</CardTitle>
+									<CardSubTitle>
+										Define los horarios en los que tu comercio está operativo.
+									</CardSubTitle>
+								</CardLabel>
+							</CardHeader>
+						</CardBody>
+						{/* Lunes */}
+						<Card className='mx-4 mb-3'>
+							<CardBody>
+								{/* <CardHeader>
+									<CardLabel>
+										<CardTitle> */}
+								<Accordion id='weekly-schedule'>
+									<DayAccordionItem
+										day='Lunes'
+										checked={enableMonday}
+										onChange={setEnableMonday}
+										id='monday'>
+										<div>Contenido del Lunes</div>
+									</DayAccordionItem>
+								</Accordion>
+							</CardBody>
+						</Card>
+					</Card>
 				</WizardItem>
 			</Wizard>
 		</div>
