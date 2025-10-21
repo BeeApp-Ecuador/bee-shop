@@ -1,12 +1,23 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import Card, { CardBody, CardHeader, CardLabel, CardTitle } from '../bootstrap/Card';
 import Wizard, { WizardItem } from '../Wizard';
 import Input from '../bootstrap/forms/Input';
 import Button from '../bootstrap/Button';
 import FormGroup from '../bootstrap/forms/FormGroup';
 import Select from '../bootstrap/forms/Select';
+import { useGetCategoriesQuery } from '../../store/api/profileApi';
 
 const FillProfile = () => {
+	const { data } = useGetCategoriesQuery({});
+	const [categories, setCategories] = useState<[]>([]);
+
+	useEffect(() => {
+		if (data) {
+			console.log(data.list);
+			setCategories(data.list);
+		}
+	}, [data]);
+
 	return (
 		<div className='col-lg-12 h-100'>
 			<Wizard
@@ -134,13 +145,14 @@ const FillProfile = () => {
 						</div>
 						<div className='col-lg-12'>
 							<FormGroup id='addressLine2' label='Address Line 2' isFloating>
-								<Input validFeedback='Looks good!' />
+								<Input validFeedback='Looks good!' readOnly />
 							</FormGroup>
 						</div>
 
 						<div className='col-lg-6'>
 							<FormGroup id='city' label='City' isFloating>
 								<Input
+									readOnly
 									// onChange={formik.handleChange}
 									// onBlur={formik.handleBlur}
 									// value={formik.values.city}
@@ -172,12 +184,13 @@ const FillProfile = () => {
 						<div className='col-md-3'>
 							<FormGroup id='zip' label='Zip' isFloating>
 								<Input
-								// onChange={formik.handleChange}
-								// onBlur={formik.handleBlur}
-								// value={formik.values.zip}
-								// isValid={formik.isValid}
-								// isTouched={formik.touched.zip}
-								// invalidFeedback={formik.errors.zip}
+									readOnly
+									// onChange={formik.handleChange}
+									// onBlur={formik.handleBlur}
+									// value={formik.values.zip}
+									// isValid={formik.isValid}
+									// isTouched={formik.touched.zip}
+									// invalidFeedback={formik.errors.zip}
 								/>
 							</FormGroup>
 						</div>
