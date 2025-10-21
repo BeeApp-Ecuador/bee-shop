@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import Card, { CardBody, CardHeader, CardLabel, CardSubTitle, CardTitle } from '../bootstrap/Card';
 import Wizard, { WizardItem } from '../Wizard';
 import Input from '../bootstrap/forms/Input';
@@ -7,14 +7,46 @@ import FormGroup from '../bootstrap/forms/FormGroup';
 import Select from '../bootstrap/forms/Select';
 import { useGetCategoriesQuery } from '../../store/api/profileApi';
 import { ShopCategoryType } from '../../type/shop-category-type';
+import MapCard, { MapCardRef } from './MapCard';
 
 const FillProfile = () => {
 	const { data } = useGetCategoriesQuery({});
 	const [categories, setCategories] = useState<ShopCategoryType[]>([]);
 	const [selectedCategories, setSelectedCategories] = useState<ShopCategoryType[]>([]);
 
-	const [tags, setTags] = useState(['Fresco', 'Orgánico', 'Artesanal', 'Rápido', 'Económico']);
+	const [tags, setTags] = useState(['Comida', 'Bebidas']);
 	const [newTag, setNewTag] = useState('');
+
+	const mapRef = useRef<MapCardRef>(null);
+	const [coords, setCoords] = useState<{ lat: number; lng: number } | null>(null);
+
+	const [havePickup, setHavePickup] = useState(false);
+	const [haveDeliveryBee, setHaveDeliveryBee] = useState(false);
+	const [haveReservation, setHaveReservation] = useState(false);
+	const [maxPeoplePerReservation, setMaxPeoplePerReservation] = useState('');
+
+	const handleCoordsChange = (coords: { lat: number; lng: number }) => {
+		console.log('Nuevas coordenadas:', coords);
+	};
+
+	useEffect(() => {
+		if ('geolocation' in navigator) {
+			navigator.geolocation.getCurrentPosition(
+				(position) => {
+					setCoords({
+						lat: position.coords.latitude,
+						lng: position.coords.longitude,
+					});
+				},
+				(err) => {
+					// setError('No se pudo obtener la ubicación. Activa los permisos de ubicación.');
+					console.error(err);
+				},
+			);
+		} else {
+			// setError('Tu navegador no soporta geolocalización.');
+		}
+	}, []);
 
 	const handleAddTag = () => {
 		const trimmed = newTag.trim();
@@ -28,12 +60,6 @@ const FillProfile = () => {
 		setTags(tags.filter((tag) => tag !== tagToRemove));
 	};
 
-	const handleKeyPress = (e: React.KeyboardEvent<HTMLInputElement>) => {
-		if (e.key === 'Enter') {
-			e.preventDefault();
-			handleAddTag();
-		}
-	};
 	const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
 		const value = e.target.value.replace(/\s/g, ''); // elimina todos los espacios
 		setNewTag(value);
@@ -58,7 +84,7 @@ const FillProfile = () => {
 					<Card>
 						<CardBody>
 							<CardHeader>
-								<CardLabel icon='Category' iconColor='warning'>
+								<CardLabel icon='Category' iconColor='info'>
 									<CardTitle>¡Cuéntanos un poco sobre tu comercio!</CardTitle>
 									<CardSubTitle>
 										Elige una o más categorías que mejor lo representen.
@@ -96,7 +122,7 @@ const FillProfile = () => {
 					<Card>
 						<CardBody>
 							<CardHeader>
-								<CardLabel icon='Label' iconColor='warning'>
+								<CardLabel icon='Label' iconColor='info'>
 									<CardTitle>
 										Etiquetas que describen tu comercio y productos
 									</CardTitle>
@@ -112,15 +138,15 @@ const FillProfile = () => {
 									<Button
 										key={tag}
 										color='info'
-										isOutline
 										className='d-flex align-items-center gap-1'>
 										<span>{tag}</span>
 										<span
 											onClick={() => handleRemoveTag(tag)}
 											style={{
-												color: '#dc3545',
+												color: 'red',
 												cursor: 'pointer',
 												fontWeight: 'bold',
+												marginLeft: '8px',
 											}}>
 											✕
 										</span>
@@ -150,147 +176,122 @@ const FillProfile = () => {
 							</div>
 						</CardBody>
 					</Card>
-
-					{/* <Card>
-						<CardHeader>
-							<CardLabel icon='Edit' iconColor='warning'>
-								<CardTitle>Personal Information</CardTitle>
-							</CardLabel>
-						</CardHeader>
-						<CardBody className='pt-0'>
-							<div className='row g-4'>
-								<div className='col-md-6'>
-									<FormGroup id='firstName' label='First Name' isFloating>
-										<Input
-											placeholder='First Name'
-											autoComplete='additional-name'
-											// onChange={formik.handleChange}
-											// onBlur={formik.handleBlur}
-											// value={formik.values.firstName}
-											// isValid={formik.isValid}
-											// isTouched={formik.touched.firstName}
-											// invalidFeedback={formik.errors.firstName}
-											validFeedback='Looks good!'
-										/>
-									</FormGroup>
-								</div>
-								<div className='col-md-6'>
-									<FormGroup id='lastName' label='Last Name' isFloating>
-										<Input
-											placeholder='Last Name'
-											autoComplete='family-name'
-											validFeedback='Looks good!'
-										/>
-									</FormGroup>
-								</div>
-								<div className='col-12'>
-									<FormGroup
-										id='displayName'
-										label='Display Name'
-										isFloating
-										formText='This will be how your name will be displayed in the account section and in reviews'>
-										<Input
-											placeholder='Display Name'
-											autoComplete='username'
-											validFeedback='Looks good!'
-										/>
-									</FormGroup>
-								</div>
-							</div>
-						</CardBody>
-					</Card>
-
-					<Card className='mb-0'>
-						<CardHeader>
-							<CardLabel icon='MarkunreadMailbox' iconColor='success'>
-								<CardTitle>Contact Information</CardTitle>
-							</CardLabel>
-						</CardHeader>
-						<CardBody className='pt-0'>
-							<div className='row g-4'>
-								<div className='col-12'>
-									<FormGroup id='phoneNumber' label='Phone Number' isFloating>
-										<Input
-											placeholder='Phone Number'
-											type='tel'
-											autoComplete='tel'
-											validFeedback='Looks good!'
-										/>
-									</FormGroup>
-								</div>
-								<div className='col-12'>
-									<FormGroup id='emailAddress' label='Email address' isFloating>
-										<Input
-											type='email'
-											placeholder='Email address'
-											autoComplete='email'
-											validFeedback='Looks good!'
-										/>
-									</FormGroup>
-								</div>
-							</div>
-						</CardBody>
-					</Card> */}
 				</WizardItem>
-				<WizardItem id='step2' title='Address'>
-					<div className='row g-4'>
-						<div className='col-lg-12'>
-							<FormGroup id='addressLine' label='Address Line' isFloating>
-								<Input validFeedback='Looks good!' />
-							</FormGroup>
+				<WizardItem id='step2' title='Servicios y ubicación'>
+					<Card>
+						<CardBody>
+							<CardHeader>
+								<CardLabel icon='House' iconColor='info'>
+									<CardTitle>¿Dónde está ubicado tu comercio?</CardTitle>
+									<CardSubTitle>
+										Proporciona la dirección física de tu comercio para que los
+										clientes puedan encontrarte fácilmente.
+									</CardSubTitle>
+								</CardLabel>
+							</CardHeader>
+						</CardBody>
+						<div className='p-3'>
+							<MapCard
+								lat={coords?.lat ?? '-2.90055'}
+								lng={coords?.lng ?? '-79.00454'}
+								heightE='300px'
+								onCoordsChange={handleCoordsChange}
+								ref={mapRef}
+							/>
 						</div>
-						<div className='col-lg-12'>
-							<FormGroup id='addressLine2' label='Address Line 2' isFloating>
-								<Input validFeedback='Looks good!' readOnly />
-							</FormGroup>
-						</div>
+					</Card>
+					<Card>
+						<CardBody>
+							<CardHeader>
+								<CardLabel icon='Build' iconColor='info'>
+									<CardTitle>Servicios ofrecidos</CardTitle>
+									<CardSubTitle>
+										Selecciona los servicios que tu comercio ofrece a los
+										clientes.
+									</CardSubTitle>
+								</CardLabel>
+							</CardHeader>
+						</CardBody>
+						<div className='px-5'>
+							<div className='d-flex flex-column gap-4 px-4 py-2 ms-2 mb-4'>
+								<div className='form-check form-switch'>
+									<input
+										className='form-check-input'
+										type='checkbox'
+										id='pickup'
+										checked={havePickup}
+										onChange={(e) => setHavePickup(e.target.checked)}
+									/>
+									<label className='form-check-label fw-bold' htmlFor='pickup'>
+										Recogida en el local
+									</label>
+									<small className='text-muted d-block'>
+										Permite que los clientes recojan sus pedidos directamente en
+										tu comercio.
+									</small>
+								</div>
 
-						<div className='col-lg-6'>
-							<FormGroup id='city' label='City' isFloating>
-								<Input
-									readOnly
-									// onChange={formik.handleChange}
-									// onBlur={formik.handleBlur}
-									// value={formik.values.city}
-									// isValid={formik.isValid}
-									// isTouched={formik.touched.city}
-									// invalidFeedback={formik.errors.city}
-									validFeedback='Looks good!'
-								/>
-							</FormGroup>
+								<div className='form-check form-switch'>
+									<input
+										className='form-check-input'
+										type='checkbox'
+										id='deliveryBee'
+										checked={haveDeliveryBee}
+										onChange={(e) => setHaveDeliveryBee(e.target.checked)}
+									/>
+									<label
+										className='form-check-label fw-bold'
+										htmlFor='deliveryBee'>
+										Entrega a domicilio (DeliveryBee)
+									</label>
+									<small className='text-muted d-block'>
+										Activa la entrega mediante repartidores asociados a la
+										plataforma.
+									</small>
+								</div>
+
+								<div className='form-check form-switch'>
+									<input
+										className='form-check-input'
+										type='checkbox'
+										id='reservation'
+										checked={haveReservation}
+										onChange={(e) => setHaveReservation(e.target.checked)}
+									/>
+									<label
+										className='form-check-label fw-bold'
+										htmlFor='reservation'>
+										Reservas de mesa
+									</label>
+									<small className='text-muted d-block'>
+										Permite que los clientes reserven una mesa con antelación.
+									</small>
+								</div>
+
+								{haveReservation && (
+									<div className='mt-2'>
+										<label htmlFor='maxPeople' className='form-label fw-bold'>
+											Número máximo de personas por reserva
+										</label>
+										<input
+											type='number'
+											className='form-control'
+											id='maxPeople'
+											min='1'
+											value={maxPeoplePerReservation}
+											onChange={(e) =>
+												setMaxPeoplePerReservation(e.target.value)
+											}
+											placeholder='Ejemplo: 5'
+										/>
+										<small className='text-muted'>
+											Define cuántas personas puede incluir cada reserva.
+										</small>
+									</div>
+								)}
+							</div>
 						</div>
-						<div className='col-md-3'>
-							<FormGroup id='state' label='State' isFloating>
-								<Select
-									ariaLabel='State'
-									placeholder='Choose...'
-									list={[
-										{ value: 'usa', text: 'USA' },
-										{ value: 'ca', text: 'Canada' },
-									]}
-									// onChange={formik.handleChange}
-									// onBlur={formik.handleBlur}
-									// value={formik.values.state}
-									// isValid={formik.isValid}
-									// isTouched={formik.touched.state}
-									// invalidFeedback={formik.errors.state}
-								/>
-							</FormGroup>
-						</div>
-						<div className='col-md-3'>
-							<FormGroup id='zip' label='Zip' isFloating>
-								<Input
-									readOnly
-									// onChange={formik.handleChange}
-									// onBlur={formik.handleBlur}
-									// value={formik.values.zip}
-									// isValid={formik.isValid}
-									// isTouched={formik.touched.zip}
-									// invalidFeedback={formik.errors.zip}
-								/>
-							</FormGroup>
-						</div>
-					</div>
+					</Card>
 				</WizardItem>
 				<WizardItem id='step3' title='Test'>
 					<div className='row g-4'>
