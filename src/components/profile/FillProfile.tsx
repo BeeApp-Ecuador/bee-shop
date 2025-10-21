@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import Card, { CardBody, CardHeader, CardLabel, CardTitle } from '../bootstrap/Card';
+import Card, { CardBody, CardHeader, CardLabel, CardSubTitle, CardTitle } from '../bootstrap/Card';
 import Wizard, { WizardItem } from '../Wizard';
 import Input from '../bootstrap/forms/Input';
 import Button from '../bootstrap/Button';
@@ -31,6 +31,16 @@ const FillProfile = () => {
 				<WizardItem id='step1' title='Categoría y Tags'>
 					<Card>
 						<CardBody>
+							{/* Poner tiulo */}
+							<CardHeader>
+								<CardLabel icon='Category' iconColor='warning'>
+									<CardTitle>¡Cuéntanos un poco sobre tu comercio!</CardTitle>
+									<CardSubTitle>
+										Elige una o más categorías que mejor lo representen.
+									</CardSubTitle>
+								</CardLabel>
+							</CardHeader>
+
 							<div className='d-flex flex-wrap justify-content-center gap-2'>
 								{categories.map((category) => {
 									const isSelected = selectedCategories.some(
