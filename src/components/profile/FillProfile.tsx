@@ -15,7 +15,7 @@ const FillProfile = () => {
 				noValidate
 				// onSubmit={formik.handleSubmit}
 				className='shadow-3d-info'>
-				<WizardItem id='step1' title='Account Detail'>
+				<WizardItem id='step1' title='Categoría y Tags'>
 					<Card>
 						<CardBody>
 							<div className='row g-4 align-items-center'>
