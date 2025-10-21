@@ -1,15 +1,17 @@
 import React, { useEffect, useState } from 'react';
-import Card, { CardBody, CardHeader, CardLabel, CardTitle } from '../bootstrap/Card';
+import Card, { CardBody, CardHeader, CardLabel, CardSubTitle, CardTitle } from '../bootstrap/Card';
 import Wizard, { WizardItem } from '../Wizard';
 import Input from '../bootstrap/forms/Input';
 import Button from '../bootstrap/Button';
 import FormGroup from '../bootstrap/forms/FormGroup';
 import Select from '../bootstrap/forms/Select';
 import { useGetCategoriesQuery } from '../../store/api/profileApi';
+import { ShopCategoryType } from '../../type/shop-category-type';
 
 const FillProfile = () => {
 	const { data } = useGetCategoriesQuery({});
-	const [categories, setCategories] = useState<[]>([]);
+	const [categories, setCategories] = useState<ShopCategoryType[]>([]);
+	const [selectedCategories, setSelectedCategories] = useState<ShopCategoryType[]>([]);
 
 	useEffect(() => {
 		if (data) {
@@ -29,28 +31,40 @@ const FillProfile = () => {
 				<WizardItem id='step1' title='Categoría y Tags'>
 					<Card>
 						<CardBody>
-							<div className='row g-4 align-items-center'>
-								<div className='col-xl'>
-									<div className='row g-4'>
-										<div className='col-auto'>
-											<Input
-												type='file'
-												autoComplete='photo'
-												ariaLabel='Upload image file'
-											/>
-										</div>
-										<div className='col-auto'>
-											<Button color='dark' isLight icon='Delete'>
-												Delete Avatar
-											</Button>
-										</div>
-										<div className='col-12'>
-											<p className='lead text-muted'>
-												Avatar helps your teammates get to know you.
-											</p>
-										</div>
-									</div>
-								</div>
+							{/* Poner tiulo */}
+							<CardHeader>
+								<CardLabel icon='Category' iconColor='warning'>
+									<CardTitle>¡Cuéntanos un poco sobre tu comercio!</CardTitle>
+									<CardSubTitle>
+										Elige una o más categorías que mejor lo representen.
+									</CardSubTitle>
+								</CardLabel>
+							</CardHeader>
+
+							<div className='d-flex flex-wrap justify-content-center gap-2'>
+								{categories.map((category) => {
+									const isSelected = selectedCategories.some(
+										(c) => c._id === category._id,
+									);
+
+									const handleToggle = () => {
+										setSelectedCategories((prev) =>
+											isSelected
+												? prev.filter((c) => c._id !== category._id)
+												: [...prev, category],
+										);
+									};
+
+									return (
+										<Button
+											key={category._id}
+											isOutline={!isSelected}
+											color='info'
+											onClick={handleToggle}>
+											{category.name}
+										</Button>
+									);
+								})}
 							</div>
 						</CardBody>
 					</Card>
