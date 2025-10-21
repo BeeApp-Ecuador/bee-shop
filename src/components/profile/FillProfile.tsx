@@ -327,38 +327,38 @@ const FillProfile = () => {
 							</CardHeader>
 						</CardBody>
 						{/* Lunes */}
-						<Card className='mx-4 mb-3'>
-							<CardBody>
-								{/* <CardHeader>
+						{/* <Card className='mx-4 mb-3'> */}
+						{/* <CardBody> */}
+						{/* <CardHeader>
 									<CardLabel>
 										<CardTitle> */}
-								<Accordion id='weekly-schedule' color='info'>
-									<DayAccordionItem
-										day='Lunes'
-										checked={enableMonday}
-										onChange={setEnableMonday}
-										id='monday'>
-										<div>Contenido del Lunes</div>
-									</DayAccordionItem>
-									<DayAccordionItem
-										day='Martes'
-										checked={enableTuesday}
-										onChange={setEnableTuesday}
-										id='tuesday'>
-										<div>Contenido del Martes</div>
-										<div>Contenido del Martes</div>
-										<div>Contenido del Martes</div>
-									</DayAccordionItem>
-									<DayAccordionItem
-										day='Miércoles'
-										checked={enableWednesday}
-										onChange={setEnableWednesday}
-										id='wednesday'>
-										<div>Contenido del Miércoles</div>
-									</DayAccordionItem>
-								</Accordion>
-							</CardBody>
-						</Card>
+						<Accordion id='weekly-schedule' color='info' className='m-4'>
+							<DayAccordionItem
+								day='Lunes'
+								checked={enableMonday}
+								onChange={setEnableMonday}
+								id='monday'>
+								<div>Contenido del Lunes</div>
+							</DayAccordionItem>
+							<DayAccordionItem
+								day='Martes'
+								checked={enableTuesday}
+								onChange={setEnableTuesday}
+								id='tuesday'>
+								<div>Contenido del Martes</div>
+								<div>Contenido del Martes</div>
+								<div>Contenido del Martes</div>
+							</DayAccordionItem>
+							<DayAccordionItem
+								day='Miércoles'
+								checked={enableWednesday}
+								onChange={setEnableWednesday}
+								id='wednesday'>
+								<div>Contenido del Miércoles</div>
+							</DayAccordionItem>
+						</Accordion>
+						{/* </CardBody>
+						</Card> */}
 					</Card>
 				</WizardItem>
 			</Wizard>
