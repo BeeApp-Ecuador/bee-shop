@@ -20,6 +20,11 @@ const FillProfile = () => {
 	const mapRef = useRef<MapCardRef>(null);
 	const [coords, setCoords] = useState<{ lat: number; lng: number } | null>(null);
 
+	const [havePickup, setHavePickup] = useState(false);
+	const [haveDeliveryBee, setHaveDeliveryBee] = useState(false);
+	const [haveReservation, setHaveReservation] = useState(false);
+	const [maxPeoplePerReservation, setMaxPeoplePerReservation] = useState('');
+
 	const handleCoordsChange = (coords: { lat: number; lng: number }) => {
 		console.log('Nuevas coordenadas:', coords);
 	};
@@ -193,6 +198,98 @@ const FillProfile = () => {
 								onCoordsChange={handleCoordsChange}
 								ref={mapRef}
 							/>
+						</div>
+					</Card>
+					<Card>
+						<CardBody>
+							<CardHeader>
+								<CardLabel icon='Build' iconColor='info'>
+									<CardTitle>Servicios ofrecidos</CardTitle>
+									<CardSubTitle>
+										Selecciona los servicios que tu comercio ofrece a los
+										clientes.
+									</CardSubTitle>
+								</CardLabel>
+							</CardHeader>
+						</CardBody>
+						<div className='px-5'>
+							<div className='d-flex flex-column gap-4 px-4 py-2 ms-2 mb-4'>
+								<div className='form-check form-switch'>
+									<input
+										className='form-check-input'
+										type='checkbox'
+										id='pickup'
+										checked={havePickup}
+										onChange={(e) => setHavePickup(e.target.checked)}
+									/>
+									<label className='form-check-label fw-bold' htmlFor='pickup'>
+										Recogida en el local
+									</label>
+									<small className='text-muted d-block'>
+										Permite que los clientes recojan sus pedidos directamente en
+										tu comercio.
+									</small>
+								</div>
+
+								<div className='form-check form-switch'>
+									<input
+										className='form-check-input'
+										type='checkbox'
+										id='deliveryBee'
+										checked={haveDeliveryBee}
+										onChange={(e) => setHaveDeliveryBee(e.target.checked)}
+									/>
+									<label
+										className='form-check-label fw-bold'
+										htmlFor='deliveryBee'>
+										Entrega a domicilio (DeliveryBee)
+									</label>
+									<small className='text-muted d-block'>
+										Activa la entrega mediante repartidores asociados a la
+										plataforma.
+									</small>
+								</div>
+
+								<div className='form-check form-switch'>
+									<input
+										className='form-check-input'
+										type='checkbox'
+										id='reservation'
+										checked={haveReservation}
+										onChange={(e) => setHaveReservation(e.target.checked)}
+									/>
+									<label
+										className='form-check-label fw-bold'
+										htmlFor='reservation'>
+										Reservas de mesa
+									</label>
+									<small className='text-muted d-block'>
+										Permite que los clientes reserven una mesa con antelación.
+									</small>
+								</div>
+
+								{haveReservation && (
+									<div className='mt-2'>
+										<label htmlFor='maxPeople' className='form-label fw-bold'>
+											Número máximo de personas por reserva
+										</label>
+										<input
+											type='number'
+											className='form-control'
+											id='maxPeople'
+											min='1'
+											value={maxPeoplePerReservation}
+											onChange={(e) =>
+												setMaxPeoplePerReservation(e.target.value)
+											}
+											placeholder='Ejemplo: 5'
+										/>
+										<small className='text-muted'>
+											Define cuántas personas puede incluir cada reserva.
+										</small>
+									</div>
+								)}
+							</div>
 						</div>
 					</Card>
 				</WizardItem>
