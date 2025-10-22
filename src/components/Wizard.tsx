@@ -59,7 +59,7 @@ const Wizard: FC<IWizardProps> = ({
 
 	const prevBtn = !!activeItemIndex && (
 		<Button color={color} isLink onClick={() => setActiveItemIndex(activeItemIndex - 1)}>
-			Previous
+			Anterior
 		</Button>
 	);
 
@@ -71,14 +71,14 @@ const Wizard: FC<IWizardProps> = ({
 				color={color}
 				isLight
 				onClick={() => setActiveItemIndex(activeItemIndex + 1)}>
-				Next
+				Siguiente
 			</Button>
 			<Button
 				className={classNames({ 'd-none': childCount !== activeItemIndex + 1 })}
 				aria-hidden={childCount !== activeItemIndex + 1}
 				type='submit'
 				color={color}>
-				Submit
+				Guardar
 			</Button>
 		</>
 	);

@@ -41,7 +41,11 @@ const WeeklySchedule: React.FC<WeeklyScheduleProps> = ({
 				checked={enableMonday}
 				onChange={setEnableMonday}
 				id='monday'>
-				<DaySchedule />
+				{enableMonday ? (
+					<DaySchedule />
+				) : (
+					<span>Para poder configurar el horario, activa el día Lunes</span>
+				)}
 			</DayAccordionItem>
 
 			<DayAccordionItem
@@ -49,7 +53,11 @@ const WeeklySchedule: React.FC<WeeklyScheduleProps> = ({
 				checked={enableTuesday}
 				onChange={setEnableTuesday}
 				id='tuesday'>
-				<DaySchedule />
+				{enableTuesday ? (
+					<DaySchedule />
+				) : (
+					<span>Para poder configurar el horario, activa el día Martes</span>
+				)}
 			</DayAccordionItem>
 
 			<DayAccordionItem
@@ -57,7 +65,11 @@ const WeeklySchedule: React.FC<WeeklyScheduleProps> = ({
 				checked={enableWednesday}
 				onChange={setEnableWednesday}
 				id='wednesday'>
-				<DaySchedule />
+				{enableWednesday ? (
+					<DaySchedule />
+				) : (
+					<span>Para poder configurar el horario, activa el día Miércoles</span>
+				)}
 			</DayAccordionItem>
 
 			<DayAccordionItem
@@ -65,7 +77,11 @@ const WeeklySchedule: React.FC<WeeklyScheduleProps> = ({
 				checked={enableThursday}
 				onChange={setEnableThursday}
 				id='thursday'>
-				<DaySchedule />
+				{enableThursday ? (
+					<DaySchedule />
+				) : (
+					<span>Para poder configurar el horario, activa el día Jueves</span>
+				)}
 			</DayAccordionItem>
 
 			<DayAccordionItem
@@ -73,7 +89,11 @@ const WeeklySchedule: React.FC<WeeklyScheduleProps> = ({
 				checked={enableFriday}
 				onChange={setEnableFriday}
 				id='friday'>
-				<DaySchedule />
+				{enableFriday ? (
+					<DaySchedule />
+				) : (
+					<span>Para poder configurar el horario, activa el día Viernes</span>
+				)}
 			</DayAccordionItem>
 
 			<DayAccordionItem
@@ -81,7 +101,11 @@ const WeeklySchedule: React.FC<WeeklyScheduleProps> = ({
 				checked={enableSaturday}
 				onChange={setEnableSaturday}
 				id='saturday'>
-				<DaySchedule />
+				{enableSaturday ? (
+					<DaySchedule />
+				) : (
+					<span>Para poder configurar el horario, activa el día Sábado</span>
+				)}
 			</DayAccordionItem>
 
 			<DayAccordionItem
@@ -89,7 +113,11 @@ const WeeklySchedule: React.FC<WeeklyScheduleProps> = ({
 				checked={enableSunday}
 				onChange={setEnableSunday}
 				id='sunday'>
-				<DaySchedule />
+				{enableSunday ? (
+					<DaySchedule />
+				) : (
+					<span>Para poder configurar el horario, activa el día Domingo</span>
+				)}
 			</DayAccordionItem>
 		</Accordion>
 	);
