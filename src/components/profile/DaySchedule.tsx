@@ -2,6 +2,7 @@ import React from 'react';
 import showNotification from '../extras/showNotification';
 import Icon from '../icon/Icon';
 import { HourRange } from './WeeklySchedule';
+import Button from '../bootstrap/Button';
 
 interface DayScheduleProps {
 	dayName: string;
@@ -141,28 +142,33 @@ const DaySchedule: React.FC<DayScheduleProps> = ({ dayName, hours, setHours, onC
 					</select>
 					<div className='d-flex gap-1'>
 						{hours.length > 1 && index === hours.length - 1 && (
-							<button
-								className='btn btn-outline-danger btn-sm'
-								onClick={() => removeHour(index)}>
-								-
-							</button>
+							<Button
+								icon='Remove'
+								onClick={() => removeHour(index)}
+								color='danger'
+								isOutline
+								size='sm'
+							/>
 						)}
 						{index === hours.length - 1 && index < 2 && (
-							<button className='btn btn-outline-primary btn-sm' onClick={addHour}>
-								+
-							</button>
+							<Button
+								icon='Add'
+								onClick={addHour}
+								color='success'
+								isOutline
+								size='sm'
+							/>
 						)}
 					</div>
 				</div>
 			))}
 
 			{dayName === 'monday' && onCopyToAll && (
-				<button
-					type='button'
-					className='btn btn-outline-secondary btn-sm mt-2'
-					onClick={() => onCopyToAll(hours)}>
-					Copiar horario para todos los días
-				</button>
+				<div className='d-flex justify-content-end w-100'>
+					<Button color='info' onClick={() => onCopyToAll(hours)}>
+						Copiar horario para todos los días
+					</Button>
+				</div>
 			)}
 		</div>
 	);
