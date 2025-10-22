@@ -9,6 +9,7 @@ import { useGetCategoriesQuery } from '../../store/api/profileApi';
 import { ShopCategoryType } from '../../type/shop-category-type';
 import MapCard, { MapCardRef } from './MapCard';
 import Accordion, { DayAccordionItem } from '../Accordion';
+import WeeklySchedule from './WeeklySchedule';
 
 const FillProfile = () => {
 	const { data } = useGetCategoriesQuery({});
@@ -326,39 +327,22 @@ const FillProfile = () => {
 								</CardLabel>
 							</CardHeader>
 						</CardBody>
-						{/* Lunes */}
-						{/* <Card className='mx-4 mb-3'> */}
-						{/* <CardBody> */}
-						{/* <CardHeader>
-									<CardLabel>
-										<CardTitle> */}
-						<Accordion id='weekly-schedule' color='info' className='m-4'>
-							<DayAccordionItem
-								day='Lunes'
-								checked={enableMonday}
-								onChange={setEnableMonday}
-								id='monday'>
-								<div>Contenido del Lunes</div>
-							</DayAccordionItem>
-							<DayAccordionItem
-								day='Martes'
-								checked={enableTuesday}
-								onChange={setEnableTuesday}
-								id='tuesday'>
-								<div>Contenido del Martes</div>
-								<div>Contenido del Martes</div>
-								<div>Contenido del Martes</div>
-							</DayAccordionItem>
-							<DayAccordionItem
-								day='Miércoles'
-								checked={enableWednesday}
-								onChange={setEnableWednesday}
-								id='wednesday'>
-								<div>Contenido del Miércoles</div>
-							</DayAccordionItem>
-						</Accordion>
-						{/* </CardBody>
-						</Card> */}
+						<WeeklySchedule
+							enableMonday={enableMonday}
+							setEnableMonday={setEnableMonday}
+							enableTuesday={enableTuesday}
+							setEnableTuesday={setEnableTuesday}
+							enableWednesday={enableWednesday}
+							setEnableWednesday={setEnableWednesday}
+							enableThursday={enableThursday}
+							setEnableThursday={setEnableThursday}
+							enableFriday={enableFriday}
+							setEnableFriday={setEnableFriday}
+							enableSaturday={enableSaturday}
+							setEnableSaturday={setEnableSaturday}
+							enableSunday={enableSunday}
+							setEnableSunday={setEnableSunday}
+						/>
 					</Card>
 				</WizardItem>
 			</Wizard>
