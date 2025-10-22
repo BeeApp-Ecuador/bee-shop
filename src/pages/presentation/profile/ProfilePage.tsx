@@ -310,6 +310,7 @@ const ProfilePage = () => {
 					setIsOpen={setIsFillingProfile}
 					isOpen={isFillingProfile}
 					isCentered
+					isStaticBackdrop
 					size='xl'>
 					<ModalHeader setIsOpen={setIsFillingProfile}>
 						<ModalTitle id='preview'>Completar Perfil</ModalTitle>
