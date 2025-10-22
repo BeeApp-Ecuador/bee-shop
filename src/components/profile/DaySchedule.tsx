@@ -95,7 +95,6 @@ const DaySchedule = () => {
 						alignItems: 'center',
 						gap: '8px',
 					}}>
-					{/* Start Hour */}
 					<select
 						className='form-control w-auto'
 						value={h.startHour}
@@ -110,7 +109,6 @@ const DaySchedule = () => {
 
 					<span>:</span>
 
-					{/* Start Minute */}
 					<select
 						className='form-control w-auto'
 						value={h.startMin}
@@ -125,7 +123,6 @@ const DaySchedule = () => {
 
 					<span>hasta</span>
 
-					{/* End Hour */}
 					<select
 						className='form-control w-auto'
 						value={h.endHour}
@@ -140,7 +137,6 @@ const DaySchedule = () => {
 
 					<span>:</span>
 
-					{/* End Minute */}
 					<select
 						className='form-control w-auto'
 						value={h.endMin}
@@ -153,7 +149,6 @@ const DaySchedule = () => {
 						))}
 					</select>
 
-					{/* Botones alineados horizontalmente */}
 					<div className='d-flex gap-1'>
 						{hours.length > 1 && index === hours.length - 1 && (
 							<button
