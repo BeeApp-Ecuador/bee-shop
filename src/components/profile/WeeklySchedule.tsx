@@ -1,6 +1,13 @@
-import React from 'react';
+import React, { useState } from 'react';
 import Accordion, { DayAccordionItem } from '../Accordion';
 import DaySchedule from './DaySchedule';
+
+export interface HourRange {
+	startHour: string;
+	startMin: string;
+	endHour: string;
+	endMin: string;
+}
 
 interface WeeklyScheduleProps {
 	enableMonday: boolean;
@@ -18,79 +25,65 @@ interface WeeklyScheduleProps {
 	enableSunday: boolean;
 	setEnableSunday: React.Dispatch<React.SetStateAction<boolean>>;
 }
-const WeeklySchedule: React.FC<WeeklyScheduleProps> = ({
-	enableMonday,
-	setEnableMonday,
-	enableTuesday,
-	setEnableTuesday,
-	enableWednesday,
-	setEnableWednesday,
-	enableThursday,
-	setEnableThursday,
-	enableFriday,
-	setEnableFriday,
-	enableSaturday,
-	setEnableSaturday,
-	enableSunday,
-	setEnableSunday,
-}) => {
+
+const WeeklySchedule: React.FC<WeeklyScheduleProps> = (props) => {
+	const [weeklyHours, setWeeklyHours] = useState<{ [day: string]: HourRange[] }>({
+		monday: [{ startHour: '', startMin: '', endHour: '', endMin: '' }],
+		tuesday: [{ startHour: '', startMin: '', endHour: '', endMin: '' }],
+		wednesday: [{ startHour: '', startMin: '', endHour: '', endMin: '' }],
+		thursday: [{ startHour: '', startMin: '', endHour: '', endMin: '' }],
+		friday: [{ startHour: '', startMin: '', endHour: '', endMin: '' }],
+		saturday: [{ startHour: '', startMin: '', endHour: '', endMin: '' }],
+		sunday: [{ startHour: '', startMin: '', endHour: '', endMin: '' }],
+	});
+
+	const copyMondayToAll = (mondayHours: HourRange[]) => {
+		props.setEnableTuesday(true);
+		props.setEnableWednesday(true);
+		props.setEnableThursday(true);
+		props.setEnableFriday(true);
+		props.setEnableSaturday(true);
+		props.setEnableSunday(true);
+		setWeeklyHours((prev) => ({
+			...prev,
+			tuesday: mondayHours.map((h) => ({ ...h })),
+			wednesday: mondayHours.map((h) => ({ ...h })),
+			thursday: mondayHours.map((h) => ({ ...h })),
+			friday: mondayHours.map((h) => ({ ...h })),
+			saturday: mondayHours.map((h) => ({ ...h })),
+			sunday: mondayHours.map((h) => ({ ...h })),
+		}));
+	};
+
+	const renderDay = (
+		dayLabel: string,
+		enable: boolean,
+		setEnable: React.Dispatch<React.SetStateAction<boolean>>,
+		key: string,
+	) => (
+		<DayAccordionItem day={dayLabel} checked={enable} onChange={setEnable} id={key}>
+			{enable ? (
+				<DaySchedule
+					dayName={key}
+					hours={weeklyHours[key]}
+					setHours={(hours) => setWeeklyHours((prev) => ({ ...prev, [key]: hours }))}
+					onCopyToAll={key === 'monday' ? copyMondayToAll : undefined}
+				/>
+			) : (
+				<span>Para poder configurar el horario, activa el día {dayLabel}</span>
+			)}
+		</DayAccordionItem>
+	);
+
 	return (
 		<Accordion id='weekly-schedule' color='info' className='m-4'>
-			<DayAccordionItem
-				day='Lunes'
-				checked={enableMonday}
-				onChange={setEnableMonday}
-				id='monday'>
-				<DaySchedule />
-			</DayAccordionItem>
-
-			<DayAccordionItem
-				day='Martes'
-				checked={enableTuesday}
-				onChange={setEnableTuesday}
-				id='tuesday'>
-				<DaySchedule />
-			</DayAccordionItem>
-
-			<DayAccordionItem
-				day='Miércoles'
-				checked={enableWednesday}
-				onChange={setEnableWednesday}
-				id='wednesday'>
-				<DaySchedule />
-			</DayAccordionItem>
-
-			<DayAccordionItem
-				day='Jueves'
-				checked={enableThursday}
-				onChange={setEnableThursday}
-				id='thursday'>
-				<DaySchedule />
-			</DayAccordionItem>
-
-			<DayAccordionItem
-				day='Viernes'
-				checked={enableFriday}
-				onChange={setEnableFriday}
-				id='friday'>
-				<DaySchedule />
-			</DayAccordionItem>
-
-			<DayAccordionItem
-				day='Sábado'
-				checked={enableSaturday}
-				onChange={setEnableSaturday}
-				id='saturday'>
-				<DaySchedule />
-			</DayAccordionItem>
-
-			<DayAccordionItem
-				day='Domingo'
-				checked={enableSunday}
-				onChange={setEnableSunday}
-				id='sunday'>
-				<DaySchedule />
-			</DayAccordionItem>
+			{renderDay('Lunes', props.enableMonday, props.setEnableMonday, 'monday')}
+			{renderDay('Martes', props.enableTuesday, props.setEnableTuesday, 'tuesday')}
+			{renderDay('Miércoles', props.enableWednesday, props.setEnableWednesday, 'wednesday')}
+			{renderDay('Jueves', props.enableThursday, props.setEnableThursday, 'thursday')}
+			{renderDay('Viernes', props.enableFriday, props.setEnableFriday, 'friday')}
+			{renderDay('Sábado', props.enableSaturday, props.setEnableSaturday, 'saturday')}
+			{renderDay('Domingo', props.enableSunday, props.setEnableSunday, 'sunday')}
 		</Accordion>
 	);
 };

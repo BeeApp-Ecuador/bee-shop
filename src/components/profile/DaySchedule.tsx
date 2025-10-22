@@ -1,83 +1,82 @@
 import React from 'react';
 import showNotification from '../extras/showNotification';
 import Icon from '../icon/Icon';
+import { HourRange } from './WeeklySchedule';
+import Button from '../bootstrap/Button';
 
-const DaySchedule = () => {
-	const [hours, setHours] = React.useState([
-		{ startHour: '', startMin: '', endHour: '', endMin: '' },
-	]);
+interface DayScheduleProps {
+	dayName: string;
+	hours: HourRange[];
+	setHours: (hours: HourRange[]) => void;
+	onCopyToAll?: (hours: HourRange[]) => void;
+}
 
+const DaySchedule: React.FC<DayScheduleProps> = ({ dayName, hours, setHours, onCopyToAll }) => {
 	const hoursOptions = Array.from({ length: 24 }, (_, i) => i.toString().padStart(2, '0'));
-	const minutesOptions = ['00', '15', '30', '45'];
+	const baseMinutesOptions = ['00', '15', '30', '45'];
+
+	const getMinutesOptions = (hour: string) =>
+		hour === '23' ? [...baseMinutesOptions, '59'] : baseMinutesOptions;
 
 	const addHour = () => {
-		setHours((prev) => {
-			const last = prev[prev.length - 1];
-			if (!last.endHour || !last.endMin) {
-				showNotification(
-					<span className='d-flex align-items-center'>
-						<Icon icon='Error' size='lg' className='me-1' />
-						<span>Error</span>
-					</span>,
-					'Debes completar la franja horaria anterior antes de agregar otra',
-					'danger',
-				);
-				return prev;
-			}
-			return [
-				...prev,
-				{ startHour: last.endHour, startMin: last.endMin, endHour: '', endMin: '' },
-			];
-		});
+		const last = hours[hours.length - 1];
+		if (!last.endHour || !last.endMin) {
+			showNotification(
+				<span className='d-flex align-items-center'>
+					<Icon icon='Error' size='lg' className='me-1' />
+					<span>Error</span>
+				</span>,
+				'Debes completar la franja horaria anterior antes de agregar otra',
+				'danger',
+			);
+			return;
+		}
+		setHours([
+			...hours,
+			{ startHour: last.endHour, startMin: last.endMin, endHour: '', endMin: '' },
+		]);
 	};
 
-	const handleChange = (
-		index: number,
-		field: 'startHour' | 'startMin' | 'endHour' | 'endMin',
-		value: string,
-	) => {
-		setHours((prev) => {
-			const newHours = [...prev];
-			const current = { ...newHours[index] };
-			current[field] = value;
+	const handleChange = (index: number, field: keyof HourRange, value: string) => {
+		const newHours = [...hours];
+		const current = { ...newHours[index], [field]: value };
 
-			const start =
-				current.startHour && current.startMin
-					? current.startHour + ':' + current.startMin
-					: null;
-			const end =
-				current.endHour && current.endMin ? current.endHour + ':' + current.endMin : null;
+		const start =
+			current.startHour && current.startMin
+				? current.startHour + ':' + current.startMin
+				: null;
+		const end =
+			current.endHour && current.endMin ? current.endHour + ':' + current.endMin : null;
 
-			if (start && end && start >= end) {
+		if (start && end && start >= end) {
+			showNotification(
+				<span className='d-flex align-items-center'>
+					<Icon icon='Error' size='lg' className='me-1' />
+					<span>Error</span>
+				</span>,
+				'La hora de inicio debe ser menor que la hora de fin',
+				'danger',
+			);
+			return;
+		}
+
+		if (index > 0) {
+			const prevEnd = newHours[index - 1].endHour + ':' + newHours[index - 1].endMin;
+			if (start && prevEnd && start <= prevEnd) {
 				showNotification(
 					<span className='d-flex align-items-center'>
 						<Icon icon='Error' size='lg' className='me-1' />
 						<span>Error</span>
 					</span>,
-					'La hora de inicio debe ser menor que la hora de fin',
+					'La hora de inicio debe ser mayor que la hora de fin de la franja anterior',
 					'danger',
 				);
-				return prev;
+				return;
 			}
+		}
 
-			if (index > 0) {
-				const prevEnd = prev[index - 1].endHour + ':' + prev[index - 1].endMin;
-				if (start && prevEnd && start <= prevEnd) {
-					showNotification(
-						<span className='d-flex align-items-center'>
-							<Icon icon='Error' size='lg' className='me-1' />
-							<span>Error</span>
-						</span>,
-						'La hora de inicio debe ser mayor que la hora de fin de la franja anterior',
-						'danger',
-					);
-					return prev;
-				}
-			}
-
-			newHours[index] = current;
-			return newHours;
-		});
+		newHours[index] = current;
+		setHours(newHours);
 	};
 
 	const removeHour = (index: number) => {
@@ -91,14 +90,13 @@ const DaySchedule = () => {
 					key={index}
 					className='d-grid align-items-center'
 					style={{
-						gridTemplateColumns: 'auto auto auto auto auto auto auto  90px',
-						alignItems: 'center',
+						gridTemplateColumns: 'auto auto auto auto auto auto auto 90px',
 						gap: '8px',
 					}}>
 					<select
-						className='form-control w-auto'
 						value={h.startHour}
-						onChange={(e) => handleChange(index, 'startHour', e.target.value)}>
+						onChange={(e) => handleChange(index, 'startHour', e.target.value)}
+						className='form-control w-auto'>
 						<option value=''>HH</option>
 						{hoursOptions.map((hh) => (
 							<option key={hh} value={hh}>
@@ -106,27 +104,23 @@ const DaySchedule = () => {
 							</option>
 						))}
 					</select>
-
 					<span>:</span>
-
 					<select
-						className='form-control w-auto'
 						value={h.startMin}
-						onChange={(e) => handleChange(index, 'startMin', e.target.value)}>
+						onChange={(e) => handleChange(index, 'startMin', e.target.value)}
+						className='form-control w-auto'>
 						<option value=''>MM</option>
-						{minutesOptions.map((mm) => (
+						{getMinutesOptions(h.startHour).map((mm) => (
 							<option key={mm} value={mm}>
 								{mm}
 							</option>
 						))}
 					</select>
-
 					<span>hasta</span>
-
 					<select
-						className='form-control w-auto'
 						value={h.endHour}
-						onChange={(e) => handleChange(index, 'endHour', e.target.value)}>
+						onChange={(e) => handleChange(index, 'endHour', e.target.value)}
+						className='form-control w-auto'>
 						<option value=''>HH</option>
 						{hoursOptions.map((hh) => (
 							<option key={hh} value={hh}>
@@ -134,41 +128,48 @@ const DaySchedule = () => {
 							</option>
 						))}
 					</select>
-
 					<span>:</span>
-
 					<select
-						className='form-control w-auto'
 						value={h.endMin}
-						onChange={(e) => handleChange(index, 'endMin', e.target.value)}>
+						onChange={(e) => handleChange(index, 'endMin', e.target.value)}
+						className='form-control w-auto'>
 						<option value=''>MM</option>
-						{minutesOptions.map((mm) => (
+						{getMinutesOptions(h.endHour).map((mm) => (
 							<option key={mm} value={mm}>
 								{mm}
 							</option>
 						))}
 					</select>
-
 					<div className='d-flex gap-1'>
 						{hours.length > 1 && index === hours.length - 1 && (
-							<button
-								type='button'
-								className='btn btn-outline-danger btn-sm'
-								onClick={() => removeHour(index)}>
-								-
-							</button>
+							<Button
+								icon='Remove'
+								onClick={() => removeHour(index)}
+								color='danger'
+								isOutline
+								size='sm'
+							/>
 						)}
 						{index === hours.length - 1 && index < 2 && (
-							<button
-								type='button'
-								className='btn btn-outline-primary btn-sm'
-								onClick={addHour}>
-								+
-							</button>
+							<Button
+								icon='Add'
+								onClick={addHour}
+								color='success'
+								isOutline
+								size='sm'
+							/>
 						)}
 					</div>
 				</div>
 			))}
+
+			{dayName === 'monday' && onCopyToAll && (
+				<div className='d-flex justify-content-end w-100'>
+					<Button color='info' onClick={() => onCopyToAll(hours)}>
+						Copiar horario para todos los días
+					</Button>
+				</div>
+			)}
 		</div>
 	);
 };
