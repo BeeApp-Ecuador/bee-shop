@@ -8,7 +8,15 @@ const DaySchedule = () => {
 	]);
 
 	const hoursOptions = Array.from({ length: 24 }, (_, i) => i.toString().padStart(2, '0'));
-	const minutesOptions = ['00', '15', '30', '45'];
+
+	const baseMinutesOptions = ['00', '15', '30', '45'];
+
+	const getMinutesOptions = (hour: string) => {
+		if (hour === '23') {
+			return [...baseMinutesOptions, '59'];
+		}
+		return baseMinutesOptions;
+	};
 
 	const addHour = () => {
 		setHours((prev) => {
@@ -26,7 +34,12 @@ const DaySchedule = () => {
 			}
 			return [
 				...prev,
-				{ startHour: last.endHour, startMin: last.endMin, endHour: '', endMin: '' },
+				{
+					startHour: last.endHour,
+					startMin: last.endMin,
+					endHour: '',
+					endMin: '',
+				},
 			];
 		});
 	};
@@ -91,10 +104,11 @@ const DaySchedule = () => {
 					key={index}
 					className='d-grid align-items-center'
 					style={{
-						gridTemplateColumns: 'auto auto auto auto auto auto auto  90px',
+						gridTemplateColumns: 'auto auto auto auto auto auto auto 90px',
 						alignItems: 'center',
 						gap: '8px',
 					}}>
+					{/* Start Hour */}
 					<select
 						className='form-control w-auto'
 						value={h.startHour}
@@ -109,12 +123,13 @@ const DaySchedule = () => {
 
 					<span>:</span>
 
+					{/* Start Minute */}
 					<select
 						className='form-control w-auto'
 						value={h.startMin}
 						onChange={(e) => handleChange(index, 'startMin', e.target.value)}>
 						<option value=''>MM</option>
-						{minutesOptions.map((mm) => (
+						{getMinutesOptions(h.startHour).map((mm) => (
 							<option key={mm} value={mm}>
 								{mm}
 							</option>
@@ -123,6 +138,7 @@ const DaySchedule = () => {
 
 					<span>hasta</span>
 
+					{/* End Hour */}
 					<select
 						className='form-control w-auto'
 						value={h.endHour}
@@ -137,18 +153,20 @@ const DaySchedule = () => {
 
 					<span>:</span>
 
+					{/* End Minute */}
 					<select
 						className='form-control w-auto'
 						value={h.endMin}
 						onChange={(e) => handleChange(index, 'endMin', e.target.value)}>
 						<option value=''>MM</option>
-						{minutesOptions.map((mm) => (
+						{getMinutesOptions(h.endHour).map((mm) => (
 							<option key={mm} value={mm}>
 								{mm}
 							</option>
 						))}
 					</select>
 
+					{/* Botones */}
 					<div className='d-flex gap-1'>
 						{hours.length > 1 && index === hours.length - 1 && (
 							<button
