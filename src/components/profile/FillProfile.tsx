@@ -200,6 +200,14 @@ const FillProfile = () => {
 							</CardHeader>
 						</CardBody>
 						<div className='p-3'>
+							<Input
+								type='text'
+								placeholder='Buscar dirección...'
+								// value={address}
+								// onChange={(e) => setAddress(e.target.value)}
+							/>
+						</div>
+						<div className='p-3'>
 							<MapCard
 								lat={coords?.lat ?? '-2.90055'}
 								lng={coords?.lng ?? '-79.00454'}
