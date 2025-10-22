@@ -163,7 +163,7 @@ const DaySchedule = () => {
 								-
 							</button>
 						)}
-						{index === hours.length - 1 && (
+						{index === hours.length - 1 && index < 2 && (
 							<button
 								type='button'
 								className='btn btn-outline-primary btn-sm'
