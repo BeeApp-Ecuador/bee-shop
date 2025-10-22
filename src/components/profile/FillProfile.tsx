@@ -33,6 +33,7 @@ const FillProfile = () => {
 	const [enableFriday, setEnableFriday] = useState(false);
 	const [enableSaturday, setEnableSaturday] = useState(false);
 	const [enableSunday, setEnableSunday] = useState(false);
+	const [address, setAddress] = useState('');
 
 	const handleCoordsChange = (coords: { lat: number; lng: number }) => {
 		console.log('Nuevas coordenadas:', coords);
@@ -203,8 +204,9 @@ const FillProfile = () => {
 							<Input
 								type='text'
 								placeholder='Buscar dirección...'
-								// value={address}
-								// onChange={(e) => setAddress(e.target.value)}
+								value={address}
+								onChange={(e) => setAddress(e.target.value)}
+								list={['fsdf', 'fsdfsd', 'asd']}
 							/>
 						</div>
 						<div className='p-3'>
