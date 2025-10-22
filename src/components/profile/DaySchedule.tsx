@@ -17,9 +17,16 @@ const DaySchedule = () => {
 	};
 
 	return (
-		<div className='d-flex flex-column gap-2'>
+		<div className='d-flex flex-column gap-2 align-items-center'>
 			{hours.map((h, index) => (
-				<div key={index} className='d-flex align-items-center gap-2'>
+				<div
+					key={index}
+					className='d-grid align-items-center'
+					style={{
+						gridTemplateColumns: 'auto auto auto 90px',
+						alignItems: 'center',
+						gap: '8px',
+					}}>
 					<input
 						type='time'
 						className='form-control w-auto'
@@ -40,25 +47,25 @@ const DaySchedule = () => {
 						onChange={(e) => handleChange(index, 'end', e.target.value)}
 					/>
 
-					{/* Botón para eliminar una fila */}
-					{hours.length > 1 && (
-						<button
-							type='button'
-							className='btn btn-outline-danger btn-sm'
-							onClick={() => removeHour(index)}>
-							🗑
-						</button>
-					)}
-
-					{/* Botón para agregar una nueva fila solo en la última */}
-					{index === hours.length - 1 && (
-						<button
-							type='button'
-							className='btn btn-outline-primary btn-sm'
-							onClick={addHour}>
-							+
-						</button>
-					)}
+					{/* Botones siempre en la misma columna */}
+					<div className='d-flex gap-1 justify-content-end'>
+						{hours.length > 1 && index === hours.length - 1 && (
+							<button
+								type='button'
+								className='btn btn-outline-danger btn-sm'
+								onClick={() => removeHour(index)}>
+								-
+							</button>
+						)}
+						{index === hours.length - 1 && (
+							<button
+								type='button'
+								className='btn btn-outline-primary btn-sm'
+								onClick={addHour}>
+								+
+							</button>
+						)}
+					</div>
 				</div>
 			))}
 		</div>
