@@ -58,6 +58,7 @@ const FillProfile = () => {
 	});
 
 	const [searchAddress] = useLazySearchAddressQuery();
+	const [addressSearchResults, setAddressSearchResults] = useState<any[]>([]);
 
 	const handleCoordsChange = (coords: { lat: number; lng: number }) => {
 		console.log('Nuevas coordenadas:', coords);
@@ -164,37 +165,37 @@ const FillProfile = () => {
 	});
 
 	useEffect(() => {
-		const fetchAddresses = async () => {
-			if (formik.values.searchInput) {
-				setSearchModalStatus(true);
-				refSearchInput?.current?.focus();
+		const delayDebounce = setTimeout(() => {
+			const fetchAddresses = async () => {
+				if (formik.values.searchInput) {
+					setSearchModalStatus(true);
+					refSearchInput?.current?.focus();
 
-				try {
-					const { data, error } = await searchAddress({
-						query: formik.values.searchInput,
-						lat: coords?.lat,
-						lon: coords?.lng,
-					});
-					if (error) {
-						console.error('Error en la búsqueda de direcciones:', error);
-						return;
-					}
+					try {
+						const { data, error } = await searchAddress({
+							query: formik.values.searchInput,
+							lat: coords?.lat,
+							lon: coords?.lng,
+						});
 
-					if (data) {
-						console.log('Direcciones encontradas:', data);
+						if (data) {
+							console.log(data.data.features);
+							setAddressSearchResults(data.data.features);
+						}
+					} catch (err) {
+						console.error('Error buscando direcciones:', err);
 					}
-				} catch (err) {
-					console.error('Error buscando direcciones:', err);
+				} else {
+					setSearchModalStatus(false);
 				}
-			} else {
-				setSearchModalStatus(false);
-			}
-		};
+			};
 
-		fetchAddresses();
+			fetchAddresses();
+		}, 400);
 
+		// 🔹 Limpieza del timeout si el usuario sigue escribiendo
 		return () => {
-			setSearchModalStatus(false);
+			clearTimeout(delayDebounce);
 		};
 	}, [formik.values.searchInput]);
 
@@ -501,16 +502,57 @@ const FillProfile = () => {
 					/>
 				</ModalHeader>
 				<ModalBody>
-					<Card>
-						<CardBody>
-							<span>dsa</span>
-						</CardBody>
-					</Card>
-					<Card>
-						<CardBody>
-							<span>dsa</span>
-						</CardBody>
-					</Card>
+					<table className='table table-hover table-modern caption-top mb-0'>
+						<tbody>
+							{addressSearchResults.length ? (
+								addressSearchResults.map((item) => (
+									<tr
+										key={item.id}
+										className='cursor-pointer'
+										onClick={() => {
+											// navigate(`../${item.path}`);
+										}}>
+										<td>
+											<div className='d-flex align-items-start'>
+												<Icon
+													icon='LocationOn'
+													size='lg'
+													className='me-2 mt-1'
+													color='primary'
+												/>
+												<div>
+													<div className='fw-bold'>
+														{item.properties.name}
+													</div>
+													<div className='text-muted small'>
+														{item.properties?.locality ||
+															(item.properties?.street &&
+																(item.properties?.locality ??
+																	item.properties?.street))}
+														{item.properties?.type === 'district' &&
+															item.properties.city}
+														{item.properties?.type !== 'city' ||
+															item.properties?.type !== 'country' ||
+															(item.properties?.type !== 'other' &&
+																(item.properties?.district
+																	? `${
+																			item.properties.district
+																		}, `
+																	: '') +
+																	(item.properties?.city ?? ''))}
+													</div>
+												</div>
+											</div>
+										</td>
+									</tr>
+								))
+							) : (
+								<tr className='table-active'>
+									<td>No result found for query "{formik.values.searchInput}"</td>
+								</tr>
+							)}
+						</tbody>
+					</table>
 				</ModalBody>
 			</Modal>
 		</div>
