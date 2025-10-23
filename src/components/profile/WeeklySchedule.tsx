@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import Accordion, { DayAccordionItem } from '../Accordion';
 import DaySchedule from './DaySchedule';
 
@@ -24,19 +24,15 @@ interface WeeklyScheduleProps {
 	setEnableSaturday: React.Dispatch<React.SetStateAction<boolean>>;
 	enableSunday: boolean;
 	setEnableSunday: React.Dispatch<React.SetStateAction<boolean>>;
+	weeklyHours: { [day: string]: HourRange[] };
+	setWeeklyHours: React.Dispatch<
+		React.SetStateAction<{
+			[day: string]: HourRange[];
+		}>
+	>;
 }
 
 const WeeklySchedule: React.FC<WeeklyScheduleProps> = (props) => {
-	const [weeklyHours, setWeeklyHours] = useState<{ [day: string]: HourRange[] }>({
-		monday: [{ startHour: '', startMin: '', endHour: '', endMin: '' }],
-		tuesday: [{ startHour: '', startMin: '', endHour: '', endMin: '' }],
-		wednesday: [{ startHour: '', startMin: '', endHour: '', endMin: '' }],
-		thursday: [{ startHour: '', startMin: '', endHour: '', endMin: '' }],
-		friday: [{ startHour: '', startMin: '', endHour: '', endMin: '' }],
-		saturday: [{ startHour: '', startMin: '', endHour: '', endMin: '' }],
-		sunday: [{ startHour: '', startMin: '', endHour: '', endMin: '' }],
-	});
-
 	const copyMondayToAll = (mondayHours: HourRange[]) => {
 		props.setEnableTuesday(true);
 		props.setEnableWednesday(true);
@@ -44,7 +40,7 @@ const WeeklySchedule: React.FC<WeeklyScheduleProps> = (props) => {
 		props.setEnableFriday(true);
 		props.setEnableSaturday(true);
 		props.setEnableSunday(true);
-		setWeeklyHours((prev) => ({
+		props.setWeeklyHours((prev) => ({
 			...prev,
 			tuesday: mondayHours.map((h) => ({ ...h })),
 			wednesday: mondayHours.map((h) => ({ ...h })),
@@ -61,12 +57,24 @@ const WeeklySchedule: React.FC<WeeklyScheduleProps> = (props) => {
 		setEnable: React.Dispatch<React.SetStateAction<boolean>>,
 		key: string,
 	) => (
-		<DayAccordionItem day={dayLabel} checked={enable} onChange={setEnable} id={key}>
+		<DayAccordionItem
+			day={dayLabel}
+			checked={enable}
+			onChange={setEnable}
+			id={key}
+			clearDaySchedule={() => {
+				props.setWeeklyHours((prev) => ({
+					...prev,
+					[key]: [{ startHour: '', startMin: '', endHour: '', endMin: '' }],
+				}));
+			}}>
 			{enable ? (
 				<DaySchedule
 					dayName={key}
-					hours={weeklyHours[key]}
-					setHours={(hours) => setWeeklyHours((prev) => ({ ...prev, [key]: hours }))}
+					hours={props.weeklyHours[key]}
+					setHours={(hours) =>
+						props.setWeeklyHours((prev) => ({ ...prev, [key]: hours }))
+					}
 					onCopyToAll={key === 'monday' ? copyMondayToAll : undefined}
 				/>
 			) : (
