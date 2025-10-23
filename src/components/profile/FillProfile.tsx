@@ -11,12 +11,12 @@ import Wizard, { WizardItem } from '../Wizard';
 import Input from '../bootstrap/forms/Input';
 import Button from '../bootstrap/Button';
 import FormGroup from '../bootstrap/forms/FormGroup';
-import { useGetCategoriesQuery } from '../../store/api/profileApi';
+import { useFillProfileMutation, useGetCategoriesQuery } from '../../store/api/profileApi';
 import { ShopCategoryType } from '../../type/shop-category-type';
 import MapCard, { MapCardRef } from './MapCard';
 import WeeklySchedule, { HourRange } from './WeeklySchedule';
 import { useFormik } from 'formik';
-import Modal, { ModalBody, ModalHeader } from '../bootstrap/Modal';
+import Modal, { ModalBody, ModalFooter, ModalHeader, ModalTitle } from '../bootstrap/Modal';
 import Icon from '../icon/Icon';
 import { useLazySearchAddressQuery } from '../../store/api/geoApi';
 import showNotification from '../extras/showNotification';
@@ -33,7 +33,11 @@ export interface ShopFormValues {
 	lng: string;
 }
 
-const FillProfile = () => {
+const FillProfile = ({
+	setIsFillingProfile,
+}: {
+	setIsFillingProfile: React.Dispatch<React.SetStateAction<boolean>>;
+}) => {
 	const { data } = useGetCategoriesQuery({});
 	const [categories, setCategories] = useState<ShopCategoryType[]>([]);
 	const [selectedCategories, setSelectedCategories] = useState<ShopCategoryType[]>([]);
@@ -55,6 +59,10 @@ const FillProfile = () => {
 
 	const refSearchInput = useRef<HTMLInputElement>(null);
 	const [searchModalStatus, setSearchModalStatus] = useState(false);
+	const [showModal, setShowModal] = useState(false);
+	const [isError, setIsError] = useState(false);
+
+	const [fillProfile] = useFillProfileMutation();
 
 	const [weeklyHours, setWeeklyHours] = useState<{ [day: string]: HourRange[] }>({
 		monday: [{ startHour: '', startMin: '', endHour: '', endMin: '' }],
@@ -77,7 +85,6 @@ const FillProfile = () => {
 	};
 
 	const handleFillProfile = async () => {
-		// verificar que en openShopSchedule haya al menos un día habilitado
 		if (
 			enableMonday ||
 			enableTuesday ||
@@ -106,7 +113,6 @@ const FillProfile = () => {
 				}),
 			);
 
-			// verificar que scehedulesArray tenga todos los horarios completos sabiendo que open y close siempre van a tener al menos esto ':' necesito que tengan horas y minutos
 			const allHoursComplete = schedulesArray.every((daySchedule) =>
 				daySchedule.schedule.every((h) => h.open.length >= 4 && h.close.length >= 4),
 			);
@@ -127,7 +133,15 @@ const FillProfile = () => {
 				...formikFillProfile.values,
 				openShopSchedule: schedulesArray,
 			};
-			console.log('Horarios a enviar:', JSON.stringify(body, null, 2));
+			const { data, error } = await fillProfile(body);
+			if (error) {
+				setIsError(true);
+				setShowModal(true);
+			}
+			if (data) {
+				setIsError(false);
+				setShowModal(true);
+			}
 		} else {
 			showNotification(
 				<span className='d-flex align-items-center'>
@@ -694,6 +708,36 @@ const FillProfile = () => {
 						</tbody>
 					</table>
 				</ModalBody>
+			</Modal>
+			<Modal
+				isOpen={showModal}
+				setIsOpen={setShowModal}
+				titleId='fillModal'
+				// isStaticBackdrop={staticBackdropStatus}
+				// isScrollable={scrollableStatus}
+				isCentered={true}
+				size='sm'
+				// fullScreen={fullScreenStatus}
+				isAnimation={true}>
+				<ModalHeader setIsOpen={() => setShowModal(!showModal)}>
+					<ModalTitle id='fillModal'>{isError ? 'Error' : 'Éxito'}</ModalTitle>
+				</ModalHeader>
+				<ModalBody>
+					<p>Has completado tu perfil exitosamente, ya puedes cargar productos.</p>
+				</ModalBody>
+				<ModalFooter>
+					<Button
+						color={isError ? 'danger' : 'success'}
+						isOutline
+						className='border-0'
+						onClick={() => {
+							if (!isError) setIsFillingProfile(false);
+							setIsError(false);
+							return setShowModal(false);
+						}}>
+						Ok
+					</Button>
+				</ModalFooter>
 			</Modal>
 		</div>
 	);

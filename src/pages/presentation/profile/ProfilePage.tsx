@@ -316,7 +316,7 @@ const ProfilePage = () => {
 						<ModalTitle id='preview'>Completar Perfil</ModalTitle>
 					</ModalHeader>
 					<ModalBody>
-						<FillProfile />
+						<FillProfile setIsFillingProfile={setIsFillingProfile} />
 					</ModalBody>
 				</Modal>
 			</Page>
