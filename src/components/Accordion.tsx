@@ -174,6 +174,7 @@ interface IDayAccordionItemProps {
 	day: string;
 	checked: boolean;
 	onChange: (value: boolean) => void;
+	clearDaySchedule: () => void;
 	children?: React.ReactNode;
 	id: string | number;
 	activeItems?: TActiveItemId;
@@ -190,6 +191,7 @@ export const DayAccordionItem: React.FC<IDayAccordionItemProps> = ({
 	activeItems,
 	setActiveItems,
 	overWriteColor,
+	clearDaySchedule,
 }) => {
 	const handleTitleClick = (
 		e: React.MouseEvent<HTMLDivElement, MouseEvent>,
@@ -233,7 +235,10 @@ export const DayAccordionItem: React.FC<IDayAccordionItemProps> = ({
 							type='checkbox'
 							id={`switch-${id}`}
 							checked={checked}
-							onChange={(e) => onChange(e.target.checked)}
+							onChange={(e) => {
+								clearDaySchedule();
+								return onChange(e.target.checked);
+							}}
 							onClick={(e) => e.stopPropagation()}
 						/>
 					</div>

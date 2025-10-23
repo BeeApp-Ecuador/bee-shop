@@ -7,8 +7,10 @@ import FormGroup from '../bootstrap/forms/FormGroup';
 import { useGetCategoriesQuery } from '../../store/api/profileApi';
 import { ShopCategoryType } from '../../type/shop-category-type';
 import MapCard, { MapCardRef } from './MapCard';
-import WeeklySchedule from './WeeklySchedule';
+import WeeklySchedule, { HourRange } from './WeeklySchedule';
 import { useFormik } from 'formik';
+import Modal, { ModalBody, ModalHeader } from '../bootstrap/Modal';
+import Icon from '../icon/Icon';
 
 export interface ShopFormValues {
 	tags: string[];
@@ -41,6 +43,15 @@ const FillProfile = () => {
 	const [enableSaturday, setEnableSaturday] = useState(false);
 	const [enableSunday, setEnableSunday] = useState(false);
 	const [address, setAddress] = useState('');
+	const [weeklyHours, setWeeklyHours] = useState<{ [day: string]: HourRange[] }>({
+		monday: [{ startHour: '', startMin: '', endHour: '', endMin: '' }],
+		tuesday: [{ startHour: '', startMin: '', endHour: '', endMin: '' }],
+		wednesday: [{ startHour: '', startMin: '', endHour: '', endMin: '' }],
+		thursday: [{ startHour: '', startMin: '', endHour: '', endMin: '' }],
+		friday: [{ startHour: '', startMin: '', endHour: '', endMin: '' }],
+		saturday: [{ startHour: '', startMin: '', endHour: '', endMin: '' }],
+		sunday: [{ startHour: '', startMin: '', endHour: '', endMin: '' }],
+	});
 
 	const handleCoordsChange = (coords: { lat: number; lng: number }) => {
 		console.log('Nuevas coordenadas:', coords);
@@ -49,6 +60,32 @@ const FillProfile = () => {
 		formikFillProfile.setFieldValue('lng', coords.lng.toString());
 	};
 
+	const handleFillProfile = async () => {
+		console.log(formikFillProfile.values);
+		let schedules = {};
+		if (enableMonday) schedules = { ...schedules, monday: weeklyHours.monday };
+		if (enableTuesday) schedules = { ...schedules, tuesday: weeklyHours.tuesday };
+		if (enableWednesday) schedules = { ...schedules, wednesday: weeklyHours.wednesday };
+		if (enableThursday) schedules = { ...schedules, thursday: weeklyHours.thursday };
+		if (enableFriday) schedules = { ...schedules, friday: weeklyHours.friday };
+		if (enableSaturday) schedules = { ...schedules, saturday: weeklyHours.saturday };
+		if (enableSunday) schedules = { ...schedules, sunday: weeklyHours.sunday };
+
+		const schedulesArray = Object.entries(schedules as Record<string, HourRange[]>).map(
+			([day, hours]) => ({
+				day: day.toUpperCase(),
+				schedule: hours.map((h) => ({
+					open: `${h.startHour}:${h.startMin}`,
+					close: `${h.endHour}:${h.endMin}`,
+				})),
+			}),
+		);
+		const body = {
+			...formikFillProfile.values,
+			openShopSchedule: schedulesArray,
+		};
+		console.log('Horarios a enviar:', JSON.stringify(body, null, 2));
+	};
 	useEffect(() => {
 		if ('geolocation' in navigator) {
 			navigator.geolocation.getCurrentPosition(
@@ -105,10 +142,32 @@ const FillProfile = () => {
 			lat: coords?.lat.toString() || '',
 			lng: coords?.lng.toString() || '',
 		},
-		onSubmit: (values) => {
-			console.log('Formulario enviado:', values);
+		onSubmit: () => {
+			handleFillProfile();
 		},
 	});
+	const refSearchInput = useRef<HTMLInputElement>(null);
+
+	const [searchModalStatus, setSearchModalStatus] = useState(false);
+	const formik = useFormik({
+		initialValues: {
+			searchInput: '',
+		},
+		// eslint-disable-next-line @typescript-eslint/no-unused-vars
+		onSubmit: (values) => {
+			setSearchModalStatus(true);
+		},
+	});
+
+	useEffect(() => {
+		if (formik.values.searchInput) {
+			setSearchModalStatus(true);
+			refSearchInput?.current?.focus();
+		}
+		return () => {
+			setSearchModalStatus(false);
+		};
+	}, [formik.values.searchInput]);
 
 	return (
 		<div className='col-lg-12 h-100'>
@@ -116,8 +175,7 @@ const FillProfile = () => {
 				isHeader
 				color='info'
 				noValidate
-				// onSubmit={formik.handleSubmit}
-
+				onSubmit={formikFillProfile.handleSubmit}
 				className='shadow-3d-info'>
 				<WizardItem id='step1' title='Categoría y Tags'>
 					<Card>
@@ -237,13 +295,13 @@ const FillProfile = () => {
 						</CardBody>
 						<div className='p-3'>
 							<Input
-								type='text'
+								id='searchInput'
+								type='search'
 								placeholder='Buscar dirección...'
-								value={address}
-								onChange={(_: React.ChangeEvent<HTMLInputElement>) =>
-									setAddress(_.target.value)
-								}
-								list={['fsdf', 'fsdfsd', 'asd']}
+								onChange={formik.handleChange}
+								value={formik.values.searchInput}
+								autoComplete='off'
+								// list={['fsdf', 'fsdfsd', 'asd']}
 							/>
 						</div>
 						<div className='p-3'>
@@ -388,10 +446,44 @@ const FillProfile = () => {
 							setEnableSaturday={setEnableSaturday}
 							enableSunday={enableSunday}
 							setEnableSunday={setEnableSunday}
+							weeklyHours={weeklyHours}
+							setWeeklyHours={setWeeklyHours}
 						/>
 					</Card>
 				</WizardItem>
 			</Wizard>
+			<Modal
+				setIsOpen={setSearchModalStatus}
+				isOpen={searchModalStatus}
+				isStaticBackdrop
+				isScrollable
+				data-tour='search-modal'>
+				<ModalHeader setIsOpen={setSearchModalStatus}>
+					<label className='border-0 bg-transparent cursor-pointer' htmlFor='searchInput'>
+						<Icon icon='Search' size='2x' color='primary' />
+					</label>
+					<Input
+						ref={refSearchInput}
+						name='searchInput'
+						className='border-0 shadow-none bg-transparent'
+						placeholder='Search...'
+						onChange={formik.handleChange}
+						value={formik.values.searchInput}
+					/>
+				</ModalHeader>
+				<ModalBody>
+					<Card>
+						<CardBody>
+							<span>dsa</span>
+						</CardBody>
+					</Card>
+					<Card>
+						<CardBody>
+							<span>dsa</span>
+						</CardBody>
+					</Card>
+				</ModalBody>
+			</Modal>
 		</div>
 	);
 };
