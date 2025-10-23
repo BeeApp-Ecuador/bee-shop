@@ -11,6 +11,7 @@ import WeeklySchedule, { HourRange } from './WeeklySchedule';
 import { useFormik } from 'formik';
 import Modal, { ModalBody, ModalHeader } from '../bootstrap/Modal';
 import Icon from '../icon/Icon';
+import { useLazySearchAddressQuery } from '../../store/api/geoApi';
 
 export interface ShopFormValues {
 	tags: string[];
@@ -42,7 +43,10 @@ const FillProfile = () => {
 	const [enableFriday, setEnableFriday] = useState(false);
 	const [enableSaturday, setEnableSaturday] = useState(false);
 	const [enableSunday, setEnableSunday] = useState(false);
-	const [address, setAddress] = useState('');
+
+	const refSearchInput = useRef<HTMLInputElement>(null);
+	const [searchModalStatus, setSearchModalStatus] = useState(false);
+
 	const [weeklyHours, setWeeklyHours] = useState<{ [day: string]: HourRange[] }>({
 		monday: [{ startHour: '', startMin: '', endHour: '', endMin: '' }],
 		tuesday: [{ startHour: '', startMin: '', endHour: '', endMin: '' }],
@@ -52,6 +56,9 @@ const FillProfile = () => {
 		saturday: [{ startHour: '', startMin: '', endHour: '', endMin: '' }],
 		sunday: [{ startHour: '', startMin: '', endHour: '', endMin: '' }],
 	});
+
+	const [searchAddress] = useLazySearchAddressQuery();
+	const [addressSearchResults, setAddressSearchResults] = useState<any[]>([]);
 
 	const handleCoordsChange = (coords: { lat: number; lng: number }) => {
 		console.log('Nuevas coordenadas:', coords);
@@ -146,9 +153,7 @@ const FillProfile = () => {
 			handleFillProfile();
 		},
 	});
-	const refSearchInput = useRef<HTMLInputElement>(null);
 
-	const [searchModalStatus, setSearchModalStatus] = useState(false);
 	const formik = useFormik({
 		initialValues: {
 			searchInput: '',
@@ -160,12 +165,37 @@ const FillProfile = () => {
 	});
 
 	useEffect(() => {
-		if (formik.values.searchInput) {
-			setSearchModalStatus(true);
-			refSearchInput?.current?.focus();
-		}
+		const delayDebounce = setTimeout(() => {
+			const fetchAddresses = async () => {
+				if (formik.values.searchInput) {
+					setSearchModalStatus(true);
+					refSearchInput?.current?.focus();
+
+					try {
+						const { data, error } = await searchAddress({
+							query: formik.values.searchInput,
+							lat: coords?.lat,
+							lon: coords?.lng,
+						});
+
+						if (data) {
+							console.log(data.data.features);
+							setAddressSearchResults(data.data.features);
+						}
+					} catch (err) {
+						console.error('Error buscando direcciones:', err);
+					}
+				} else {
+					setSearchModalStatus(false);
+				}
+			};
+
+			fetchAddresses();
+		}, 400);
+
+		// 🔹 Limpieza del timeout si el usuario sigue escribiendo
 		return () => {
-			setSearchModalStatus(false);
+			clearTimeout(delayDebounce);
 		};
 	}, [formik.values.searchInput]);
 
@@ -472,16 +502,57 @@ const FillProfile = () => {
 					/>
 				</ModalHeader>
 				<ModalBody>
-					<Card>
-						<CardBody>
-							<span>dsa</span>
-						</CardBody>
-					</Card>
-					<Card>
-						<CardBody>
-							<span>dsa</span>
-						</CardBody>
-					</Card>
+					<table className='table table-hover table-modern caption-top mb-0'>
+						<tbody>
+							{addressSearchResults.length ? (
+								addressSearchResults.map((item) => (
+									<tr
+										key={item.id}
+										className='cursor-pointer'
+										onClick={() => {
+											// navigate(`../${item.path}`);
+										}}>
+										<td>
+											<div className='d-flex align-items-start'>
+												<Icon
+													icon='LocationOn'
+													size='lg'
+													className='me-2 mt-1'
+													color='primary'
+												/>
+												<div>
+													<div className='fw-bold'>
+														{item.properties.name}
+													</div>
+													<div className='text-muted small'>
+														{item.properties?.locality ||
+															(item.properties?.street &&
+																(item.properties?.locality ??
+																	item.properties?.street))}
+														{item.properties?.type === 'district' &&
+															item.properties.city}
+														{item.properties?.type !== 'city' ||
+															item.properties?.type !== 'country' ||
+															(item.properties?.type !== 'other' &&
+																(item.properties?.district
+																	? `${
+																			item.properties.district
+																		}, `
+																	: '') +
+																	(item.properties?.city ?? ''))}
+													</div>
+												</div>
+											</div>
+										</td>
+									</tr>
+								))
+							) : (
+								<tr className='table-active'>
+									<td>No result found for query "{formik.values.searchInput}"</td>
+								</tr>
+							)}
+						</tbody>
+					</table>
 				</ModalBody>
 			</Modal>
 		</div>
