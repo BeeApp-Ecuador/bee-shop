@@ -11,6 +11,7 @@ import WeeklySchedule, { HourRange } from './WeeklySchedule';
 import { useFormik } from 'formik';
 import Modal, { ModalBody, ModalHeader } from '../bootstrap/Modal';
 import Icon from '../icon/Icon';
+import { useLazySearchAddressQuery } from '../../store/api/geoApi';
 
 export interface ShopFormValues {
 	tags: string[];
@@ -42,7 +43,10 @@ const FillProfile = () => {
 	const [enableFriday, setEnableFriday] = useState(false);
 	const [enableSaturday, setEnableSaturday] = useState(false);
 	const [enableSunday, setEnableSunday] = useState(false);
-	const [address, setAddress] = useState('');
+
+	const refSearchInput = useRef<HTMLInputElement>(null);
+	const [searchModalStatus, setSearchModalStatus] = useState(false);
+
 	const [weeklyHours, setWeeklyHours] = useState<{ [day: string]: HourRange[] }>({
 		monday: [{ startHour: '', startMin: '', endHour: '', endMin: '' }],
 		tuesday: [{ startHour: '', startMin: '', endHour: '', endMin: '' }],
@@ -52,6 +56,8 @@ const FillProfile = () => {
 		saturday: [{ startHour: '', startMin: '', endHour: '', endMin: '' }],
 		sunday: [{ startHour: '', startMin: '', endHour: '', endMin: '' }],
 	});
+
+	const [searchAddress] = useLazySearchAddressQuery();
 
 	const handleCoordsChange = (coords: { lat: number; lng: number }) => {
 		console.log('Nuevas coordenadas:', coords);
@@ -146,9 +152,7 @@ const FillProfile = () => {
 			handleFillProfile();
 		},
 	});
-	const refSearchInput = useRef<HTMLInputElement>(null);
 
-	const [searchModalStatus, setSearchModalStatus] = useState(false);
 	const formik = useFormik({
 		initialValues: {
 			searchInput: '',
@@ -160,10 +164,35 @@ const FillProfile = () => {
 	});
 
 	useEffect(() => {
-		if (formik.values.searchInput) {
-			setSearchModalStatus(true);
-			refSearchInput?.current?.focus();
-		}
+		const fetchAddresses = async () => {
+			if (formik.values.searchInput) {
+				setSearchModalStatus(true);
+				refSearchInput?.current?.focus();
+
+				try {
+					const { data, error } = await searchAddress({
+						query: formik.values.searchInput,
+						lat: coords?.lat,
+						lon: coords?.lng,
+					});
+					if (error) {
+						console.error('Error en la búsqueda de direcciones:', error);
+						return;
+					}
+
+					if (data) {
+						console.log('Direcciones encontradas:', data);
+					}
+				} catch (err) {
+					console.error('Error buscando direcciones:', err);
+				}
+			} else {
+				setSearchModalStatus(false);
+			}
+		};
+
+		fetchAddresses();
+
 		return () => {
 			setSearchModalStatus(false);
 		};

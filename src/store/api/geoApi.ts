@@ -1,8 +1,6 @@
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
 
 import { getEnvVariables } from '../../helpers/getEnvVariables';
-import { useContext } from 'react';
-import AuthContext from '../../contexts/authContext';
 import { ShopType } from '../../type/shop-type';
 const { VITE_URL } = getEnvVariables();
 
@@ -39,19 +37,19 @@ export const geoApi = createApi({
 				}),
 			}),
 			searchAddress: builder.query({
-				query: ({ query, lat, lng }) => {
+				query: ({ query, lat, lon }) => {
 					const shopSaved = JSON.parse(
 						localStorage.getItem('facit_authUsername')!,
 					) as ShopType;
 
 					return {
-						url: `api/v2/address/search/${query}`,
+						url: `api/v2/photon/shop/search`,
 						params: {
-							query,
+							q: query,
 							limit: 10,
 							country: shopSaved.country,
 							lat,
-							lng,
+							lon,
 						},
 						headers: {
 							'Content-Type': 'application/json',
