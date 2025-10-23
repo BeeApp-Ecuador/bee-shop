@@ -23,6 +23,17 @@ export const profileApi = createApi({
 				url: 'categories',
 			}),
 		}),
+		fillProfile: builder.mutation({
+			query: (body) => ({
+				url: 'api/v2/shop/fill',
+				method: 'POST',
+				body,
+				headers: {
+					'Content-Type': 'application/json',
+					Authorization: localStorage.getItem('token')!,
+				},
+			}),
+		}),
 	}),
 });
-export const { useGetCategoriesQuery } = profileApi;
+export const { useGetCategoriesQuery, useFillProfileMutation } = profileApi;
