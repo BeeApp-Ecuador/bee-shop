@@ -4,23 +4,11 @@ import Wizard, { WizardItem } from '../Wizard';
 import Input from '../bootstrap/forms/Input';
 import Button from '../bootstrap/Button';
 import FormGroup from '../bootstrap/forms/FormGroup';
-import Select from '../bootstrap/forms/Select';
 import { useGetCategoriesQuery } from '../../store/api/profileApi';
 import { ShopCategoryType } from '../../type/shop-category-type';
 import MapCard, { MapCardRef } from './MapCard';
-import Accordion, { DayAccordionItem } from '../Accordion';
 import WeeklySchedule from './WeeklySchedule';
 import { useFormik } from 'formik';
-
-export interface Schedule {
-	open: string; // formato "HH:mm"
-	close: string; // formato "HH:mm"
-}
-
-export interface OpenShopDay {
-	day: string; // ejemplo: "MONDAY", "TUESDAY", etc.
-	schedule: Schedule[];
-}
 
 export interface ShopFormValues {
 	tags: string[];
@@ -31,7 +19,6 @@ export interface ShopFormValues {
 	maxPeoplePerReservation: number;
 	lat: string;
 	lng: string;
-	openShopSchedule: OpenShopDay[];
 }
 
 const FillProfile = () => {
@@ -45,10 +32,7 @@ const FillProfile = () => {
 	const mapRef = useRef<MapCardRef>(null);
 	const [coords, setCoords] = useState<{ lat: number; lng: number } | null>(null);
 
-	const [havePickup, setHavePickup] = useState(false);
-	const [haveDeliveryBee, setHaveDeliveryBee] = useState(false);
-	const [haveReservation, setHaveReservation] = useState(false);
-	const [maxPeoplePerReservation, setMaxPeoplePerReservation] = useState('');
+	// const [maxPeoplePerReservation, setMaxPeoplePerReservation] = useState('');
 	const [enableMonday, setEnableMonday] = useState(true);
 	const [enableTuesday, setEnableTuesday] = useState(false);
 	const [enableWednesday, setEnableWednesday] = useState(false);
@@ -100,7 +84,7 @@ const FillProfile = () => {
 	};
 
 	const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-		const value = e.target.value.replace(/\s/g, ''); // elimina todos los espacios
+		const value = e.target.value.replace(/\s/g, '');
 		setNewTag(value);
 	};
 
@@ -117,20 +101,9 @@ const FillProfile = () => {
 			havePickup: false,
 			haveDeliveryBee: false,
 			haveReservation: false,
-			maxPeoplePerReservation: Number(maxPeoplePerReservation),
+			maxPeoplePerReservation: 0,
 			lat: coords?.lat.toString() || '',
 			lng: coords?.lng.toString() || '',
-			openShopSchedule: [
-				// {
-				// 	day: 'MONDAY',
-				// 	schedule: [
-				// 		{
-				// 			open: '09:00',
-				// 			close: '18:00',
-				// 		},
-				// 	],
-				// },
-			],
 		},
 		onSubmit: (values) => {
 			console.log('Formulario enviado:', values);
@@ -141,7 +114,7 @@ const FillProfile = () => {
 		<div className='col-lg-12 h-100'>
 			<Wizard
 				isHeader
-				color='primary'
+				color='info'
 				noValidate
 				// onSubmit={formik.handleSubmit}
 
@@ -150,7 +123,7 @@ const FillProfile = () => {
 					<Card>
 						<CardBody>
 							<CardHeader>
-								<CardLabel icon='Category' iconColor='info'>
+								<CardLabel icon='Category' iconColor='primary'>
 									<CardTitle>¡Cuéntanos un poco sobre tu comercio!</CardTitle>
 									<CardSubTitle>
 										Elige una o más categorías que mejor lo representen.
@@ -194,7 +167,7 @@ const FillProfile = () => {
 					<Card>
 						<CardBody>
 							<CardHeader>
-								<CardLabel icon='Label' iconColor='info'>
+								<CardLabel icon='Label' iconColor='primary'>
 									<CardTitle>
 										Etiquetas que describen tu comercio y productos
 									</CardTitle>
@@ -253,7 +226,7 @@ const FillProfile = () => {
 					<Card>
 						<CardBody>
 							<CardHeader>
-								<CardLabel icon='House' iconColor='info'>
+								<CardLabel icon='House' iconColor='primary'>
 									<CardTitle>¿Dónde está ubicado tu comercio?</CardTitle>
 									<CardSubTitle>
 										Proporciona la dirección física de tu comercio para que los
@@ -267,7 +240,9 @@ const FillProfile = () => {
 								type='text'
 								placeholder='Buscar dirección...'
 								value={address}
-								onChange={(e) => setAddress(e.target.value)}
+								onChange={(_: React.ChangeEvent<HTMLInputElement>) =>
+									setAddress(_.target.value)
+								}
 								list={['fsdf', 'fsdfsd', 'asd']}
 							/>
 						</div>
@@ -284,7 +259,7 @@ const FillProfile = () => {
 					<Card>
 						<CardBody>
 							<CardHeader>
-								<CardLabel icon='Build' iconColor='info'>
+								<CardLabel icon='Build' iconColor='primary'>
 									<CardTitle>Servicios ofrecidos</CardTitle>
 									<CardSubTitle>
 										Selecciona los servicios que tu comercio ofrece a los
@@ -365,11 +340,6 @@ const FillProfile = () => {
 									}}>
 									{formikFillProfile.values.haveReservation && (
 										<div className='m-2'>
-											{/* <label
-												htmlFor='maxPeople'
-												className='form-label fw-bold'>
-												Número máximo de personas por reserva
-											</label> */}
 											<FormGroup
 												id='maxPeoplePerReservation'
 												label='Define cuántas personas puede incluir cada reserva.'>
