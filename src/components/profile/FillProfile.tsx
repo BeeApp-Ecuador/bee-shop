@@ -9,6 +9,8 @@ import { ShopCategoryType } from '../../type/shop-category-type';
 import MapCard, { MapCardRef } from './MapCard';
 import WeeklySchedule, { HourRange } from './WeeklySchedule';
 import { useFormik } from 'formik';
+import Modal, { ModalBody, ModalHeader } from '../bootstrap/Modal';
+import Icon from '../icon/Icon';
 
 export interface ShopFormValues {
 	tags: string[];
@@ -144,6 +146,28 @@ const FillProfile = () => {
 			handleFillProfile();
 		},
 	});
+	const refSearchInput = useRef<HTMLInputElement>(null);
+
+	const [searchModalStatus, setSearchModalStatus] = useState(false);
+	const formik = useFormik({
+		initialValues: {
+			searchInput: '',
+		},
+		// eslint-disable-next-line @typescript-eslint/no-unused-vars
+		onSubmit: (values) => {
+			setSearchModalStatus(true);
+		},
+	});
+
+	useEffect(() => {
+		if (formik.values.searchInput) {
+			setSearchModalStatus(true);
+			refSearchInput?.current?.focus();
+		}
+		return () => {
+			setSearchModalStatus(false);
+		};
+	}, [formik.values.searchInput]);
 
 	return (
 		<div className='col-lg-12 h-100'>
@@ -274,10 +298,8 @@ const FillProfile = () => {
 								id='searchInput'
 								type='search'
 								placeholder='Buscar dirección...'
-								value={address}
-								onChange={(_: React.ChangeEvent<HTMLInputElement>) =>
-									setAddress(_.target.value)
-								}
+								onChange={formik.handleChange}
+								value={formik.values.searchInput}
 								autoComplete='off'
 								// list={['fsdf', 'fsdfsd', 'asd']}
 							/>
@@ -430,6 +452,38 @@ const FillProfile = () => {
 					</Card>
 				</WizardItem>
 			</Wizard>
+			<Modal
+				setIsOpen={setSearchModalStatus}
+				isOpen={searchModalStatus}
+				isStaticBackdrop
+				isScrollable
+				data-tour='search-modal'>
+				<ModalHeader setIsOpen={setSearchModalStatus}>
+					<label className='border-0 bg-transparent cursor-pointer' htmlFor='searchInput'>
+						<Icon icon='Search' size='2x' color='primary' />
+					</label>
+					<Input
+						ref={refSearchInput}
+						name='searchInput'
+						className='border-0 shadow-none bg-transparent'
+						placeholder='Search...'
+						onChange={formik.handleChange}
+						value={formik.values.searchInput}
+					/>
+				</ModalHeader>
+				<ModalBody>
+					<Card>
+						<CardBody>
+							<span>dsa</span>
+						</CardBody>
+					</Card>
+					<Card>
+						<CardBody>
+							<span>dsa</span>
+						</CardBody>
+					</Card>
+				</ModalBody>
+			</Modal>
 		</div>
 	);
 };
