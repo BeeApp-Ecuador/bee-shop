@@ -1,17 +1,26 @@
 import React, { useEffect, useRef, useState } from 'react';
-import Card, { CardBody, CardHeader, CardLabel, CardSubTitle, CardTitle } from '../bootstrap/Card';
+import Card, {
+	CardBody,
+	CardFooter,
+	CardHeader,
+	CardLabel,
+	CardSubTitle,
+	CardTitle,
+} from '../bootstrap/Card';
 import Wizard, { WizardItem } from '../Wizard';
 import Input from '../bootstrap/forms/Input';
 import Button from '../bootstrap/Button';
 import FormGroup from '../bootstrap/forms/FormGroup';
-import { useGetCategoriesQuery } from '../../store/api/profileApi';
+import { useFillProfileMutation, useGetCategoriesQuery } from '../../store/api/profileApi';
 import { ShopCategoryType } from '../../type/shop-category-type';
 import MapCard, { MapCardRef } from './MapCard';
 import WeeklySchedule, { HourRange } from './WeeklySchedule';
 import { useFormik } from 'formik';
-import Modal, { ModalBody, ModalHeader } from '../bootstrap/Modal';
+import Modal, { ModalBody, ModalFooter, ModalHeader, ModalTitle } from '../bootstrap/Modal';
 import Icon from '../icon/Icon';
 import { useLazySearchAddressQuery } from '../../store/api/geoApi';
+import showNotification from '../extras/showNotification';
+import Textarea from '../bootstrap/forms/Textarea';
 
 export interface ShopFormValues {
 	tags: string[];
@@ -19,12 +28,16 @@ export interface ShopFormValues {
 	havePickup: boolean;
 	haveDeliveryBee: boolean;
 	haveReservation: boolean;
-	maxPeoplePerReservation: number;
+	descriptionReservation: string;
 	lat: string;
 	lng: string;
 }
 
-const FillProfile = () => {
+const FillProfile = ({
+	setIsFillingProfile,
+}: {
+	setIsFillingProfile: React.Dispatch<React.SetStateAction<boolean>>;
+}) => {
 	const { data } = useGetCategoriesQuery({});
 	const [categories, setCategories] = useState<ShopCategoryType[]>([]);
 	const [selectedCategories, setSelectedCategories] = useState<ShopCategoryType[]>([]);
@@ -46,6 +59,10 @@ const FillProfile = () => {
 
 	const refSearchInput = useRef<HTMLInputElement>(null);
 	const [searchModalStatus, setSearchModalStatus] = useState(false);
+	const [showModal, setShowModal] = useState(false);
+	const [isError, setIsError] = useState(false);
+
+	const [fillProfile] = useFillProfileMutation();
 
 	const [weeklyHours, setWeeklyHours] = useState<{ [day: string]: HourRange[] }>({
 		monday: [{ startHour: '', startMin: '', endHour: '', endMin: '' }],
@@ -68,30 +85,73 @@ const FillProfile = () => {
 	};
 
 	const handleFillProfile = async () => {
-		console.log(formikFillProfile.values);
-		let schedules = {};
-		if (enableMonday) schedules = { ...schedules, monday: weeklyHours.monday };
-		if (enableTuesday) schedules = { ...schedules, tuesday: weeklyHours.tuesday };
-		if (enableWednesday) schedules = { ...schedules, wednesday: weeklyHours.wednesday };
-		if (enableThursday) schedules = { ...schedules, thursday: weeklyHours.thursday };
-		if (enableFriday) schedules = { ...schedules, friday: weeklyHours.friday };
-		if (enableSaturday) schedules = { ...schedules, saturday: weeklyHours.saturday };
-		if (enableSunday) schedules = { ...schedules, sunday: weeklyHours.sunday };
+		if (
+			enableMonday ||
+			enableTuesday ||
+			enableWednesday ||
+			enableThursday ||
+			enableFriday ||
+			enableSaturday ||
+			enableSunday
+		) {
+			let schedules = {};
+			if (enableMonday) schedules = { ...schedules, monday: weeklyHours.monday };
+			if (enableTuesday) schedules = { ...schedules, tuesday: weeklyHours.tuesday };
+			if (enableWednesday) schedules = { ...schedules, wednesday: weeklyHours.wednesday };
+			if (enableThursday) schedules = { ...schedules, thursday: weeklyHours.thursday };
+			if (enableFriday) schedules = { ...schedules, friday: weeklyHours.friday };
+			if (enableSaturday) schedules = { ...schedules, saturday: weeklyHours.saturday };
+			if (enableSunday) schedules = { ...schedules, sunday: weeklyHours.sunday };
 
-		const schedulesArray = Object.entries(schedules as Record<string, HourRange[]>).map(
-			([day, hours]) => ({
-				day: day.toUpperCase(),
-				schedule: hours.map((h) => ({
-					open: `${h.startHour}:${h.startMin}`,
-					close: `${h.endHour}:${h.endMin}`,
-				})),
-			}),
-		);
-		const body = {
-			...formikFillProfile.values,
-			openShopSchedule: schedulesArray,
-		};
-		console.log('Horarios a enviar:', JSON.stringify(body, null, 2));
+			const schedulesArray = Object.entries(schedules as Record<string, HourRange[]>).map(
+				([day, hours]) => ({
+					day: day.toUpperCase(),
+					schedule: hours.map((h) => ({
+						open: `${h.startHour}:${h.startMin}`,
+						close: `${h.endHour}:${h.endMin}`,
+					})),
+				}),
+			);
+
+			const allHoursComplete = schedulesArray.every((daySchedule) =>
+				daySchedule.schedule.every((h) => h.open.length >= 4 && h.close.length >= 4),
+			);
+
+			if (!allHoursComplete) {
+				showNotification(
+					<span className='d-flex align-items-center'>
+						<Icon icon='Error' size='lg' className='me-1' />
+						<span>Error</span>
+					</span>,
+					'Por favor, completa todos los horarios antes de continuar.',
+					'danger',
+				);
+				return;
+			}
+
+			const body = {
+				...formikFillProfile.values,
+				openShopSchedule: schedulesArray,
+			};
+			const { data, error } = await fillProfile(body);
+			if (error) {
+				setIsError(true);
+				setShowModal(true);
+			}
+			if (data) {
+				setIsError(false);
+				setShowModal(true);
+			}
+		} else {
+			showNotification(
+				<span className='d-flex align-items-center'>
+					<Icon icon='Error' size='lg' className='me-1' />
+					<span>Error</span>
+				</span>,
+				'Debes habilitar al menos un día de la semana en el horario de atención',
+				'danger',
+			);
+		}
 	};
 	useEffect(() => {
 		if ('geolocation' in navigator) {
@@ -140,18 +200,57 @@ const FillProfile = () => {
 
 	const formikFillProfile = useFormik<ShopFormValues>({
 		initialValues: {
-			tags: [],
+			tags: ['Comida', 'Bebidas'],
 			category: selectedCategories.map((c) => c._id),
 			havePickup: false,
 			haveDeliveryBee: false,
 			haveReservation: false,
-			maxPeoplePerReservation: 0,
+			descriptionReservation: '',
 			lat: coords?.lat.toString() || '',
 			lng: coords?.lng.toString() || '',
+		},
+		validate: (values) => {
+			const errors: Partial<Record<keyof ShopFormValues, string>> = {};
+			if (values.category.length === 0) {
+				errors.category = 'Selecciona al menos una categoría.';
+			}
+			if (!values.lat) {
+				errors.lat = 'La latitud es requerida.';
+			}
+			if (!values.lng) {
+				errors.lng = 'La longitud es requerida.';
+			}
+			if (!values.tags.length) {
+				errors.tags = 'Agrega al menos una etiqueta.';
+			}
+			// validar que uno de estos debe ser true (havePickup, haveDeliveryBee, haveReservation)
+			if (!values.havePickup && !values.haveDeliveryBee && !values.haveReservation) {
+				errors.havePickup = 'Debes seleccionar al menos un servicio ofrecido.';
+				errors.haveDeliveryBee = 'Debes seleccionar al menos un servicio ofrecido.';
+				errors.haveReservation = 'Debes seleccionar al menos un servicio ofrecido.';
+			}
+			if (values.haveReservation && !values.descriptionReservation) {
+				errors.descriptionReservation =
+					'La descripción del servicio de reservas es requerida cuando el servicio está habilitado.';
+			}
+			if (Object.keys(errors).length > 0) {
+				showNotification(
+					<span className='d-flex align-items-center'>
+						<Icon icon='Error' size='lg' className='me-1' />
+						<span>Error</span>
+					</span>,
+					'Los datos del formulario contienen errores. Revisa e intenta nuevamente.',
+					'danger',
+				);
+			}
+			console.log(errors);
+			return errors;
 		},
 		onSubmit: () => {
 			handleFillProfile();
 		},
+		validateOnChange: false,
+		validateOnBlur: false,
 	});
 
 	const formik = useFormik({
@@ -250,6 +349,17 @@ const FillProfile = () => {
 									);
 								})}
 							</div>
+							{formikFillProfile.touched.category &&
+								formikFillProfile.errors.category && (
+									<div
+										style={{
+											color: 'red',
+											fontSize: '0.85rem',
+											marginTop: '4px',
+										}}>
+										{formikFillProfile.errors.category}
+									</div>
+								)}
 						</CardBody>
 					</Card>
 					<Card>
@@ -307,6 +417,12 @@ const FillProfile = () => {
 									}}
 								/>
 							</div>
+							{formikFillProfile.touched.tags && formikFillProfile.errors.tags && (
+								<div
+									style={{ color: 'red', fontSize: '0.85rem', marginTop: '4px' }}>
+									{formikFillProfile.errors.tags}
+								</div>
+							)}
 						</CardBody>
 					</Card>
 				</WizardItem>
@@ -429,17 +545,28 @@ const FillProfile = () => {
 									{formikFillProfile.values.haveReservation && (
 										<div className='m-2'>
 											<FormGroup
-												id='maxPeoplePerReservation'
-												label='Define cuántas personas puede incluir cada reserva.'>
-												<Input
-													type='number'
-													id='maxPeoplePerReservation'
+												id='descriptionReservation'
+												label='Descripción del servicio de reservas'>
+												<Textarea
+													style={{ minHeight: '100px', resize: 'none' }}
+													id='descriptionReservation'
+													name='descriptionReservation'
 													value={
 														formikFillProfile.values
-															.maxPeoplePerReservation
+															.descriptionReservation
 													}
+													onBlur={formikFillProfile.handleBlur}
 													onChange={formikFillProfile.handleChange}
-													placeholder='Ejemplo: 5'
+													invalidFeedback={
+														formikFillProfile.errors
+															.descriptionReservation
+													}
+													isTouched={
+														formikFillProfile.touched
+															.descriptionReservation
+													}
+													isValid={formikFillProfile.isValid}
+													placeholder='Ejemplo: "Reserva tu mesa con anticipación para garantizar tu lugar"'
 												/>
 											</FormGroup>
 										</div>
@@ -447,6 +574,20 @@ const FillProfile = () => {
 								</div>
 							</div>
 						</div>
+						<CardFooter>
+							<div className='text-danger'>
+								{(formikFillProfile.touched.havePickup &&
+									formikFillProfile.errors.havePickup) ||
+									(formikFillProfile.touched.haveDeliveryBee &&
+										formikFillProfile.errors.haveDeliveryBee) ||
+									(formikFillProfile.touched.haveReservation &&
+										formikFillProfile.errors.haveReservation && (
+											<div>
+												Debes seleccionar al menos un servicio ofrecido
+											</div>
+										))}
+							</div>
+						</CardFooter>
 					</Card>
 				</WizardItem>
 				<WizardItem id='step3' title='Horarios'>
@@ -510,7 +651,20 @@ const FillProfile = () => {
 										key={item.id}
 										className='cursor-pointer'
 										onClick={() => {
-											// navigate(`../${item.path}`);
+											setCoords({
+												lat: item.geometry.coordinates[1],
+												lng: item.geometry.coordinates[0],
+											});
+											mapRef.current?.setMarker(
+												item.geometry.coordinates[0],
+												item.geometry.coordinates[1],
+											);
+											mapRef.current?.centerMap(
+												item.geometry.coordinates[0],
+												item.geometry.coordinates[1],
+											);
+
+											setSearchModalStatus(false);
 										}}>
 										<td>
 											<div className='d-flex align-items-start'>
@@ -554,6 +708,36 @@ const FillProfile = () => {
 						</tbody>
 					</table>
 				</ModalBody>
+			</Modal>
+			<Modal
+				isOpen={showModal}
+				setIsOpen={setShowModal}
+				titleId='fillModal'
+				// isStaticBackdrop={staticBackdropStatus}
+				// isScrollable={scrollableStatus}
+				isCentered={true}
+				size='sm'
+				// fullScreen={fullScreenStatus}
+				isAnimation={true}>
+				<ModalHeader setIsOpen={() => setShowModal(!showModal)}>
+					<ModalTitle id='fillModal'>{isError ? 'Error' : 'Éxito'}</ModalTitle>
+				</ModalHeader>
+				<ModalBody>
+					<p>Has completado tu perfil exitosamente, ya puedes cargar productos.</p>
+				</ModalBody>
+				<ModalFooter>
+					<Button
+						color={isError ? 'danger' : 'success'}
+						isOutline
+						className='border-0'
+						onClick={() => {
+							if (!isError) setIsFillingProfile(false);
+							setIsError(false);
+							return setShowModal(false);
+						}}>
+						Ok
+					</Button>
+				</ModalFooter>
 			</Modal>
 		</div>
 	);
