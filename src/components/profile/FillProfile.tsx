@@ -10,6 +10,7 @@ import { ShopCategoryType } from '../../type/shop-category-type';
 import MapCard, { MapCardRef } from './MapCard';
 import Accordion, { DayAccordionItem } from '../Accordion';
 import WeeklySchedule from './WeeklySchedule';
+import { useFormik } from 'formik';
 
 export interface Schedule {
 	open: string; // formato "HH:mm"
@@ -59,6 +60,9 @@ const FillProfile = () => {
 
 	const handleCoordsChange = (coords: { lat: number; lng: number }) => {
 		console.log('Nuevas coordenadas:', coords);
+		setCoords(coords);
+		formikFillProfile.setFieldValue('lat', coords.lat.toString());
+		formikFillProfile.setFieldValue('lng', coords.lng.toString());
 	};
 
 	useEffect(() => {
@@ -85,11 +89,14 @@ const FillProfile = () => {
 		if (trimmed && !tags.includes(trimmed)) {
 			setTags([...tags, trimmed]);
 			setNewTag('');
+			formikFillProfile.setFieldValue('tags', [...tags, trimmed]);
 		}
 	};
 
 	const handleRemoveTag = (tagToRemove: string) => {
-		setTags(tags.filter((tag) => tag !== tagToRemove));
+		const updatedTags = tags.filter((tag) => tag !== tagToRemove);
+		setTags(updatedTags);
+		formikFillProfile.setFieldValue('tags', updatedTags);
 	};
 
 	const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -99,16 +106,42 @@ const FillProfile = () => {
 
 	useEffect(() => {
 		if (data) {
-			console.log(data.list);
 			setCategories(data.list);
 		}
 	}, [data]);
+
+	const formikFillProfile = useFormik<ShopFormValues>({
+		initialValues: {
+			tags: [],
+			category: selectedCategories.map((c) => c._id),
+			havePickup: false,
+			haveDeliveryBee: false,
+			haveReservation: false,
+			maxPeoplePerReservation: Number(maxPeoplePerReservation),
+			lat: coords?.lat.toString() || '',
+			lng: coords?.lng.toString() || '',
+			openShopSchedule: [
+				// {
+				// 	day: 'MONDAY',
+				// 	schedule: [
+				// 		{
+				// 			open: '09:00',
+				// 			close: '18:00',
+				// 		},
+				// 	],
+				// },
+			],
+		},
+		onSubmit: (values) => {
+			console.log('Formulario enviado:', values);
+		},
+	});
 
 	return (
 		<div className='col-lg-12 h-100'>
 			<Wizard
 				isHeader
-				color='info'
+				color='primary'
 				noValidate
 				// onSubmit={formik.handleSubmit}
 
@@ -132,10 +165,16 @@ const FillProfile = () => {
 									);
 
 									const handleToggle = () => {
-										setSelectedCategories((prev) =>
-											isSelected
-												? prev.filter((c) => c._id !== category._id)
-												: [...prev, category],
+										const updatedCategories = isSelected
+											? selectedCategories.filter(
+													(c) => c._id !== category._id,
+												)
+											: [...selectedCategories, category];
+
+										setSelectedCategories(updatedCategories);
+										formikFillProfile.setFieldValue(
+											'category',
+											updatedCategories.map((c) => c._id),
 										);
 									};
 
@@ -260,11 +299,13 @@ const FillProfile = () => {
 									<input
 										className='form-check-input'
 										type='checkbox'
-										id='pickup'
-										checked={havePickup}
-										onChange={(e) => setHavePickup(e.target.checked)}
+										id='havePickup'
+										checked={formikFillProfile.values.havePickup}
+										onChange={formikFillProfile.handleChange}
 									/>
-									<label className='form-check-label fw-bold' htmlFor='pickup'>
+									<label
+										className='form-check-label fw-bold'
+										htmlFor='havePickup'>
 										Recogida en el local
 									</label>
 									<small className='text-muted d-block'>
@@ -277,13 +318,13 @@ const FillProfile = () => {
 									<input
 										className='form-check-input'
 										type='checkbox'
-										id='deliveryBee'
-										checked={haveDeliveryBee}
-										onChange={(e) => setHaveDeliveryBee(e.target.checked)}
+										id='haveDeliveryBee'
+										checked={formikFillProfile.values.haveDeliveryBee}
+										onChange={formikFillProfile.handleChange}
 									/>
 									<label
 										className='form-check-label fw-bold'
-										htmlFor='deliveryBee'>
+										htmlFor='haveDeliveryBee'>
 										Entrega a domicilio (DeliveryBee)
 									</label>
 									<small className='text-muted d-block'>
@@ -296,13 +337,13 @@ const FillProfile = () => {
 									<input
 										className='form-check-input'
 										type='checkbox'
-										id='reservation'
-										checked={haveReservation}
-										onChange={(e) => setHaveReservation(e.target.checked)}
+										id='haveReservation'
+										checked={formikFillProfile.values.haveReservation}
+										onChange={formikFillProfile.handleChange}
 									/>
 									<label
 										className='form-check-label fw-bold'
-										htmlFor='reservation'>
+										htmlFor='haveReservation'>
 										Reservas de mesa
 									</label>
 									<small className='text-muted d-block'>
@@ -313,34 +354,36 @@ const FillProfile = () => {
 								<div
 									style={{
 										overflow: 'hidden',
-										opacity: haveReservation ? 1 : 0,
-										height: haveReservation ? 'auto' : 0,
-										transform: haveReservation
+										opacity: formikFillProfile.values.haveReservation ? 1 : 0,
+										height: formikFillProfile.values.haveReservation
+											? 'auto'
+											: 0,
+										transform: formikFillProfile.values.haveReservation
 											? 'translateY(0)'
 											: 'translateY(-10px)',
 										transition: 'all 0.4s ease',
 									}}>
-									{haveReservation && (
-										<div className='mt-2'>
-											<label
+									{formikFillProfile.values.haveReservation && (
+										<div className='m-2'>
+											{/* <label
 												htmlFor='maxPeople'
 												className='form-label fw-bold'>
 												Número máximo de personas por reserva
-											</label>
-											<input
-												type='number'
-												className='form-control'
-												id='maxPeople'
-												min='1'
-												value={maxPeoplePerReservation}
-												onChange={(e) =>
-													setMaxPeoplePerReservation(e.target.value)
-												}
-												placeholder='Ejemplo: 5'
-											/>
-											<small className='text-muted'>
-												Define cuántas personas puede incluir cada reserva.
-											</small>
+											</label> */}
+											<FormGroup
+												id='maxPeoplePerReservation'
+												label='Define cuántas personas puede incluir cada reserva.'>
+												<Input
+													type='number'
+													id='maxPeoplePerReservation'
+													value={
+														formikFillProfile.values
+															.maxPeoplePerReservation
+													}
+													onChange={formikFillProfile.handleChange}
+													placeholder='Ejemplo: 5'
+												/>
+											</FormGroup>
 										</div>
 									)}
 								</div>
