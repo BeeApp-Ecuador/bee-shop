@@ -30,6 +30,7 @@ interface MapCardProps {
 
 export interface MapCardRef {
 	centerMap: (lng: number, lat: number, zoom?: number) => void;
+	setMarker: (lng: number, lat: number) => void;
 }
 
 const MapCard = forwardRef<MapCardRef, MapCardProps>(
@@ -144,6 +145,7 @@ const MapCard = forwardRef<MapCardRef, MapCardProps>(
 
 		useImperativeHandle(ref, () => ({
 			centerMap,
+			setMarker,
 		}));
 
 		return (

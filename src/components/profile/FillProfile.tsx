@@ -510,7 +510,20 @@ const FillProfile = () => {
 										key={item.id}
 										className='cursor-pointer'
 										onClick={() => {
-											// navigate(`../${item.path}`);
+											setCoords({
+												lat: item.geometry.coordinates[1],
+												lng: item.geometry.coordinates[0],
+											});
+											mapRef.current?.setMarker(
+												item.geometry.coordinates[0],
+												item.geometry.coordinates[1],
+											);
+											mapRef.current?.centerMap(
+												item.geometry.coordinates[0],
+												item.geometry.coordinates[1],
+											);
+
+											setSearchModalStatus(false);
 										}}>
 										<td>
 											<div className='d-flex align-items-start'>
