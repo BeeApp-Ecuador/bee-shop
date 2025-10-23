@@ -546,7 +546,7 @@ const FillProfile = ({
 										<div className='m-2'>
 											<FormGroup
 												id='descriptionReservation'
-												label='Descripción del servicio de reservas'>
+												label='Descripción del servicio de reservas e información adicional de aforo, políticas y condiciones'>
 												<Textarea
 													style={{ minHeight: '100px', resize: 'none' }}
 													id='descriptionReservation'

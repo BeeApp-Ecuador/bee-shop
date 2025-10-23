@@ -26,7 +26,7 @@ export const profileApi = createApi({
 		fillProfile: builder.mutation({
 			query: (body) => ({
 				url: 'api/v2/shop/fill',
-				method: 'POST',
+				method: 'PUT',
 				body,
 				headers: {
 					'Content-Type': 'application/json',
