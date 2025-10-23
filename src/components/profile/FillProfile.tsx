@@ -11,6 +11,28 @@ import MapCard, { MapCardRef } from './MapCard';
 import Accordion, { DayAccordionItem } from '../Accordion';
 import WeeklySchedule from './WeeklySchedule';
 
+export interface Schedule {
+	open: string; // formato "HH:mm"
+	close: string; // formato "HH:mm"
+}
+
+export interface OpenShopDay {
+	day: string; // ejemplo: "MONDAY", "TUESDAY", etc.
+	schedule: Schedule[];
+}
+
+export interface ShopFormValues {
+	tags: string[];
+	category: string[];
+	havePickup: boolean;
+	haveDeliveryBee: boolean;
+	haveReservation: boolean;
+	maxPeoplePerReservation: number;
+	lat: string;
+	lng: string;
+	openShopSchedule: OpenShopDay[];
+}
+
 const FillProfile = () => {
 	const { data } = useGetCategoriesQuery({});
 	const [categories, setCategories] = useState<ShopCategoryType[]>([]);
@@ -89,6 +111,7 @@ const FillProfile = () => {
 				color='info'
 				noValidate
 				// onSubmit={formik.handleSubmit}
+
 				className='shadow-3d-info'>
 				<WizardItem id='step1' title='Categoría y Tags'>
 					<Card>
