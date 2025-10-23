@@ -271,13 +271,15 @@ const FillProfile = () => {
 						</CardBody>
 						<div className='p-3'>
 							<Input
-								type='text'
+								id='searchInput'
+								type='search'
 								placeholder='Buscar dirección...'
 								value={address}
 								onChange={(_: React.ChangeEvent<HTMLInputElement>) =>
 									setAddress(_.target.value)
 								}
-								list={['fsdf', 'fsdfsd', 'asd']}
+								autoComplete='off'
+								// list={['fsdf', 'fsdfsd', 'asd']}
 							/>
 						</div>
 						<div className='p-3'>
