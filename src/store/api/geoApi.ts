@@ -1,6 +1,9 @@
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
 
 import { getEnvVariables } from '../../helpers/getEnvVariables';
+import { useContext } from 'react';
+import AuthContext from '../../contexts/authContext';
+import { ShopType } from '../../type/shop-type';
 const { VITE_URL } = getEnvVariables();
 
 export const geoApi = createApi({
@@ -35,8 +38,35 @@ export const geoApi = createApi({
 					url: `api/v2/canton/${stateId}`,
 				}),
 			}),
+			searchAddress: builder.query({
+				query: ({ query, lat, lng }) => {
+					const shopSaved = JSON.parse(
+						localStorage.getItem('facit_authUsername')!,
+					) as ShopType;
+
+					return {
+						url: `api/v2/address/search/${query}`,
+						params: {
+							query,
+							limit: 10,
+							country: shopSaved.country,
+							lat,
+							lng,
+						},
+						headers: {
+							'Content-Type': 'application/json',
+							Authorization: localStorage.getItem('token')!,
+						},
+					};
+				},
+			}),
 		};
 	},
 });
 
-export const { useGetCountriesQuery, useLazyGetStatesQuery, useLazyGetCitiesQuery } = geoApi;
+export const {
+	useGetCountriesQuery,
+	useLazyGetStatesQuery,
+	useLazyGetCitiesQuery,
+	useLazySearchAddressQuery,
+} = geoApi;
