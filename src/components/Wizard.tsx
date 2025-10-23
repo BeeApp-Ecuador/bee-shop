@@ -15,6 +15,7 @@ import Button from './bootstrap/Button';
 import Popovers from './bootstrap/Popovers';
 import useDarkMode from '../hooks/useDarkMode';
 import { TColor } from '../type/color-type';
+import Spinner from './bootstrap/Spinner';
 
 interface IWizardItemProps extends React.HTMLAttributes<HTMLDivElement> {
 	id: string;
@@ -39,6 +40,7 @@ interface IWizardProps extends ICardProps {
 	children: ReactElement<IWizardItemProps> | ReactElement<IWizardItemProps>[];
 	color?: TColor;
 	isHeader?: boolean | 'withButton';
+	isLoading?: boolean;
 }
 const Wizard: FC<IWizardProps> = ({
 	children,
@@ -46,6 +48,8 @@ const Wizard: FC<IWizardProps> = ({
 	isHeader,
 	color = 'primary',
 	stretch,
+	isLoading = false,
+
 	...props
 }) => {
 	const { themeStatus } = useDarkMode();
@@ -77,7 +81,10 @@ const Wizard: FC<IWizardProps> = ({
 				className={classNames({ 'd-none': childCount !== activeItemIndex + 1 })}
 				aria-hidden={childCount !== activeItemIndex + 1}
 				type='submit'
+				isDisable={isLoading}
 				color={color}>
+				{/* if is loading show a spinner */}
+				{isLoading && <Spinner isSmall inButton isGrow />}
 				Guardar
 			</Button>
 		</>

@@ -63,6 +63,7 @@ const FillProfile = ({
 	const [isError, setIsError] = useState(false);
 
 	const [fillProfile] = useFillProfileMutation();
+	const [isLoading, setIsLoading] = useState(false);
 
 	const [weeklyHours, setWeeklyHours] = useState<{ [day: string]: HourRange[] }>({
 		monday: [{ startHour: '', startMin: '', endHour: '', endMin: '' }],
@@ -133,12 +134,15 @@ const FillProfile = ({
 				...formikFillProfile.values,
 				openShopSchedule: schedulesArray,
 			};
+			setIsLoading(true);
 			const { data, error } = await fillProfile(body);
+			setIsLoading(false);
 			if (error) {
 				setIsError(true);
 				setShowModal(true);
 			}
 			if (data) {
+				console.log(data);
 				setIsError(false);
 				setShowModal(true);
 			}
@@ -301,6 +305,7 @@ const FillProfile = ({
 	return (
 		<div className='col-lg-12 h-100'>
 			<Wizard
+				isLoading={isLoading}
 				isHeader
 				color='info'
 				noValidate
@@ -546,7 +551,7 @@ const FillProfile = ({
 										<div className='m-2'>
 											<FormGroup
 												id='descriptionReservation'
-												label='Descripción del servicio de reservas'>
+												label='Descripción del servicio de reservas e información adicional de aforo, políticas y condiciones'>
 												<Textarea
 													style={{ minHeight: '100px', resize: 'none' }}
 													id='descriptionReservation'
