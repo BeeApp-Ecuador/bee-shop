@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useContext, useEffect, useRef, useState } from 'react';
 import Card, {
 	CardBody,
 	CardFooter,
@@ -21,6 +21,7 @@ import Icon from '../icon/Icon';
 import { useLazySearchAddressQuery } from '../../store/api/geoApi';
 import showNotification from '../extras/showNotification';
 import Textarea from '../bootstrap/forms/Textarea';
+import AuthContext from '../../contexts/authContext';
 
 export interface ShopFormValues {
 	tags: string[];
@@ -35,9 +36,13 @@ export interface ShopFormValues {
 
 const FillProfile = ({
 	setIsFillingProfile,
+	isEditing,
 }: {
 	setIsFillingProfile: React.Dispatch<React.SetStateAction<boolean>>;
+	isEditing: boolean;
 }) => {
+	const { user: shop } = useContext(AuthContext);
+
 	const { data } = useGetCategoriesQuery({});
 	const [categories, setCategories] = useState<ShopCategoryType[]>([]);
 	const [selectedCategories, setSelectedCategories] = useState<ShopCategoryType[]>([]);
@@ -74,6 +79,72 @@ const FillProfile = ({
 		saturday: [{ startHour: '', startMin: '', endHour: '', endMin: '' }],
 		sunday: [{ startHour: '', startMin: '', endHour: '', endMin: '' }],
 	});
+
+	console.log('SHOP:', JSON.stringify(shop.openShopSchedule, null, 2));
+	useEffect(() => {
+		if (isEditing && shop?.openShopSchedule?.length > 0) {
+			const newWeeklyHours: { [day: string]: HourRange[] } = {
+				monday: [{ startHour: '', startMin: '', endHour: '', endMin: '' }],
+				tuesday: [{ startHour: '', startMin: '', endHour: '', endMin: '' }],
+				wednesday: [{ startHour: '', startMin: '', endHour: '', endMin: '' }],
+				thursday: [{ startHour: '', startMin: '', endHour: '', endMin: '' }],
+				friday: [{ startHour: '', startMin: '', endHour: '', endMin: '' }],
+				saturday: [{ startHour: '', startMin: '', endHour: '', endMin: '' }],
+				sunday: [{ startHour: '', startMin: '', endHour: '', endMin: '' }],
+			};
+
+			let monday = false;
+			let tuesday = false;
+			let wednesday = false;
+			let thursday = false;
+			let friday = false;
+			let saturday = false;
+			let sunday = false;
+
+			shop.openShopSchedule.forEach((item: any) => {
+				const day = item.day.toLowerCase();
+
+				newWeeklyHours[day] = item.schedule.map((s: any) => {
+					const [startHour, startMin] = s.open.split(':');
+					const [endHour, endMin] = s.close.split(':');
+					return { startHour, startMin, endHour, endMin };
+				});
+
+				switch (day) {
+					case 'monday':
+						monday = true;
+						break;
+					case 'tuesday':
+						tuesday = true;
+						break;
+					case 'wednesday':
+						wednesday = true;
+						break;
+					case 'thursday':
+						thursday = true;
+						break;
+					case 'friday':
+						friday = true;
+						break;
+					case 'saturday':
+						saturday = true;
+						break;
+					case 'sunday':
+						sunday = true;
+						break;
+				}
+			});
+
+			setWeeklyHours(newWeeklyHours);
+			setEnableMonday(monday);
+			setEnableTuesday(tuesday);
+			setEnableWednesday(wednesday);
+			setEnableThursday(thursday);
+			setEnableFriday(friday);
+			setEnableSaturday(saturday);
+			setEnableSunday(sunday);
+		}
+	}, [isEditing, shop]);
 
 	const [searchAddress] = useLazySearchAddressQuery();
 	const [addressSearchResults, setAddressSearchResults] = useState<any[]>([]);
@@ -202,16 +273,34 @@ const FillProfile = ({
 		}
 	}, [data]);
 
+	useEffect(() => {
+		if (isEditing && shop?.category) {
+			const selected = categories.filter((cat) =>
+				shop.category!.some((c) => c === cat._id || c === cat._id),
+			);
+			setSelectedCategories(selected);
+			formikFillProfile.setFieldValue(
+				'category',
+				selected.map((c) => c._id),
+			);
+			const shopTags = shop.tags || [];
+			setTags(shopTags);
+			formikFillProfile.setFieldValue('tags', shopTags);
+		}
+	}, [isEditing, shop, categories, tags]);
+
 	const formikFillProfile = useFormik<ShopFormValues>({
 		initialValues: {
-			tags: ['Comida', 'Bebidas'],
-			category: selectedCategories.map((c) => c._id),
-			havePickup: false,
-			haveDeliveryBee: false,
-			haveReservation: false,
-			descriptionReservation: '',
-			lat: coords?.lat.toString() || '',
-			lng: coords?.lng.toString() || '',
+			tags: isEditing ? shop.tags : ['Comida', 'Bebidas'],
+			category: isEditing
+				? shop.category!.map((c) => c)
+				: selectedCategories.map((c) => c._id),
+			havePickup: isEditing ? shop.havePickup : false,
+			haveDeliveryBee: isEditing ? shop.haveDeliveryBee : false,
+			haveReservation: isEditing ? shop.haveReservation : false,
+			descriptionReservation: isEditing ? shop.descriptionReservation : '',
+			lat: isEditing ? shop.lat.toString() : coords?.lat.toString() || '',
+			lng: isEditing ? shop.lng.toString() : coords?.lng.toString() || '',
 		},
 		validate: (values) => {
 			const errors: Partial<Record<keyof ShopFormValues, string>> = {};

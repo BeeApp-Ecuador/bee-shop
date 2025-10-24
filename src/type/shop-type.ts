@@ -4,10 +4,18 @@ export interface ShopType {
 	businessName: string;
 	category?: [];
 	ciLegalAgent: string;
-	city: string;
-	country: string;
+	city: {
+		_id: string;
+		description: string;
+	};
+	completedProfile: boolean;
+	country: {
+		_id: string;
+		name: string;
+	};
 	createdAt: string;
 	description: string;
+	descriptionReservation: string;
 	email: string;
 	expiredInvoice: any;
 	haveDeliveryBee: boolean;
@@ -17,7 +25,9 @@ export interface ShopType {
 	identificationLegal: string;
 	img: string;
 	isInvoice: boolean;
+	lat: string;
 	legalName: string;
+	lng: string;
 	maxPeoplePerReservation: number;
 	nameLegalAgent: string;
 	notifyInvoice: boolean;
@@ -27,7 +37,10 @@ export interface ShopType {
 	phoneLegalAgent: string;
 	prefix: string;
 	prefixLegalAgent: string;
-	province: string;
+	province: {
+		_id: string;
+		descripcion: string;
+	};
 	qrShop: string;
 	resetPassword: boolean;
 	ruc: string;

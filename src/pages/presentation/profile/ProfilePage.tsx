@@ -124,10 +124,16 @@ const ProfilePage = () => {
 													color='primary'
 													onClick={() => setIsFillingProfile(true)}>
 													<Icon
-														icon='IncompleteCircle'
+														icon={
+															shop.completedProfile
+																? 'Edit'
+																: 'IncompleteCircle'
+														}
 														className='me-2'
 													/>
-													Completar Perfil
+													{shop.completedProfile
+														? 'Editar Perfil'
+														: 'Completar Perfil'}
 												</Button>
 											</div>
 										</div>
@@ -313,10 +319,15 @@ const ProfilePage = () => {
 					isStaticBackdrop
 					size='xl'>
 					<ModalHeader setIsOpen={setIsFillingProfile}>
-						<ModalTitle id='preview'>Completar Perfil</ModalTitle>
+						<ModalTitle id='preview'>
+							{shop.completedProfile ? 'Editar Perfil' : 'Completar Perfil'}
+						</ModalTitle>
 					</ModalHeader>
 					<ModalBody>
-						<FillProfile setIsFillingProfile={setIsFillingProfile} />
+						<FillProfile
+							setIsFillingProfile={setIsFillingProfile}
+							isEditing={shop.completedProfile}
+						/>
 					</ModalBody>
 				</Modal>
 			</Page>
