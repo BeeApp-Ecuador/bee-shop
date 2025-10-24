@@ -5,6 +5,7 @@ export interface ShopType {
 	category?: [];
 	ciLegalAgent: string;
 	city: string;
+	completedProfile: boolean;
 	country: string;
 	createdAt: string;
 	description: string;

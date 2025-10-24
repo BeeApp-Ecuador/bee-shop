@@ -35,8 +35,10 @@ export interface ShopFormValues {
 
 const FillProfile = ({
 	setIsFillingProfile,
+	isEditing,
 }: {
 	setIsFillingProfile: React.Dispatch<React.SetStateAction<boolean>>;
+	isEditing: boolean;
 }) => {
 	const { data } = useGetCategoriesQuery({});
 	const [categories, setCategories] = useState<ShopCategoryType[]>([]);
