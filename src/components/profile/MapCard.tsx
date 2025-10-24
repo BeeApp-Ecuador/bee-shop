@@ -42,7 +42,6 @@ const MapCard = forwardRef<MapCardRef, MapCardProps>(
 		const [, setIsNew] = useState(true);
 		const [, setZoom] = useState(15);
 
-		// 🔹 Inicialización del mapa
 		useEffect(() => {
 			const defaultLat = lat && lat !== 'null' ? Number(lat) : -0.21542619772706928;
 			const defaultLng = lng && lng !== 'null' ? Number(lng) : -78.51745989941895;
@@ -76,8 +75,8 @@ const MapCard = forwardRef<MapCardRef, MapCardProps>(
 				});
 				map.getViewport().style.width = '100%';
 				map.getViewport().style.height = '100%';
-				map.getViewport().style.overflow = 'hidden'; // recorta todo
-				map.getViewport().style.borderRadius = '30px'; // coincide con tu div
+				map.getViewport().style.overflow = 'hidden';
+				map.getViewport().style.borderRadius = '30px';
 				map.getViewport().style.background = 'transparent';
 
 				mapInstance.current = map;
@@ -93,7 +92,6 @@ const MapCard = forwardRef<MapCardRef, MapCardProps>(
 			// eslint-disable-next-line react-hooks/exhaustive-deps
 		}, []);
 
-		// 🔹 Crear marcador
 		const setMarker = (lng: number, lat: number) => {
 			const map = mapInstance.current;
 			if (!map) return;
@@ -125,7 +123,6 @@ const MapCard = forwardRef<MapCardRef, MapCardProps>(
 			onCoordsChange?.({ lat, lng });
 		};
 
-		// 🔹 Evento click
 		const handleMapClick = (event: any) => {
 			const map = mapInstance.current;
 			if (!map) return;
@@ -135,7 +132,6 @@ const MapCard = forwardRef<MapCardRef, MapCardProps>(
 			setMarker(lon, lat);
 		};
 
-		// 🔹 Método para centrar el mapa externamente
 		const centerMap = useCallback((lng: number, lat: number, zoomLevel = 14) => {
 			const map = mapInstance.current;
 			if (!map) return;
