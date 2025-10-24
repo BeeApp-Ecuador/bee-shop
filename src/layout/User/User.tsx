@@ -14,11 +14,12 @@ import useNavigationItemHandle from '../../hooks/useNavigationItemHandle';
 import AuthContext from '../../contexts/authContext';
 import ThemeContext from '../../contexts/themeContext';
 import { ShopType } from '../../type/shop-type';
+import { useLogoutMutation } from '../../store/api/authApi';
 
 const User = () => {
 	const { width } = useWindowSize();
 	const { setAsideStatus } = useContext(ThemeContext);
-	const { userData, setUser, user: shop } = useContext(AuthContext);
+	const { userData, setUser, user: shop, setToken } = useContext(AuthContext);
 
 	const navigate = useNavigate();
 	const handleItem = useNavigationItemHandle();
@@ -27,6 +28,19 @@ const User = () => {
 	const [collapseStatus, setCollapseStatus] = useState<boolean>(false);
 
 	const { t } = useTranslation(['translation', 'menu']);
+	const [logout] = useLogoutMutation();
+
+	const handleLogout = async () => {
+		const { data } = await logout({});
+		if (data && data.statusCode === 200) {
+			if (setUser) setUser({} as ShopType);
+			if (setToken) setToken('');
+			if (width < Number(import.meta.env.VITE_MOBILE_BREAKPOINT_SIZE)) {
+				setAsideStatus(false);
+			}
+			navigate(`../${demoPagesMenu.login.path}`);
+		}
+	};
 
 	return (
 		<>
@@ -47,13 +61,7 @@ const User = () => {
 			</div>
 			<DropdownMenu>
 				<DropdownItem>
-					<Button
-						icon='AccountBox'
-						onClick={() =>
-							navigate(
-								`../${demoPagesMenu.appointment.subMenu.employeeID.path}/${userData?.id}`,
-							)
-						}>
+					<Button icon='AccountBox' onClick={() => navigate(`/profile`)}>
 						Profile
 					</Button>
 				</DropdownItem>
@@ -120,13 +128,7 @@ const User = () => {
 							role='presentation'
 							className='navigation-item cursor-pointer'
 							onClick={() => {
-								if (setUser) {
-									setUser({} as ShopType);
-								}
-								if (width < Number(import.meta.env.VITE_MOBILE_BREAKPOINT_SIZE)) {
-									setAsideStatus(false);
-								}
-								navigate(`../${demoPagesMenu.login.path}`);
+								handleLogout();
 							}}>
 							<span className='navigation-link navigation-link-pill'>
 								<span className='navigation-link-info'>
