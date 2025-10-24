@@ -15,6 +15,7 @@ export interface ShopType {
 	};
 	createdAt: string;
 	description: string;
+	descriptionReservation: string;
 	email: string;
 	expiredInvoice: any;
 	haveDeliveryBee: boolean;
@@ -24,7 +25,9 @@ export interface ShopType {
 	identificationLegal: string;
 	img: string;
 	isInvoice: boolean;
+	lat: string;
 	legalName: string;
+	lng: string;
 	maxPeoplePerReservation: number;
 	nameLegalAgent: string;
 	notifyInvoice: boolean;
