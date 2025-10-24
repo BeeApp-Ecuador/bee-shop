@@ -53,9 +53,9 @@ const CategoryRow: FC<ICategoryRowProps> = ({
 			<td>{description}</td>
 			<td className='text-end'>
 				<div className='d-inline-flex gap-2'>
-					<Popovers desc='Deshabilitar' trigger='hover'>
+					<Popovers desc={status ? 'Deshabilitar' : 'Habilitar'} trigger='hover'>
 						<Button
-							color='danger'
+							color={status ? 'danger' : 'success'}
 							isLight
 							icon={status ? 'Block' : 'CheckCircle'}
 							aria-label='Disable'

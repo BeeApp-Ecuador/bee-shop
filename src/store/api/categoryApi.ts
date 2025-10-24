@@ -39,6 +39,17 @@ export const categoryApi = createApi({
 				},
 			}),
 		}),
+		changeStatusCategory: builder.mutation({
+			query: (categoryId) => ({
+				url: `api/v2/shop/product/category/${categoryId}`,
+				method: 'DELETE',
+				headers: {
+					'Content-Type': 'application/json',
+					Authorization: localStorage.getItem('token')!,
+				},
+			}),
+		}),
 	}),
 });
-export const { useGetCategoriesQuery, useCreateCategoryMutation } = categoryApi;
+export const { useGetCategoriesQuery, useCreateCategoryMutation, useChangeStatusCategoryMutation } =
+	categoryApi;

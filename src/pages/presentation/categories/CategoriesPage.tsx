@@ -27,7 +27,11 @@ import PaginationButtons, { PER_COUNT } from '../../../components/PaginationButt
 import useDarkMode from '../../../hooks/useDarkMode';
 import { enUS } from 'date-fns/locale';
 import CategoryRow from '../../../components/categories/CategoryRow';
-import { useCreateCategoryMutation, useGetCategoriesQuery } from '../../../store/api/categoryApi';
+import {
+	useChangeStatusCategoryMutation,
+	useCreateCategoryMutation,
+	useGetCategoriesQuery,
+} from '../../../store/api/categoryApi';
 import { ProductCategoryType } from '../../../type/product-category-type';
 import OffCanvas, {
 	OffCanvasBody,
@@ -47,6 +51,7 @@ const CategoriesPage = () => {
 
 	const { data: categoriesData, refetch } = useGetCategoriesQuery({ page, limit });
 	const [saveCategory] = useCreateCategoryMutation();
+	const [changeStatusCategory] = useChangeStatusCategoryMutation();
 
 	const [editPanel, setEditPanel] = useState<boolean>(false);
 	const [editItem, setEditItem] = useState<ProductCategoryType | null>(null);
@@ -69,6 +74,16 @@ const CategoriesPage = () => {
 		setIsLoading(false);
 		if (data && data.meta.status === 201) {
 			setEditPanel(false);
+			refetch();
+		}
+	};
+
+	const handleChangeStatusCategory = async (categoryId: string) => {
+		console.log(categoryId);
+		setIsLoading(true);
+		const { data } = await changeStatusCategory(categoryId);
+		setIsLoading(false);
+		if (data && data.meta.status === 200) {
 			refetch();
 		}
 	};
@@ -219,7 +234,9 @@ const CategoriesPage = () => {
 											name={category.name}
 											description={category.description}
 											status={category.status!}
-											onDisableOrEnable={() => {}}
+											onDisableOrEnable={() => {
+												handleChangeStatusCategory(category._id!);
+											}}
 											onEdit={() => {
 												setEditItem(category);
 												setEditPanel(true);
