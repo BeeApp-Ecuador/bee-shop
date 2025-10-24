@@ -816,7 +816,11 @@ const FillProfile = ({
 					<ModalTitle id='fillModal'>{isError ? 'Error' : 'Éxito'}</ModalTitle>
 				</ModalHeader>
 				<ModalBody>
-					<p>Has completado tu perfil exitosamente, ya puedes cargar productos.</p>
+					{isEditing ? (
+						<p>Los cambios han sido guardados exitosamente.</p>
+					) : (
+						<p>Has completado tu perfil exitosamente, ya puedes cargar productos.</p>
+					)}
 				</ModalBody>
 				<ModalFooter>
 					<Button
