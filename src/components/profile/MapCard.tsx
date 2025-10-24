@@ -1,4 +1,3 @@
-/* eslint-disable import/no-extraneous-dependencies */
 import React, {
 	useEffect,
 	useRef,
@@ -26,6 +25,7 @@ interface MapCardProps {
 	lng?: number | string | null;
 	heightE?: string;
 	onCoordsChange?: (coords: { lat: number; lng: number }) => void;
+	interactive?: boolean;
 }
 
 export interface MapCardRef {
@@ -34,13 +34,13 @@ export interface MapCardRef {
 }
 
 const MapCard = forwardRef<MapCardRef, MapCardProps>(
-	({ lat, lng, heightE, onCoordsChange }, ref) => {
+	({ lat, lng, heightE, onCoordsChange, interactive = true }, ref) => {
 		const mapRef = useRef<HTMLDivElement>(null);
 		const mapInstance = useRef<Map | null>(null);
 		const markerLayerRef = useRef<VectorLayer<any> | null>(null);
 
-		const [isNew, setIsNew] = useState(true);
-		const [zoom, setZoom] = useState(15);
+		const [, setIsNew] = useState(true);
+		const [, setZoom] = useState(15);
 
 		// 🔹 Inicialización del mapa
 		useEffect(() => {
@@ -82,7 +82,9 @@ const MapCard = forwardRef<MapCardRef, MapCardProps>(
 
 				mapInstance.current = map;
 				setMarker(defaultLng, defaultLat);
-				map.on('click', handleMapClick);
+				if (interactive) {
+					map.on('click', handleMapClick);
+				}
 			}
 
 			return () => {
@@ -141,6 +143,7 @@ const MapCard = forwardRef<MapCardRef, MapCardProps>(
 			map.getView().setCenter(transform([lng, lat], 'EPSG:4326', 'EPSG:3857'));
 			map.getView().setZoom(zoomLevel);
 			setMarker(lng, lat);
+			// eslint-disable-next-line react-hooks/exhaustive-deps
 		}, []);
 
 		useImperativeHandle(ref, () => ({

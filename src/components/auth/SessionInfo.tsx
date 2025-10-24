@@ -35,6 +35,13 @@ const SessionInfo = ({ formikRegister }: { formikRegister: FormikProps<RegisterF
 					</FormGroup>
 				</div>
 
+				<div className='col-12 col-sm-12'>
+					<span className='text-muted small'>
+						La contraseña debe tener al menos 6 caracteres y debe contener al menos una
+						letra mayúscula, una letra minúscula, un número y uno de estos caracteres
+						especiales (@ $ ! % * ? &)
+					</span>
+				</div>
 				<div className='col-12 col-sm-6'>
 					<FormGroup id='password' isFloating label='Contraseña'>
 						<Input

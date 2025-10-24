@@ -31,6 +31,8 @@ import {
 	SessionInfo,
 	VerifyCode,
 } from '../../../components/auth';
+import showNotification from '../../../components/extras/showNotification';
+import Icon from '../../../components/icon/Icon';
 
 export interface RegisterFormValues {
 	nameLegalAgent: string;
@@ -343,7 +345,16 @@ const Login: FC<ILoginProps> = ({ isSignUp }) => {
 			} else if (values.confirmPassword !== values.password) {
 				errors.confirmPassword = 'Las contraseñas no coinciden';
 			}
-
+			// if (Object.keys(errors).length > 0) {
+			// 	showNotification(
+			// 		<span className='d-flex align-items-center'>
+			// 			<Icon icon='Error' size='lg' className='me-1' />
+			// 			<span>Error</span>
+			// 		</span>,
+			// 		'Los datos del formulario contienen errores. Revisa e intenta nuevamente.',
+			// 		'danger',
+			// 	);
+			// }
 			return errors;
 		},
 		validateOnChange: false,

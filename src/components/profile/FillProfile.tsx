@@ -53,7 +53,6 @@ const FillProfile = ({
 	const mapRef = useRef<MapCardRef>(null);
 	const [coords, setCoords] = useState<{ lat: number; lng: number } | null>(null);
 
-	// const [maxPeoplePerReservation, setMaxPeoplePerReservation] = useState('');
 	const [enableMonday, setEnableMonday] = useState(true);
 	const [enableTuesday, setEnableTuesday] = useState(false);
 	const [enableWednesday, setEnableWednesday] = useState(false);
@@ -69,6 +68,7 @@ const FillProfile = ({
 
 	const [fillProfile] = useFillProfileMutation();
 	const [isLoading, setIsLoading] = useState(false);
+	const { setUser } = useContext(AuthContext);
 
 	const [weeklyHours, setWeeklyHours] = useState<{ [day: string]: HourRange[] }>({
 		monday: [{ startHour: '', startMin: '', endHour: '', endMin: '' }],
@@ -80,7 +80,6 @@ const FillProfile = ({
 		sunday: [{ startHour: '', startMin: '', endHour: '', endMin: '' }],
 	});
 
-	console.log('SHOP:', JSON.stringify(shop.openShopSchedule, null, 2));
 	useEffect(() => {
 		if (isEditing && shop?.openShopSchedule?.length > 0) {
 			const newWeeklyHours: { [day: string]: HourRange[] } = {
@@ -200,7 +199,7 @@ const FillProfile = ({
 				);
 				return;
 			}
-
+			console.log(formikFillProfile.values);
 			const body = {
 				...formikFillProfile.values,
 				openShopSchedule: schedulesArray,
@@ -213,7 +212,7 @@ const FillProfile = ({
 				setShowModal(true);
 			}
 			if (data) {
-				console.log(data);
+				setUser(data.shop!);
 				setIsError(false);
 				setShowModal(true);
 			}
@@ -287,6 +286,7 @@ const FillProfile = ({
 			setTags(shopTags);
 			formikFillProfile.setFieldValue('tags', shopTags);
 		}
+		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [isEditing, shop, categories, tags]);
 
 	const formikFillProfile = useFormik<ShopFormValues>({
@@ -364,7 +364,7 @@ const FillProfile = ({
 					refSearchInput?.current?.focus();
 
 					try {
-						const { data, error } = await searchAddress({
+						const { data } = await searchAddress({
 							query: formik.values.searchInput,
 							lat: coords?.lat,
 							lon: coords?.lng,
@@ -385,10 +385,10 @@ const FillProfile = ({
 			fetchAddresses();
 		}, 400);
 
-		// 🔹 Limpieza del timeout si el usuario sigue escribiendo
 		return () => {
 			clearTimeout(delayDebounce);
 		};
+		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [formik.values.searchInput]);
 
 	return (
@@ -546,8 +546,8 @@ const FillProfile = ({
 						</div>
 						<div className='p-3'>
 							<MapCard
-								lat={coords?.lat ?? '-2.90055'}
-								lng={coords?.lng ?? '-79.00454'}
+								lat={isEditing ? shop.lat : (coords?.lat ?? '-2.90055')}
+								lng={isEditing ? shop.lng : (coords?.lng ?? '-79.00454')}
 								heightE='300px'
 								onCoordsChange={handleCoordsChange}
 								ref={mapRef}
@@ -817,7 +817,11 @@ const FillProfile = ({
 					<ModalTitle id='fillModal'>{isError ? 'Error' : 'Éxito'}</ModalTitle>
 				</ModalHeader>
 				<ModalBody>
-					<p>Has completado tu perfil exitosamente, ya puedes cargar productos.</p>
+					{isEditing ? (
+						<p>Los cambios han sido guardados exitosamente.</p>
+					) : (
+						<p>Has completado tu perfil exitosamente, ya puedes cargar productos.</p>
+					)}
 				</ModalBody>
 				<ModalFooter>
 					<Button

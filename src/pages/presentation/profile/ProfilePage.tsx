@@ -1,4 +1,4 @@
-import React, { useContext, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import { useFormik } from 'formik';
 
 import { useMeasure } from 'react-use';
@@ -25,7 +25,7 @@ import Progress from '../../../components/bootstrap/Progress';
 import Modal, { ModalBody, ModalHeader, ModalTitle } from '../../../components/bootstrap/Modal';
 import { demoPagesMenu } from '../../../menu';
 import AuthContext from '../../../contexts/authContext';
-import { useChangePasswordMutation } from '../../../store/api/authApi';
+import { useChangePasswordMutation, useGetSessionQuery } from '../../../store/api/authApi';
 import Spinner from '../../../components/bootstrap/Spinner';
 import LegalAgentInfo from '../../../components/profile/LegalAgentInfo';
 import AddressInfo from '../../../components/profile/AddressInfo';
@@ -33,8 +33,18 @@ import FillProfile from '../../../components/profile/FillProfile';
 
 const ProfilePage = () => {
 	const { user: shop } = useContext(AuthContext);
+	const { setUser } = useContext(AuthContext);
+
 	const [changePassword] = useChangePasswordMutation();
 	const [isUpdatingPassword, setIsUpdatingPassword] = useState(false);
+	const { data: sessionData, isSuccess } = useGetSessionQuery({});
+
+	useEffect(() => {
+		if (sessionData && isSuccess) {
+			if (sessionData.statusCode === 200) setUser(sessionData.data!);
+		}
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [sessionData]);
 
 	const formikPassword = useFormik({
 		initialValues: {
@@ -93,7 +103,7 @@ const ProfilePage = () => {
 		},
 	});
 	const [ref] = useMeasure<HTMLDivElement>();
-	const [selectedImage, setSelectedImage] = useState<string | undefined>(undefined);
+	// const [selectedImage, setSelectedImage] = useState<string | undefined>(undefined);
 	const [isFillingProfile, setIsFillingProfile] = useState(false);
 
 	return (
@@ -119,23 +129,25 @@ const ProfilePage = () => {
 												</div>
 												<div className='h5 text-muted'>Founder</div>
 											</div>
-											<div className='flex-shrink-0'>
-												<Button
-													color='primary'
-													onClick={() => setIsFillingProfile(true)}>
-													<Icon
-														icon={
-															shop.completedProfile
-																? 'Edit'
-																: 'IncompleteCircle'
-														}
-														className='me-2'
-													/>
-													{shop.completedProfile
-														? 'Editar Perfil'
-														: 'Completar Perfil'}
-												</Button>
-											</div>
+											{shop.status === 'ACTIVE' && (
+												<div className='flex-shrink-0'>
+													<Button
+														color='primary'
+														onClick={() => setIsFillingProfile(true)}>
+														<Icon
+															icon={
+																shop.completedProfile
+																	? 'Edit'
+																	: 'IncompleteCircle'
+															}
+															className='me-2'
+														/>
+														{shop.completedProfile
+															? 'Editar Perfil'
+															: 'Completar Perfil'}
+													</Button>
+												</div>
+											)}
 										</div>
 									</div>
 									<div className='col-12'>
@@ -304,14 +316,6 @@ const ProfilePage = () => {
 					</div>
 				</div>
 
-				{/* <Modal setIsOpen={setSelectedImage} isOpen={!!selectedImage} isCentered>
-					<ModalHeader setIsOpen={setSelectedImage}>
-						<ModalTitle id='preview'>Preview</ModalTitle>
-					</ModalHeader>
-					<ModalBody>
-						<img src={selectedImage} alt='eneme' />
-					</ModalBody>
-				</Modal> */}
 				<Modal
 					setIsOpen={setIsFillingProfile}
 					isOpen={isFillingProfile}
