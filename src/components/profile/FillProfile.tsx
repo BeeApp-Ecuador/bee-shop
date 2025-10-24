@@ -69,6 +69,7 @@ const FillProfile = ({
 
 	const [fillProfile] = useFillProfileMutation();
 	const [isLoading, setIsLoading] = useState(false);
+	const { setUser } = useContext(AuthContext);
 
 	const [weeklyHours, setWeeklyHours] = useState<{ [day: string]: HourRange[] }>({
 		monday: [{ startHour: '', startMin: '', endHour: '', endMin: '' }],
@@ -214,6 +215,7 @@ const FillProfile = ({
 			}
 			if (data) {
 				console.log(data);
+				setUser(data.shop!);
 				setIsError(false);
 				setShowModal(true);
 			}
