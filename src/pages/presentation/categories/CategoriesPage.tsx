@@ -73,30 +73,38 @@ const CategoriesPage = () => {
 	const [date, setDate] = useState<Date>(new Date());
 
 	const [filterMenu, setFilterMenu] = useState<boolean>(false);
-	const formik = useFormik<ProductCategoryType>({
+	const formikCategory = useFormik<ProductCategoryType>({
 		initialValues: {
 			name: '',
 			description: '',
+		},
+		validate: (values) => {
+			const errors: Partial<ProductCategoryType> = {};
+			if (!values.name) errors.name = 'Required';
+			return errors;
 		},
 		// eslint-disable-next-line @typescript-eslint/no-unused-vars
 		onSubmit: (values) => {
 			setFilterMenu(false);
 			// alert(JSON.stringify(values, null, 2));
 		},
+		validateOnMount: true,
 	});
 
 	const filteredData = data.filter(
 		(f) =>
 			// Category
-			f.category === formik.values.categoryName &&
+			f.category === formikCategory.values.categoryName &&
 			// Price
-			(formik.values.minPrice === '' || f.price > Number(formik.values.minPrice)) &&
-			(formik.values.maxPrice === '' || f.price < Number(formik.values.maxPrice)) &&
+			(formikCategory.values.minPrice === '' ||
+				f.price > Number(formikCategory.values.minPrice)) &&
+			(formikCategory.values.maxPrice === '' ||
+				f.price < Number(formikCategory.values.maxPrice)) &&
 			//	Company
-			((formik.values.companyA ? f.store === 'Company A' : false) ||
-				(formik.values.companyB ? f.store === 'Company B' : false) ||
-				(formik.values.companyC ? f.store === 'Company C' : false) ||
-				(formik.values.companyD ? f.store === 'Company D' : false)),
+			((formikCategory.values.companyA ? f.store === 'Company A' : false) ||
+				(formikCategory.values.companyB ? f.store === 'Company B' : false) ||
+				(formikCategory.values.companyC ? f.store === 'Company C' : false) ||
+				(formikCategory.values.companyD ? f.store === 'Company D' : false)),
 	);
 
 	const [currentPage, setCurrentPage] = useState<number>(1);
@@ -113,13 +121,7 @@ const CategoriesPage = () => {
 					<CardLabel icon='Category' iconColor='primary'>
 						<CardTitle tag='div' className='h5'>
 							Categorías
-							<small className='ms-2'>
-								Item:{' '}
-								{selectTable.values.selectedList.length
-									? `${selectTable.values.selectedList.length} / `
-									: null}
-								{filteredData.length}
-							</small>
+							<small className='ms-2'>Item: 12</small>
 						</CardTitle>
 					</CardLabel>
 				</SubHeaderLeft>
@@ -225,8 +227,8 @@ const CategoriesPage = () => {
 								{categories.length > 0 ? (
 									categories.map((category) => (
 										<CategoryRow
-											key={category._id}
-											id={category._id}
+											key={category._id!}
+											id={category._id!}
 											name={category.name}
 											description={category.description}
 										/>
@@ -255,7 +257,7 @@ const CategoriesPage = () => {
 				isRightPanel
 				tag='form'
 				noValidate
-				onSubmit={formik.handleSubmit}>
+				onSubmit={formikCategory.handleSubmit}>
 				<OffCanvasHeader setOpen={setEditPanel}>
 					<OffCanvasTitle id='edit-panel'>
 						{editItem?.name || 'Nueva Categoría'}{' '}
@@ -279,13 +281,12 @@ const CategoriesPage = () => {
 									<FormGroup id='name' label='Name' isFloating>
 										<Input
 											placeholder='Name'
-											onChange={formik.handleChange}
-											onBlur={formik.handleBlur}
-											value={formik.values.name}
-											isValid={formik.isValid}
-											isTouched={formik.touched.name}
-											invalidFeedback={formik.errors.name}
-											validFeedback='Looks good!'
+											onChange={formikCategory.handleChange}
+											onBlur={formikCategory.handleBlur}
+											value={formikCategory.values.name}
+											isValid={formikCategory.isValid}
+											isTouched={formikCategory.touched.name}
+											invalidFeedback={formikCategory.errors.name}
 										/>
 									</FormGroup>
 								</div>
@@ -293,13 +294,12 @@ const CategoriesPage = () => {
 									<FormGroup id='description' label='Description' isFloating>
 										<Input
 											placeholder='Description'
-											onChange={formik.handleChange}
-											onBlur={formik.handleBlur}
-											value={formik.values.description}
-											isValid={formik.isValid}
-											isTouched={formik.touched.description}
-											invalidFeedback={formik.errors.description}
-											validFeedback='Looks good!'
+											onChange={formikCategory.handleChange}
+											onBlur={formikCategory.handleBlur}
+											value={formikCategory.values.description}
+											isValid={formikCategory.isValid}
+											isTouched={formikCategory.touched.description}
+											invalidFeedback={formikCategory.errors.description}
 										/>
 									</FormGroup>
 								</div>
@@ -309,11 +309,13 @@ const CategoriesPage = () => {
 				</OffCanvasBody>
 				<div className='p-3'>
 					<Button
-						color='info'
+						className='w-100'
+						size='lg'
+						color='primary'
 						icon='Save'
 						type='submit'
-						isDisable={!formik.isValid && !!formik.submitCount}>
-						Save
+						isDisable={!formikCategory.isValid}>
+						Guardar
 					</Button>
 				</div>
 			</OffCanvas>
