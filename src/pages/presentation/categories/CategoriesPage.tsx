@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import dayjs from 'dayjs';
 import { useFormik } from 'formik';
 import { Calendar as DatePicker } from 'react-date-range';
@@ -22,19 +22,12 @@ import Input from '../../../components/bootstrap/forms/Input';
 import FormGroup from '../../../components/bootstrap/forms/FormGroup';
 import Popovers from '../../../components/bootstrap/Popovers';
 
-import data from '../../../common/data/dummyProductData';
 import { demoPagesMenu } from '../../../menu';
-import PaginationButtons, {
-	dataPagination,
-	PER_COUNT,
-} from '../../../components/PaginationButtons';
-import useSortableData from '../../../hooks/useSortableData';
-import useSelectTable from '../../../hooks/useSelectTable';
+import PaginationButtons, { PER_COUNT } from '../../../components/PaginationButtons';
 import useDarkMode from '../../../hooks/useDarkMode';
-import useTourStep from '../../../hooks/useTourStep';
 import { enUS } from 'date-fns/locale';
 import CategoryRow from '../../../components/categories/CategoryRow';
-import { useGetCategoriesQuery } from '../../../store/api/categoryApi';
+import { useCreateCategoryMutation, useGetCategoriesQuery } from '../../../store/api/categoryApi';
 import { ProductCategoryType } from '../../../type/product-category-type';
 import OffCanvas, {
 	OffCanvasBody,
@@ -42,21 +35,43 @@ import OffCanvas, {
 	OffCanvasTitle,
 } from '../../../components/bootstrap/OffCanvas';
 import { Badge } from '../../../components/icon/material-icons';
+import AuthContext from '../../../contexts/authContext';
+import Spinner from '../../../components/bootstrap/Spinner';
 
 const CategoriesPage = () => {
-	/**
-	 * For Tour
-	 */
-	useTourStep(6);
+	const { user: shop } = useContext(AuthContext);
+
 	const [page, setPage] = useState(1);
-	const [totalPages, setTotalPages] = useState(1);
 	const [limit, setLimit] = useState(10);
-	const { data: categoriesData } = useGetCategoriesQuery({ page, limit });
+	const [totalPages, setTotalPages] = useState(1);
+
+	const { data: categoriesData, refetch } = useGetCategoriesQuery({ page, limit });
+	const [saveCategory] = useCreateCategoryMutation();
 
 	const [editPanel, setEditPanel] = useState<boolean>(false);
 	const [editItem, setEditItem] = useState<ProductCategoryType | null>(null);
 
 	const [categories, setCategories] = useState<ProductCategoryType[]>([]);
+
+	const [isLoading, setIsLoading] = useState<boolean>(false);
+
+	const { themeStatus, darkModeStatus } = useDarkMode();
+
+	const [date, setDate] = useState<Date>(new Date());
+
+	const [filterMenu, setFilterMenu] = useState<boolean>(false);
+	const [currentPage, setCurrentPage] = useState<number>(1);
+	const [perPage, setPerPage] = useState<number>(PER_COUNT['10']);
+
+	const handleSaveCategory = async (category: any) => {
+		setIsLoading(true);
+		const { data } = await saveCategory(category);
+		setIsLoading(false);
+		if (data && data.meta.status === 201) {
+			setEditPanel(false);
+			refetch();
+		}
+	};
 
 	useEffect(() => {
 		if (categoriesData) {
@@ -67,11 +82,6 @@ const CategoriesPage = () => {
 		}
 	}, [categoriesData]);
 
-	const { themeStatus, darkModeStatus } = useDarkMode();
-
-	const [date, setDate] = useState<Date>(new Date());
-
-	const [filterMenu, setFilterMenu] = useState<boolean>(false);
 	const formikCategory = useFormik<ProductCategoryType>({
 		initialValues: {
 			name: '',
@@ -84,14 +94,11 @@ const CategoriesPage = () => {
 		},
 		// eslint-disable-next-line @typescript-eslint/no-unused-vars
 		onSubmit: (values) => {
-			setFilterMenu(false);
-			// alert(JSON.stringify(values, null, 2));
+			const body = { ...values, shop: shop._id };
+			handleSaveCategory(body);
 		},
 		validateOnMount: true,
 	});
-
-	const [currentPage, setCurrentPage] = useState<number>(1);
-	const [perPage, setPerPage] = useState<number>(PER_COUNT['10']);
 
 	return (
 		<PageWrapper title={demoPagesMenu.listPages.subMenu.listBoxed.text}>
@@ -294,6 +301,7 @@ const CategoriesPage = () => {
 						icon='Save'
 						type='submit'
 						isDisable={!formikCategory.isValid}>
+						{isLoading && <Spinner isSmall inButton isGrow />}
 						Guardar
 					</Button>
 				</div>
