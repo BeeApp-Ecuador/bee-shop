@@ -2,15 +2,7 @@ import React, { useEffect, useState } from 'react';
 import dayjs from 'dayjs';
 import { useFormik } from 'formik';
 import { Calendar as DatePicker } from 'react-date-range';
-import classNames from 'classnames';
-import SubHeader, {
-	SubHeaderLeft,
-	SubHeaderRight,
-	SubheaderSeparator,
-} from '../../../layout/SubHeader/SubHeader';
-import Avatar from '../../../components/Avatar';
-import UserImageWebp from '../../../assets/img/wanna/wanna1.webp';
-import UserImage from '../../../assets/img/wanna/wanna1.png';
+import SubHeader, { SubHeaderLeft, SubHeaderRight } from '../../../layout/SubHeader/SubHeader';
 import Button from '../../../components/bootstrap/Button';
 import PageWrapper from '../../../layout/PageWrapper/PageWrapper';
 import Page from '../../../layout/Page/Page';
@@ -26,14 +18,8 @@ import Dropdown, {
 	DropdownMenu,
 	DropdownToggle,
 } from '../../../components/bootstrap/Dropdown';
-import Checks, { ChecksGroup } from '../../../components/bootstrap/forms/Checks';
-import InputGroup, { InputGroupText } from '../../../components/bootstrap/forms/InputGroup';
 import Input from '../../../components/bootstrap/forms/Input';
 import FormGroup from '../../../components/bootstrap/forms/FormGroup';
-import Label from '../../../components/bootstrap/forms/Label';
-import CommonFilterTag from '../../_common/CommonFilterTag';
-import CommonTableRow from '../../_common/CommonTableRow';
-import Select from '../../../components/bootstrap/forms/Select';
 import Popovers from '../../../components/bootstrap/Popovers';
 
 import data from '../../../common/data/dummyProductData';
@@ -43,15 +29,19 @@ import PaginationButtons, {
 	PER_COUNT,
 } from '../../../components/PaginationButtons';
 import useSortableData from '../../../hooks/useSortableData';
-import Icon from '../../../components/icon/Icon';
 import useSelectTable from '../../../hooks/useSelectTable';
 import useDarkMode from '../../../hooks/useDarkMode';
 import useTourStep from '../../../hooks/useTourStep';
 import { enUS } from 'date-fns/locale';
 import CategoryRow from '../../../components/categories/CategoryRow';
 import { useGetCategoriesQuery } from '../../../store/api/categoryApi';
-import { series } from '../../../common/data/chartDummyData';
 import { ProductCategoryType } from '../../../type/product-category-type';
+import OffCanvas, {
+	OffCanvasBody,
+	OffCanvasHeader,
+	OffCanvasTitle,
+} from '../../../components/bootstrap/OffCanvas';
+import { Badge } from '../../../components/icon/material-icons';
 
 const CategoriesPage = () => {
 	/**
@@ -59,15 +49,21 @@ const CategoriesPage = () => {
 	 */
 	useTourStep(6);
 	const [page, setPage] = useState(1);
+	const [totalPages, setTotalPages] = useState(1);
 	const [limit, setLimit] = useState(10);
 	const { data: categoriesData } = useGetCategoriesQuery({ page, limit });
+
+	const [editPanel, setEditPanel] = useState<boolean>(false);
+	const [editItem, setEditItem] = useState<ProductCategoryType | null>(null);
 
 	const [categories, setCategories] = useState<ProductCategoryType[]>([]);
 
 	useEffect(() => {
 		if (categoriesData) {
+			console.log(categoriesData);
 			if (categoriesData.meta.status === 200) {
 				setCategories(categoriesData.data);
+				setTotalPages(categoriesData.totalPages);
 			}
 		}
 	}, [categoriesData]);
@@ -77,15 +73,10 @@ const CategoriesPage = () => {
 	const [date, setDate] = useState<Date>(new Date());
 
 	const [filterMenu, setFilterMenu] = useState<boolean>(false);
-	const formik = useFormik({
+	const formik = useFormik<ProductCategoryType>({
 		initialValues: {
-			minPrice: '',
-			maxPrice: '',
-			categoryName: '3D Shapes',
-			companyA: true,
-			companyB: true,
-			companyC: true,
-			companyD: true,
+			name: '',
+			description: '',
 		},
 		// eslint-disable-next-line @typescript-eslint/no-unused-vars
 		onSubmit: (values) => {
@@ -117,20 +108,39 @@ const CategoriesPage = () => {
 
 	return (
 		<PageWrapper title={demoPagesMenu.listPages.subMenu.listBoxed.text}>
+			<SubHeader>
+				<SubHeaderLeft>
+					<CardLabel icon='Category' iconColor='primary'>
+						<CardTitle tag='div' className='h5'>
+							Categorías
+							<small className='ms-2'>
+								Item:{' '}
+								{selectTable.values.selectedList.length
+									? `${selectTable.values.selectedList.length} / `
+									: null}
+								{filteredData.length}
+							</small>
+						</CardTitle>
+					</CardLabel>
+				</SubHeaderLeft>
+				<SubHeaderRight>
+					<Button
+						color={darkModeStatus ? 'light' : 'dark'}
+						isLight
+						icon='Add'
+						onClick={() => {
+							setEditItem(null);
+							setEditPanel(true);
+						}}>
+						Crear
+					</Button>
+				</SubHeaderRight>
+			</SubHeader>
 			<Page>
 				<Card stretch data-tour='list'>
 					<CardHeader>
-						<CardLabel icon='Category' iconColor='primary'>
-							<CardTitle tag='div' className='h5'>
-								Categorías
-								<small className='ms-2'>
-									Item:{' '}
-									{selectTable.values.selectedList.length
-										? `${selectTable.values.selectedList.length} / `
-										: null}
-									{filteredData.length}
-								</small>
-							</CardTitle>
+						<CardLabel>
+							<></>
 						</CardLabel>
 						<CardActions>
 							<Dropdown isButtonGroup>
@@ -212,33 +222,101 @@ const CategoriesPage = () => {
 								</tr>
 							</thead>
 							<tbody>
-								{onCurrentPageItems.map((i) => (
-									<CategoryRow
-										key={i.id}
-										id={i.id}
-										name={i.name}
-										description='Descripción de la categoría'
-										selectName='selectedList'
-										selectOnChange={selectTable.handleChange}
-										selectChecked={selectTable.values.selectedList.includes(
-											// @ts-ignore
-											i.id.toString(),
-										)}
-									/>
-								))}
+								{categories.length > 0 ? (
+									categories.map((category) => (
+										<CategoryRow
+											key={category._id}
+											id={category._id}
+											name={category.name}
+											description={category.description}
+										/>
+									))
+								) : (
+									<tr>
+										<td colSpan={3}>No hay categorías disponibles</td>
+									</tr>
+								)}
 							</tbody>
 						</table>
 					</CardBody>
 					<PaginationButtons
-						data={items}
+						data={categories}
 						label='items'
 						setCurrentPage={setCurrentPage}
-						currentPage={currentPage}
-						perPage={perPage}
+						currentPage={page}
+						perPage={limit}
 						setPerPage={setPerPage}
 					/>
 				</Card>
 			</Page>
+			<OffCanvas
+				setOpen={setEditPanel}
+				isOpen={editPanel}
+				isRightPanel
+				tag='form'
+				noValidate
+				onSubmit={formik.handleSubmit}>
+				<OffCanvasHeader setOpen={setEditPanel}>
+					<OffCanvasTitle id='edit-panel'>
+						{editItem?.name || 'Nueva Categoría'}{' '}
+						{editItem?.name ? (
+							<Badge color='primary'>Editar</Badge>
+						) : (
+							<Badge color='success'>Nueva</Badge>
+						)}
+					</OffCanvasTitle>
+				</OffCanvasHeader>
+				<OffCanvasBody>
+					<Card>
+						<CardHeader>
+							<CardLabel icon='Description' iconColor='success'>
+								<CardTitle>Categoría</CardTitle>
+							</CardLabel>
+						</CardHeader>
+						<CardBody>
+							<div className='row g-4'>
+								<div className='col-12'>
+									<FormGroup id='name' label='Name' isFloating>
+										<Input
+											placeholder='Name'
+											onChange={formik.handleChange}
+											onBlur={formik.handleBlur}
+											value={formik.values.name}
+											isValid={formik.isValid}
+											isTouched={formik.touched.name}
+											invalidFeedback={formik.errors.name}
+											validFeedback='Looks good!'
+										/>
+									</FormGroup>
+								</div>
+								<div className='col-12'>
+									<FormGroup id='description' label='Description' isFloating>
+										<Input
+											placeholder='Description'
+											onChange={formik.handleChange}
+											onBlur={formik.handleBlur}
+											value={formik.values.description}
+											isValid={formik.isValid}
+											isTouched={formik.touched.description}
+											invalidFeedback={formik.errors.description}
+											validFeedback='Looks good!'
+										/>
+									</FormGroup>
+								</div>
+							</div>
+						</CardBody>
+					</Card>
+				</OffCanvasBody>
+				<div className='p-3'>
+					<Button
+						color='info'
+						icon='Save'
+						type='submit'
+						isDisable={!formik.isValid && !!formik.submitCount}>
+						Save
+					</Button>
+				</div>
+			</OffCanvas>
 		</PageWrapper>
 	);
 };

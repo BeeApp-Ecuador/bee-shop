@@ -10,18 +10,11 @@ interface ICategoryRowProps {
 	id: string | number;
 	name: string;
 	description: string;
-	selectOnChange: any;
-	selectChecked: any;
-	selectName: string;
+	// selectOnChange: any;
+	// selectChecked: any;
+	// selectName: string;
 }
-const CategoryRow: FC<ICategoryRowProps> = ({
-	id,
-	name,
-	description,
-	selectOnChange,
-	selectChecked,
-	selectName,
-}) => {
+const CategoryRow: FC<ICategoryRowProps> = ({ id, name, description }) => {
 	const { darkModeStatus } = useDarkMode();
 	return (
 		<tr>
