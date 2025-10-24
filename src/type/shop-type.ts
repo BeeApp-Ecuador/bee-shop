@@ -4,9 +4,15 @@ export interface ShopType {
 	businessName: string;
 	category?: [];
 	ciLegalAgent: string;
-	city: string;
+	city: {
+		_id: string;
+		description: string;
+	};
 	completedProfile: boolean;
-	country: string;
+	country: {
+		_id: string;
+		name: string;
+	};
 	createdAt: string;
 	description: string;
 	email: string;
@@ -28,7 +34,10 @@ export interface ShopType {
 	phoneLegalAgent: string;
 	prefix: string;
 	prefixLegalAgent: string;
-	province: string;
+	province: {
+		_id: string;
+		descripcion: string;
+	};
 	qrShop: string;
 	resetPassword: boolean;
 	ruc: string;

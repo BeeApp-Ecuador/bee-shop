@@ -54,13 +54,13 @@ const AddressInfo = ({ shop }: { shop: ShopType }) => {
 			<CardBody>
 				<div className='row g-4'>
 					<FormGroup className='col-md-4' id='formCountry' label='País'>
-						<Input disabled value={shop.country} />
+						<Input disabled value={shop.country.name} />
 					</FormGroup>
 					<FormGroup className='col-md-4' id='formState' label='Provincia'>
-						<Input disabled value={shop.province} />
+						<Input disabled value={shop.province.descripcion} />
 					</FormGroup>
 					<FormGroup className='col-md-4' id='formCity' label='Ciudad'>
-						<Input disabled value={shop.city} />
+						<Input disabled value={shop.city.description} />
 					</FormGroup>
 					<FormGroup className='col-12' id='formAddressLine' label='Dirección'>
 						<Input disabled value={shop.address} />
