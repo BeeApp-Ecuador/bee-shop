@@ -16,8 +16,6 @@ import MapCard, { MapCardRef } from './MapCard';
 
 const AddressInfo = ({ shop }: { shop: ShopType }) => {
 	const [coords, setCoords] = useState<{ lat: number; lng: number } | null>(null);
-	// const [error, setError] = useState<string | null>(null);
-	const [searchAddress, setSearchAddress] = useState<string>('');
 	const handleCoordsChange = (coords: { lat: number; lng: number }) => {
 		console.log('Nuevas coordenadas:', coords);
 	};
@@ -46,6 +44,7 @@ const AddressInfo = ({ shop }: { shop: ShopType }) => {
 				// setError('Tu navegador no soporta geolocalización.');
 			}
 		}
+		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, []);
 	return (
 		<Card

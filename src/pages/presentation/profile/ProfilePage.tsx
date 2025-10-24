@@ -103,7 +103,6 @@ const ProfilePage = () => {
 		},
 	});
 	const [ref] = useMeasure<HTMLDivElement>();
-	// const [selectedImage, setSelectedImage] = useState<string | undefined>(undefined);
 	const [isFillingProfile, setIsFillingProfile] = useState(false);
 
 	return (
@@ -117,11 +116,7 @@ const ProfilePage = () => {
 									<div className='col-12'>
 										<div className='d-flex align-items-center'>
 											<div className='flex-shrink-0'>
-												<Avatar
-													// srcSet={shop.img}
-													src={shop.img}
-													className='rounded-circle'
-												/>
+												<Avatar src={shop.img} className='rounded-circle' />
 											</div>
 											<div className='flex-grow-1 ms-3'>
 												<div className='h2 fw-bold'>

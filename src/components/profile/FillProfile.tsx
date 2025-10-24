@@ -237,12 +237,9 @@ const FillProfile = ({
 					});
 				},
 				(err) => {
-					// setError('No se pudo obtener la ubicación. Activa los permisos de ubicación.');
 					console.error(err);
 				},
 			);
-		} else {
-			// setError('Tu navegador no soporta geolocalización.');
 		}
 	}, []);
 
@@ -316,7 +313,6 @@ const FillProfile = ({
 			if (!values.tags.length) {
 				errors.tags = 'Agrega al menos una etiqueta.';
 			}
-			// validar que uno de estos debe ser true (havePickup, haveDeliveryBee, haveReservation)
 			if (!values.havePickup && !values.haveDeliveryBee && !values.haveReservation) {
 				errors.havePickup = 'Debes seleccionar al menos un servicio ofrecido.';
 				errors.haveDeliveryBee = 'Debes seleccionar al menos un servicio ofrecido.';
@@ -371,7 +367,6 @@ const FillProfile = ({
 						});
 
 						if (data) {
-							console.log(data.data.features);
 							setAddressSearchResults(data.data.features);
 						}
 					} catch (err) {
@@ -502,12 +497,9 @@ const FillProfile = ({
 									}}
 									placeholder='+'
 									style={{
-										// border: 'none',
-										// boxShadow: 'none',
 										width: '100px',
 										height: '35px',
 										textAlign: 'center',
-										// padding: '0 6px',
 									}}
 								/>
 							</div>
@@ -541,7 +533,6 @@ const FillProfile = ({
 								onChange={formik.handleChange}
 								value={formik.values.searchInput}
 								autoComplete='off'
-								// list={['fsdf', 'fsdfsd', 'asd']}
 							/>
 						</div>
 						<div className='p-3'>
@@ -796,7 +787,7 @@ const FillProfile = ({
 								))
 							) : (
 								<tr className='table-active'>
-									<td>No result found for query "{formik.values.searchInput}"</td>
+									<td>No hay resultados para: "{formik.values.searchInput}"</td>
 								</tr>
 							)}
 						</tbody>
@@ -807,11 +798,8 @@ const FillProfile = ({
 				isOpen={showModal}
 				setIsOpen={setShowModal}
 				titleId='fillModal'
-				// isStaticBackdrop={staticBackdropStatus}
-				// isScrollable={scrollableStatus}
 				isCentered={true}
 				size='sm'
-				// fullScreen={fullScreenStatus}
 				isAnimation={true}>
 				<ModalHeader setIsOpen={() => setShowModal(!showModal)}>
 					<ModalTitle id='fillModal'>{isError ? 'Error' : 'Éxito'}</ModalTitle>
