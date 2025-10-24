@@ -14,11 +14,12 @@ import useNavigationItemHandle from '../../hooks/useNavigationItemHandle';
 import AuthContext from '../../contexts/authContext';
 import ThemeContext from '../../contexts/themeContext';
 import { ShopType } from '../../type/shop-type';
+import { useLogoutMutation } from '../../store/api/authApi';
 
 const User = () => {
 	const { width } = useWindowSize();
 	const { setAsideStatus } = useContext(ThemeContext);
-	const { userData, setUser } = useContext(AuthContext);
+	const { userData, setUser, user: shop, setToken } = useContext(AuthContext);
 
 	const navigate = useNavigate();
 	const handleItem = useNavigationItemHandle();
@@ -27,6 +28,19 @@ const User = () => {
 	const [collapseStatus, setCollapseStatus] = useState<boolean>(false);
 
 	const { t } = useTranslation(['translation', 'menu']);
+	const [logout] = useLogoutMutation();
+
+	const handleLogout = async () => {
+		const { data } = await logout({});
+		if (data && data.statusCode === 200) {
+			if (setUser) setUser({} as ShopType);
+			if (setToken) setToken('');
+			if (width < Number(import.meta.env.VITE_MOBILE_BREAKPOINT_SIZE)) {
+				setAsideStatus(false);
+			}
+			navigate(`../${demoPagesMenu.login.path}`);
+		}
+	};
 
 	return (
 		<>
@@ -35,31 +49,19 @@ const User = () => {
 				role='presentation'
 				onClick={() => setCollapseStatus(!collapseStatus)}>
 				<div className='user-avatar'>
-					<img
-						srcSet={userData?.srcSet}
-						src={userData?.src}
-						alt='Avatar'
-						width={128}
-						height={128}
-					/>
+					<img src={shop.img} alt='Avatar' width={128} height={128} />
 				</div>
 				<div className='user-info'>
 					<div className='user-name d-flex align-items-center'>
-						{`${userData?.name} ${userData?.surname}`}
-						<Icon icon='Verified' className='ms-1' color='info' />
+						{`${shop.businessName}`}
+						<Icon icon='Verified' className='ms-1' color='success' />
 					</div>
 					<div className='user-sub-title'>{userData?.position}</div>
 				</div>
 			</div>
 			<DropdownMenu>
 				<DropdownItem>
-					<Button
-						icon='AccountBox'
-						onClick={() =>
-							navigate(
-								`../${demoPagesMenu.appointment.subMenu.employeeID.path}/${userData?.id}`,
-							)
-						}>
+					<Button icon='AccountBox' onClick={() => navigate(`/profile`)}>
 						Profile
 					</Button>
 				</DropdownItem>
@@ -126,13 +128,7 @@ const User = () => {
 							role='presentation'
 							className='navigation-item cursor-pointer'
 							onClick={() => {
-								if (setUser) {
-									setUser({} as ShopType);
-								}
-								if (width < Number(import.meta.env.VITE_MOBILE_BREAKPOINT_SIZE)) {
-									setAsideStatus(false);
-								}
-								navigate(`../${demoPagesMenu.login.path}`);
+								handleLogout();
 							}}>
 							<span className='navigation-link navigation-link-pill'>
 								<span className='navigation-link-info'>

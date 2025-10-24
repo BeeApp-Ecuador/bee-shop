@@ -30,6 +30,7 @@ export const authApi = createApi({
 				body,
 			}),
 		}),
+
 		sendEmailVerification: builder.mutation({
 			query: (body) => ({
 				url: 'api/v2/messages/validate/email',
@@ -37,6 +38,7 @@ export const authApi = createApi({
 				body,
 			}),
 		}),
+
 		verifyCode: builder.mutation({
 			query: (body) => ({
 				url: 'api/v2/messages/validate/code',
@@ -44,6 +46,7 @@ export const authApi = createApi({
 				body,
 			}),
 		}),
+
 		changePassword: builder.mutation({
 			query: (body) => ({
 				url: 'api/v2/shop/change/password',
@@ -55,10 +58,22 @@ export const authApi = createApi({
 				},
 			}),
 		}),
+
 		getSession: builder.query({
 			query: () => ({
 				url: 'api/v2/shop/authenticate',
 				method: 'GET',
+				headers: {
+					'Content-Type': 'application/json',
+					Authorization: localStorage.getItem('token')!,
+				},
+			}),
+		}),
+
+		logout: builder.mutation({
+			query: () => ({
+				url: 'api/v2/shop/logout',
+				method: 'DELETE',
 				headers: {
 					'Content-Type': 'application/json',
 					Authorization: localStorage.getItem('token')!,
@@ -76,4 +91,5 @@ export const {
 	useVerifyCodeMutation,
 	useChangePasswordMutation,
 	useGetSessionQuery,
+	useLogoutMutation,
 } = authApi;

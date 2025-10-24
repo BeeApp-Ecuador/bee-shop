@@ -122,7 +122,7 @@ const ProfilePage = () => {
 												<div className='h2 fw-bold'>
 													{shop.businessName}
 												</div>
-												<div className='h5 text-muted'>Founder</div>
+												{/* <div className='h5 text-muted'>Founder</div> */}
 											</div>
 											{shop.status === 'ACTIVE' && (
 												<div className='flex-shrink-0'>

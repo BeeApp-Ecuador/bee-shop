@@ -83,7 +83,7 @@ const App = () => {
 					zIndex: fullScreenStatus ? 1 : undefined,
 					overflow: fullScreenStatus ? 'scroll' : undefined,
 				}}>
-				{shop.status !== 'PENDING' && <AsideRoutes />}
+				{shop.status !== 'PENDING' && shop.completedProfile && <AsideRoutes />}
 				<Wrapper />
 			</div>
 			<Portal id='portal-notification'>
