@@ -28,6 +28,17 @@ export const categoryApi = createApi({
 				},
 			}),
 		}),
+		createCategory: builder.mutation({
+			query: (category) => ({
+				url: 'api/v2/shop/product/category',
+				method: 'POST',
+				body: category,
+				headers: {
+					'Content-Type': 'application/json',
+					Authorization: localStorage.getItem('token')!,
+				},
+			}),
+		}),
 	}),
 });
-export const { useGetCategoriesQuery } = categoryApi;
+export const { useGetCategoriesQuery, useCreateCategoryMutation } = categoryApi;

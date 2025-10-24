@@ -60,7 +60,6 @@ const CategoriesPage = () => {
 
 	useEffect(() => {
 		if (categoriesData) {
-			console.log(categoriesData);
 			if (categoriesData.meta.status === 200) {
 				setCategories(categoriesData.data);
 				setTotalPages(categoriesData.totalPages);
@@ -91,28 +90,8 @@ const CategoriesPage = () => {
 		validateOnMount: true,
 	});
 
-	const filteredData = data.filter(
-		(f) =>
-			// Category
-			f.category === formikCategory.values.categoryName &&
-			// Price
-			(formikCategory.values.minPrice === '' ||
-				f.price > Number(formikCategory.values.minPrice)) &&
-			(formikCategory.values.maxPrice === '' ||
-				f.price < Number(formikCategory.values.maxPrice)) &&
-			//	Company
-			((formikCategory.values.companyA ? f.store === 'Company A' : false) ||
-				(formikCategory.values.companyB ? f.store === 'Company B' : false) ||
-				(formikCategory.values.companyC ? f.store === 'Company C' : false) ||
-				(formikCategory.values.companyD ? f.store === 'Company D' : false)),
-	);
-
 	const [currentPage, setCurrentPage] = useState<number>(1);
 	const [perPage, setPerPage] = useState<number>(PER_COUNT['10']);
-
-	const { items, requestSort, getClassNamesFor } = useSortableData(filteredData);
-	const onCurrentPageItems = dataPagination(items, currentPage, perPage);
-	const { selectTable, SelectAllCheck } = useSelectTable(onCurrentPageItems);
 
 	return (
 		<PageWrapper title={demoPagesMenu.listPages.subMenu.listBoxed.text}>
@@ -121,7 +100,7 @@ const CategoriesPage = () => {
 					<CardLabel icon='Category' iconColor='primary'>
 						<CardTitle tag='div' className='h5'>
 							Categorías
-							<small className='ms-2'>Item: 12</small>
+							<small className='ms-2'>Item: {categories.length}</small>
 						</CardTitle>
 					</CardLabel>
 				</SubHeaderLeft>
