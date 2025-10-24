@@ -41,9 +41,9 @@ const ProfilePage = () => {
 
 	useEffect(() => {
 		if (sessionData && isSuccess) {
-			console.log('session', sessionData);
 			if (sessionData.statusCode === 200) setUser(sessionData.data!);
 		}
+		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [sessionData]);
 
 	const formikPassword = useFormik({
@@ -103,7 +103,7 @@ const ProfilePage = () => {
 		},
 	});
 	const [ref] = useMeasure<HTMLDivElement>();
-	const [selectedImage, setSelectedImage] = useState<string | undefined>(undefined);
+	// const [selectedImage, setSelectedImage] = useState<string | undefined>(undefined);
 	const [isFillingProfile, setIsFillingProfile] = useState(false);
 
 	return (
@@ -316,14 +316,6 @@ const ProfilePage = () => {
 					</div>
 				</div>
 
-				{/* <Modal setIsOpen={setSelectedImage} isOpen={!!selectedImage} isCentered>
-					<ModalHeader setIsOpen={setSelectedImage}>
-						<ModalTitle id='preview'>Preview</ModalTitle>
-					</ModalHeader>
-					<ModalBody>
-						<img src={selectedImage} alt='eneme' />
-					</ModalBody>
-				</Modal> */}
 				<Modal
 					setIsOpen={setIsFillingProfile}
 					isOpen={isFillingProfile}

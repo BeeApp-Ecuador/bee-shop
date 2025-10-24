@@ -286,6 +286,7 @@ const FillProfile = ({
 			setTags(shopTags);
 			formikFillProfile.setFieldValue('tags', shopTags);
 		}
+		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [isEditing, shop, categories, tags]);
 
 	const formikFillProfile = useFormik<ShopFormValues>({
@@ -363,7 +364,7 @@ const FillProfile = ({
 					refSearchInput?.current?.focus();
 
 					try {
-						const { data, error } = await searchAddress({
+						const { data } = await searchAddress({
 							query: formik.values.searchInput,
 							lat: coords?.lat,
 							lon: coords?.lng,
@@ -384,10 +385,10 @@ const FillProfile = ({
 			fetchAddresses();
 		}, 400);
 
-		// 🔹 Limpieza del timeout si el usuario sigue escribiendo
 		return () => {
 			clearTimeout(delayDebounce);
 		};
+		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [formik.values.searchInput]);
 
 	return (

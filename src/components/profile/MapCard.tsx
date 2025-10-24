@@ -1,4 +1,3 @@
-/* eslint-disable import/no-extraneous-dependencies */
 import React, {
 	useEffect,
 	useRef,
@@ -40,8 +39,8 @@ const MapCard = forwardRef<MapCardRef, MapCardProps>(
 		const mapInstance = useRef<Map | null>(null);
 		const markerLayerRef = useRef<VectorLayer<any> | null>(null);
 
-		const [isNew, setIsNew] = useState(true);
-		const [zoom, setZoom] = useState(15);
+		const [, setIsNew] = useState(true);
+		const [, setZoom] = useState(15);
 
 		// 🔹 Inicialización del mapa
 		useEffect(() => {
@@ -144,6 +143,7 @@ const MapCard = forwardRef<MapCardRef, MapCardProps>(
 			map.getView().setCenter(transform([lng, lat], 'EPSG:4326', 'EPSG:3857'));
 			map.getView().setZoom(zoomLevel);
 			setMarker(lng, lat);
+			// eslint-disable-next-line react-hooks/exhaustive-deps
 		}, []);
 
 		useImperativeHandle(ref, () => ({
