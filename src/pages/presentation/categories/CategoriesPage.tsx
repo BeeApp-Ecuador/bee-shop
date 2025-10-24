@@ -201,6 +201,7 @@ const CategoriesPage = () => {
 								<tr>
 									{/* <th scope='col'>{SelectAllCheck}</th> */}
 
+									<th scope='col'>Estado</th>
 									<th scope='col'>Nombre</th>
 									<th scope='col'>Descripción</th>
 
@@ -217,6 +218,12 @@ const CategoriesPage = () => {
 											id={category._id!}
 											name={category.name}
 											description={category.description}
+											status={category.status!}
+											onDisableOrEnable={() => {}}
+											onEdit={() => {
+												setEditItem(category);
+												setEditPanel(true);
+											}}
 										/>
 									))
 								) : (
