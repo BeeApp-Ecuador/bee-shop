@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import dayjs from 'dayjs';
 import { useFormik } from 'formik';
 import { Calendar as DatePicker } from 'react-date-range';
@@ -49,12 +49,28 @@ import useDarkMode from '../../../hooks/useDarkMode';
 import useTourStep from '../../../hooks/useTourStep';
 import { enUS } from 'date-fns/locale';
 import CategoryRow from '../../../components/categories/CategoryRow';
+import { useGetCategoriesQuery } from '../../../store/api/categoryApi';
+import { series } from '../../../common/data/chartDummyData';
+import { ProductCategoryType } from '../../../type/product-category-type';
 
 const CategoriesPage = () => {
 	/**
 	 * For Tour
 	 */
 	useTourStep(6);
+	const [page, setPage] = useState(1);
+	const [limit, setLimit] = useState(10);
+	const { data: categoriesData } = useGetCategoriesQuery({ page, limit });
+
+	const [categories, setCategories] = useState<ProductCategoryType[]>([]);
+
+	useEffect(() => {
+		if (categoriesData) {
+			if (categoriesData.meta.status === 200) {
+				setCategories(categoriesData.data);
+			}
+		}
+	}, [categoriesData]);
 
 	const { themeStatus, darkModeStatus } = useDarkMode();
 
@@ -185,33 +201,11 @@ const CategoriesPage = () => {
 						<table className='table table-modern table-hover'>
 							<thead>
 								<tr>
-									<th scope='col'>{SelectAllCheck}</th>
+									{/* <th scope='col'>{SelectAllCheck}</th> */}
 
 									<th scope='col'>Nombre</th>
 									<th scope='col'>Descripción</th>
-									{/* <th
-										scope='col'
-										onClick={() => requestSort('stock')}
-										className='cursor-pointer text-decoration-underline'>
-										Stock{' '}
-										<Icon
-											size='lg'
-											className={getClassNamesFor('stock')}
-											icon='FilterList'
-										/>
-									</th> */}
-									{/* <th
-										scope='col'
-										onClick={() => requestSort('price')}
-										className='cursor-pointer text-decoration-underline'>
-										Price{' '}
-										<Icon
-											size='lg'
-											className={getClassNamesFor('price')}
-											icon='FilterList'
-										/>
-									</th> */}
-									{/* <th scope='col'>Store</th> */}
+
 									<th scope='col' className='text-end'>
 										Acciones
 									</th>
@@ -219,17 +213,6 @@ const CategoriesPage = () => {
 							</thead>
 							<tbody>
 								{onCurrentPageItems.map((i) => (
-									// <CommonTableRow
-									// 	key={i.id}
-									// 	// eslint-disable-next-line react/jsx-props-no-spreading
-									// 	{...i}
-									// 	selectName='selectedList'
-									// 	selectOnChange={selectTable.handleChange}
-									// 	selectChecked={selectTable.values.selectedList.includes(
-									// 		// @ts-ignore
-									// 		i.id.toString(),
-									// 	)}
-									// />
 									<CategoryRow
 										key={i.id}
 										id={i.id}
