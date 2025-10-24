@@ -23,21 +23,28 @@ const AddressInfo = ({ shop }: { shop: ShopType }) => {
 	};
 	const mapRef = useRef<MapCardRef>(null);
 	useEffect(() => {
-		if ('geolocation' in navigator) {
-			navigator.geolocation.getCurrentPosition(
-				(position) => {
-					setCoords({
-						lat: position.coords.latitude,
-						lng: position.coords.longitude,
-					});
-				},
-				(err) => {
-					// setError('No se pudo obtener la ubicación. Activa los permisos de ubicación.');
-					console.error(err);
-				},
-			);
+		if (shop.completedProfile) {
+			setCoords({
+				lat: parseFloat(shop.lat),
+				lng: parseFloat(shop.lng),
+			});
 		} else {
-			// setError('Tu navegador no soporta geolocalización.');
+			if ('geolocation' in navigator) {
+				navigator.geolocation.getCurrentPosition(
+					(position) => {
+						setCoords({
+							lat: position.coords.latitude,
+							lng: position.coords.longitude,
+						});
+					},
+					(err) => {
+						// setError('No se pudo obtener la ubicación. Activa los permisos de ubicación.');
+						console.error(err);
+					},
+				);
+			} else {
+				// setError('Tu navegador no soporta geolocalización.');
+			}
 		}
 	}, []);
 	return (
@@ -65,19 +72,13 @@ const AddressInfo = ({ shop }: { shop: ShopType }) => {
 					<FormGroup className='col-12' id='formAddressLine' label='Dirección'>
 						<Input disabled value={shop.address} />
 					</FormGroup>
-					<FormGroup className='col-12' id='formAddressLine' label='Buscar en el mapa'>
-						<Input
-							id='formAddressLine'
-							value={searchAddress}
-							onChange={(e: any) => setSearchAddress(e.target.value)}
-						/>
-					</FormGroup>
 					<MapCard
 						lat={coords?.lat ?? '-2.90055'}
 						lng={coords?.lng ?? '-79.00454'}
 						heightE='300px'
 						onCoordsChange={handleCoordsChange}
 						ref={mapRef}
+						interactive={false}
 					/>
 				</div>
 			</CardBody>

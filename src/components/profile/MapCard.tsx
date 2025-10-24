@@ -26,6 +26,7 @@ interface MapCardProps {
 	lng?: number | string | null;
 	heightE?: string;
 	onCoordsChange?: (coords: { lat: number; lng: number }) => void;
+	interactive?: boolean;
 }
 
 export interface MapCardRef {
@@ -34,7 +35,7 @@ export interface MapCardRef {
 }
 
 const MapCard = forwardRef<MapCardRef, MapCardProps>(
-	({ lat, lng, heightE, onCoordsChange }, ref) => {
+	({ lat, lng, heightE, onCoordsChange, interactive = true }, ref) => {
 		const mapRef = useRef<HTMLDivElement>(null);
 		const mapInstance = useRef<Map | null>(null);
 		const markerLayerRef = useRef<VectorLayer<any> | null>(null);
@@ -82,7 +83,9 @@ const MapCard = forwardRef<MapCardRef, MapCardProps>(
 
 				mapInstance.current = map;
 				setMarker(defaultLng, defaultLat);
-				map.on('click', handleMapClick);
+				if (interactive) {
+					map.on('click', handleMapClick);
+				}
 			}
 
 			return () => {

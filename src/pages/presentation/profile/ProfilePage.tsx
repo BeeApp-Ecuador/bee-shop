@@ -119,23 +119,25 @@ const ProfilePage = () => {
 												</div>
 												<div className='h5 text-muted'>Founder</div>
 											</div>
-											<div className='flex-shrink-0'>
-												<Button
-													color='primary'
-													onClick={() => setIsFillingProfile(true)}>
-													<Icon
-														icon={
-															shop.completedProfile
-																? 'Edit'
-																: 'IncompleteCircle'
-														}
-														className='me-2'
-													/>
-													{shop.completedProfile
-														? 'Editar Perfil'
-														: 'Completar Perfil'}
-												</Button>
-											</div>
+											{shop.status === 'ACTIVE' && (
+												<div className='flex-shrink-0'>
+													<Button
+														color='primary'
+														onClick={() => setIsFillingProfile(true)}>
+														<Icon
+															icon={
+																shop.completedProfile
+																	? 'Edit'
+																	: 'IncompleteCircle'
+															}
+															className='me-2'
+														/>
+														{shop.completedProfile
+															? 'Editar Perfil'
+															: 'Completar Perfil'}
+													</Button>
+												</div>
+											)}
 										</div>
 									</div>
 									<div className='col-12'>
