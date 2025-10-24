@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import dayjs from 'dayjs';
 import { useFormik } from 'formik';
 import { Calendar as DatePicker } from 'react-date-range';
@@ -22,19 +22,12 @@ import Input from '../../../components/bootstrap/forms/Input';
 import FormGroup from '../../../components/bootstrap/forms/FormGroup';
 import Popovers from '../../../components/bootstrap/Popovers';
 
-import data from '../../../common/data/dummyProductData';
 import { demoPagesMenu } from '../../../menu';
-import PaginationButtons, {
-	dataPagination,
-	PER_COUNT,
-} from '../../../components/PaginationButtons';
-import useSortableData from '../../../hooks/useSortableData';
-import useSelectTable from '../../../hooks/useSelectTable';
+import PaginationButtons, { PER_COUNT } from '../../../components/PaginationButtons';
 import useDarkMode from '../../../hooks/useDarkMode';
-import useTourStep from '../../../hooks/useTourStep';
 import { enUS } from 'date-fns/locale';
 import CategoryRow from '../../../components/categories/CategoryRow';
-import { useGetCategoriesQuery } from '../../../store/api/categoryApi';
+import { useCreateCategoryMutation, useGetCategoriesQuery } from '../../../store/api/categoryApi';
 import { ProductCategoryType } from '../../../type/product-category-type';
 import OffCanvas, {
 	OffCanvasBody,
@@ -42,25 +35,46 @@ import OffCanvas, {
 	OffCanvasTitle,
 } from '../../../components/bootstrap/OffCanvas';
 import { Badge } from '../../../components/icon/material-icons';
+import AuthContext from '../../../contexts/authContext';
+import Spinner from '../../../components/bootstrap/Spinner';
 
 const CategoriesPage = () => {
-	/**
-	 * For Tour
-	 */
-	useTourStep(6);
+	const { user: shop } = useContext(AuthContext);
+
 	const [page, setPage] = useState(1);
-	const [totalPages, setTotalPages] = useState(1);
 	const [limit, setLimit] = useState(10);
-	const { data: categoriesData } = useGetCategoriesQuery({ page, limit });
+	const [totalPages, setTotalPages] = useState(1);
+
+	const { data: categoriesData, refetch } = useGetCategoriesQuery({ page, limit });
+	const [saveCategory] = useCreateCategoryMutation();
 
 	const [editPanel, setEditPanel] = useState<boolean>(false);
 	const [editItem, setEditItem] = useState<ProductCategoryType | null>(null);
 
 	const [categories, setCategories] = useState<ProductCategoryType[]>([]);
 
+	const [isLoading, setIsLoading] = useState<boolean>(false);
+
+	const { themeStatus, darkModeStatus } = useDarkMode();
+
+	const [date, setDate] = useState<Date>(new Date());
+
+	const [filterMenu, setFilterMenu] = useState<boolean>(false);
+	const [currentPage, setCurrentPage] = useState<number>(1);
+	const [perPage, setPerPage] = useState<number>(PER_COUNT['10']);
+
+	const handleSaveCategory = async (category: any) => {
+		setIsLoading(true);
+		const { data } = await saveCategory(category);
+		setIsLoading(false);
+		if (data && data.meta.status === 201) {
+			setEditPanel(false);
+			refetch();
+		}
+	};
+
 	useEffect(() => {
 		if (categoriesData) {
-			console.log(categoriesData);
 			if (categoriesData.meta.status === 200) {
 				setCategories(categoriesData.data);
 				setTotalPages(categoriesData.totalPages);
@@ -68,43 +82,23 @@ const CategoriesPage = () => {
 		}
 	}, [categoriesData]);
 
-	const { themeStatus, darkModeStatus } = useDarkMode();
-
-	const [date, setDate] = useState<Date>(new Date());
-
-	const [filterMenu, setFilterMenu] = useState<boolean>(false);
-	const formik = useFormik<ProductCategoryType>({
+	const formikCategory = useFormik<ProductCategoryType>({
 		initialValues: {
 			name: '',
 			description: '',
 		},
+		validate: (values) => {
+			const errors: Partial<ProductCategoryType> = {};
+			if (!values.name) errors.name = 'Required';
+			return errors;
+		},
 		// eslint-disable-next-line @typescript-eslint/no-unused-vars
 		onSubmit: (values) => {
-			setFilterMenu(false);
-			// alert(JSON.stringify(values, null, 2));
+			const body = { ...values, shop: shop._id };
+			handleSaveCategory(body);
 		},
+		validateOnMount: true,
 	});
-
-	const filteredData = data.filter(
-		(f) =>
-			// Category
-			f.category === formik.values.categoryName &&
-			// Price
-			(formik.values.minPrice === '' || f.price > Number(formik.values.minPrice)) &&
-			(formik.values.maxPrice === '' || f.price < Number(formik.values.maxPrice)) &&
-			//	Company
-			((formik.values.companyA ? f.store === 'Company A' : false) ||
-				(formik.values.companyB ? f.store === 'Company B' : false) ||
-				(formik.values.companyC ? f.store === 'Company C' : false) ||
-				(formik.values.companyD ? f.store === 'Company D' : false)),
-	);
-
-	const [currentPage, setCurrentPage] = useState<number>(1);
-	const [perPage, setPerPage] = useState<number>(PER_COUNT['10']);
-
-	const { items, requestSort, getClassNamesFor } = useSortableData(filteredData);
-	const onCurrentPageItems = dataPagination(items, currentPage, perPage);
-	const { selectTable, SelectAllCheck } = useSelectTable(onCurrentPageItems);
 
 	return (
 		<PageWrapper title={demoPagesMenu.listPages.subMenu.listBoxed.text}>
@@ -113,13 +107,7 @@ const CategoriesPage = () => {
 					<CardLabel icon='Category' iconColor='primary'>
 						<CardTitle tag='div' className='h5'>
 							Categorías
-							<small className='ms-2'>
-								Item:{' '}
-								{selectTable.values.selectedList.length
-									? `${selectTable.values.selectedList.length} / `
-									: null}
-								{filteredData.length}
-							</small>
+							<small className='ms-2'>Item: {categories.length}</small>
 						</CardTitle>
 					</CardLabel>
 				</SubHeaderLeft>
@@ -225,8 +213,8 @@ const CategoriesPage = () => {
 								{categories.length > 0 ? (
 									categories.map((category) => (
 										<CategoryRow
-											key={category._id}
-											id={category._id}
+											key={category._id!}
+											id={category._id!}
 											name={category.name}
 											description={category.description}
 										/>
@@ -255,7 +243,7 @@ const CategoriesPage = () => {
 				isRightPanel
 				tag='form'
 				noValidate
-				onSubmit={formik.handleSubmit}>
+				onSubmit={formikCategory.handleSubmit}>
 				<OffCanvasHeader setOpen={setEditPanel}>
 					<OffCanvasTitle id='edit-panel'>
 						{editItem?.name || 'Nueva Categoría'}{' '}
@@ -279,13 +267,12 @@ const CategoriesPage = () => {
 									<FormGroup id='name' label='Name' isFloating>
 										<Input
 											placeholder='Name'
-											onChange={formik.handleChange}
-											onBlur={formik.handleBlur}
-											value={formik.values.name}
-											isValid={formik.isValid}
-											isTouched={formik.touched.name}
-											invalidFeedback={formik.errors.name}
-											validFeedback='Looks good!'
+											onChange={formikCategory.handleChange}
+											onBlur={formikCategory.handleBlur}
+											value={formikCategory.values.name}
+											isValid={formikCategory.isValid}
+											isTouched={formikCategory.touched.name}
+											invalidFeedback={formikCategory.errors.name}
 										/>
 									</FormGroup>
 								</div>
@@ -293,13 +280,12 @@ const CategoriesPage = () => {
 									<FormGroup id='description' label='Description' isFloating>
 										<Input
 											placeholder='Description'
-											onChange={formik.handleChange}
-											onBlur={formik.handleBlur}
-											value={formik.values.description}
-											isValid={formik.isValid}
-											isTouched={formik.touched.description}
-											invalidFeedback={formik.errors.description}
-											validFeedback='Looks good!'
+											onChange={formikCategory.handleChange}
+											onBlur={formikCategory.handleBlur}
+											value={formikCategory.values.description}
+											isValid={formikCategory.isValid}
+											isTouched={formikCategory.touched.description}
+											invalidFeedback={formikCategory.errors.description}
 										/>
 									</FormGroup>
 								</div>
@@ -309,11 +295,14 @@ const CategoriesPage = () => {
 				</OffCanvasBody>
 				<div className='p-3'>
 					<Button
-						color='info'
+						className='w-100'
+						size='lg'
+						color='primary'
 						icon='Save'
 						type='submit'
-						isDisable={!formik.isValid && !!formik.submitCount}>
-						Save
+						isDisable={!formikCategory.isValid}>
+						{isLoading && <Spinner isSmall inButton isGrow />}
+						Guardar
 					</Button>
 				</div>
 			</OffCanvas>
