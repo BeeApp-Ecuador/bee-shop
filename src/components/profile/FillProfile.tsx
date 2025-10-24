@@ -53,7 +53,6 @@ const FillProfile = ({
 	const mapRef = useRef<MapCardRef>(null);
 	const [coords, setCoords] = useState<{ lat: number; lng: number } | null>(null);
 
-	// const [maxPeoplePerReservation, setMaxPeoplePerReservation] = useState('');
 	const [enableMonday, setEnableMonday] = useState(true);
 	const [enableTuesday, setEnableTuesday] = useState(false);
 	const [enableWednesday, setEnableWednesday] = useState(false);
@@ -81,7 +80,6 @@ const FillProfile = ({
 		sunday: [{ startHour: '', startMin: '', endHour: '', endMin: '' }],
 	});
 
-	console.log('SHOP:', JSON.stringify(shop.openShopSchedule, null, 2));
 	useEffect(() => {
 		if (isEditing && shop?.openShopSchedule?.length > 0) {
 			const newWeeklyHours: { [day: string]: HourRange[] } = {
@@ -201,7 +199,7 @@ const FillProfile = ({
 				);
 				return;
 			}
-
+			console.log(formikFillProfile.values);
 			const body = {
 				...formikFillProfile.values,
 				openShopSchedule: schedulesArray,
@@ -214,7 +212,6 @@ const FillProfile = ({
 				setShowModal(true);
 			}
 			if (data) {
-				console.log(data);
 				setUser(data.shop!);
 				setIsError(false);
 				setShowModal(true);
@@ -548,8 +545,8 @@ const FillProfile = ({
 						</div>
 						<div className='p-3'>
 							<MapCard
-								lat={coords?.lat ?? '-2.90055'}
-								lng={coords?.lng ?? '-79.00454'}
+								lat={isEditing ? shop.lat : (coords?.lat ?? '-2.90055')}
+								lng={isEditing ? shop.lng : (coords?.lng ?? '-79.00454')}
 								heightE='300px'
 								onCoordsChange={handleCoordsChange}
 								ref={mapRef}

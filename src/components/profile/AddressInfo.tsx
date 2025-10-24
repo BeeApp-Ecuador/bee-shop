@@ -73,8 +73,8 @@ const AddressInfo = ({ shop }: { shop: ShopType }) => {
 						<Input disabled value={shop.address} />
 					</FormGroup>
 					<MapCard
-						lat={coords?.lat ?? '-2.90055'}
-						lng={coords?.lng ?? '-79.00454'}
+						lat={shop.completedProfile ? shop.lat : (coords?.lat ?? '-2.90055')}
+						lng={shop.completedProfile ? shop.lng : (coords?.lng ?? '-79.00454')}
 						heightE='300px'
 						onCoordsChange={handleCoordsChange}
 						ref={mapRef}
