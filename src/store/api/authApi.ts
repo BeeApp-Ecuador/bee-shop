@@ -55,6 +55,16 @@ export const authApi = createApi({
 				},
 			}),
 		}),
+		getSession: builder.query({
+			query: () => ({
+				url: 'api/v2/shop/authenticate',
+				method: 'GET',
+				headers: {
+					'Content-Type': 'application/json',
+					Authorization: localStorage.getItem('token')!,
+				},
+			}),
+		}),
 	}),
 });
 
@@ -65,4 +75,5 @@ export const {
 	useSendEmailVerificationMutation,
 	useVerifyCodeMutation,
 	useChangePasswordMutation,
+	useGetSessionQuery,
 } = authApi;

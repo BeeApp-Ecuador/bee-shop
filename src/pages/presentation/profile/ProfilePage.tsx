@@ -1,4 +1,4 @@
-import React, { useContext, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import { useFormik } from 'formik';
 
 import { useMeasure } from 'react-use';
@@ -25,7 +25,7 @@ import Progress from '../../../components/bootstrap/Progress';
 import Modal, { ModalBody, ModalHeader, ModalTitle } from '../../../components/bootstrap/Modal';
 import { demoPagesMenu } from '../../../menu';
 import AuthContext from '../../../contexts/authContext';
-import { useChangePasswordMutation } from '../../../store/api/authApi';
+import { useChangePasswordMutation, useGetSessionQuery } from '../../../store/api/authApi';
 import Spinner from '../../../components/bootstrap/Spinner';
 import LegalAgentInfo from '../../../components/profile/LegalAgentInfo';
 import AddressInfo from '../../../components/profile/AddressInfo';
@@ -33,8 +33,18 @@ import FillProfile from '../../../components/profile/FillProfile';
 
 const ProfilePage = () => {
 	const { user: shop } = useContext(AuthContext);
+	const { setUser } = useContext(AuthContext);
+
 	const [changePassword] = useChangePasswordMutation();
 	const [isUpdatingPassword, setIsUpdatingPassword] = useState(false);
+	const { data: sessionData, isSuccess } = useGetSessionQuery({});
+
+	useEffect(() => {
+		if (sessionData && isSuccess) {
+			console.log('session', sessionData);
+			if (sessionData.statusCode === 200) setUser(sessionData.data!);
+		}
+	}, [sessionData]);
 
 	const formikPassword = useFormik({
 		initialValues: {
