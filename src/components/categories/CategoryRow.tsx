@@ -10,22 +10,15 @@ interface ICategoryRowProps {
 	id: string | number;
 	name: string;
 	description: string;
-	selectOnChange: any;
-	selectChecked: any;
-	selectName: string;
+	// selectOnChange: any;
+	// selectChecked: any;
+	// selectName: string;
 }
-const CategoryRow: FC<ICategoryRowProps> = ({
-	id,
-	name,
-	description,
-	selectOnChange,
-	selectChecked,
-	selectName,
-}) => {
+const CategoryRow: FC<ICategoryRowProps> = ({ id, name, description }) => {
 	const { darkModeStatus } = useDarkMode();
 	return (
 		<tr>
-			<th scope='row' aria-label='Check'>
+			{/* <th scope='row' aria-label='Check'>
 				<Checks
 					id={id.toString()}
 					name={selectName}
@@ -34,7 +27,7 @@ const CategoryRow: FC<ICategoryRowProps> = ({
 					checked={selectChecked}
 					ariaLabel={selectName}
 				/>
-			</th>
+			</th> */}
 			<td className='fw-bold'>{name}</td>
 			<td>{description}</td>
 			<td className='text-end'>
