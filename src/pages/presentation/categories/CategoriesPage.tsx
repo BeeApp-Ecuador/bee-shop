@@ -23,11 +23,15 @@ import FormGroup from '../../../components/bootstrap/forms/FormGroup';
 import Popovers from '../../../components/bootstrap/Popovers';
 
 import { demoPagesMenu } from '../../../menu';
-import PaginationButtons, { PER_COUNT } from '../../../components/PaginationButtons';
+import PaginationButtons from '../../../components/PaginationButtons';
 import useDarkMode from '../../../hooks/useDarkMode';
 import { enUS } from 'date-fns/locale';
 import CategoryRow from '../../../components/categories/CategoryRow';
-import { useCreateCategoryMutation, useGetCategoriesQuery } from '../../../store/api/categoryApi';
+import {
+	useChangeStatusCategoryMutation,
+	useCreateCategoryMutation,
+	useGetCategoriesQuery,
+} from '../../../store/api/categoryApi';
 import { ProductCategoryType } from '../../../type/product-category-type';
 import OffCanvas, {
 	OffCanvasBody,
@@ -43,10 +47,11 @@ const CategoriesPage = () => {
 
 	const [page, setPage] = useState(1);
 	const [limit, setLimit] = useState(10);
-	const [totalPages, setTotalPages] = useState(1);
+	const [total, setTotal] = useState(0);
 
 	const { data: categoriesData, refetch } = useGetCategoriesQuery({ page, limit });
 	const [saveCategory] = useCreateCategoryMutation();
+	const [changeStatusCategory] = useChangeStatusCategoryMutation();
 
 	const [editPanel, setEditPanel] = useState<boolean>(false);
 	const [editItem, setEditItem] = useState<ProductCategoryType | null>(null);
@@ -59,10 +64,6 @@ const CategoriesPage = () => {
 
 	const [date, setDate] = useState<Date>(new Date());
 
-	const [filterMenu, setFilterMenu] = useState<boolean>(false);
-	const [currentPage, setCurrentPage] = useState<number>(1);
-	const [perPage, setPerPage] = useState<number>(PER_COUNT['10']);
-
 	const handleSaveCategory = async (category: any) => {
 		setIsLoading(true);
 		const { data } = await saveCategory(category);
@@ -73,11 +74,20 @@ const CategoriesPage = () => {
 		}
 	};
 
+	const handleChangeStatusCategory = async (categoryId: string) => {
+		setIsLoading(true);
+		const { data } = await changeStatusCategory(categoryId);
+		setIsLoading(false);
+		if (data && data.meta.status === 200) {
+			refetch();
+		}
+	};
+
 	useEffect(() => {
 		if (categoriesData) {
 			if (categoriesData.meta.status === 200) {
 				setCategories(categoriesData.data);
-				setTotalPages(categoriesData.totalPages);
+				setTotal(categoriesData.total);
 			}
 		}
 	}, [categoriesData]);
@@ -201,6 +211,7 @@ const CategoriesPage = () => {
 								<tr>
 									{/* <th scope='col'>{SelectAllCheck}</th> */}
 
+									<th scope='col'>Estado</th>
 									<th scope='col'>Nombre</th>
 									<th scope='col'>Descripción</th>
 
@@ -217,6 +228,14 @@ const CategoriesPage = () => {
 											id={category._id!}
 											name={category.name}
 											description={category.description}
+											status={category.status!}
+											onDisableOrEnable={() => {
+												handleChangeStatusCategory(category._id!);
+											}}
+											onEdit={() => {
+												setEditItem(category);
+												setEditPanel(true);
+											}}
 										/>
 									))
 								) : (
@@ -229,11 +248,12 @@ const CategoriesPage = () => {
 					</CardBody>
 					<PaginationButtons
 						data={categories}
-						label='items'
-						setCurrentPage={setCurrentPage}
+						label='categorías'
+						setCurrentPage={setPage}
 						currentPage={page}
 						perPage={limit}
-						setPerPage={setPerPage}
+						setPerPage={setLimit}
+						totalItems={total}
 					/>
 				</Card>
 			</Page>
