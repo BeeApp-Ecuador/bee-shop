@@ -23,7 +23,7 @@ import FormGroup from '../../../components/bootstrap/forms/FormGroup';
 import Popovers from '../../../components/bootstrap/Popovers';
 
 import { demoPagesMenu } from '../../../menu';
-import PaginationButtons, { PER_COUNT } from '../../../components/PaginationButtons';
+import PaginationButtons from '../../../components/PaginationButtons';
 import useDarkMode from '../../../hooks/useDarkMode';
 import { enUS } from 'date-fns/locale';
 import CategoryRow from '../../../components/categories/CategoryRow';
@@ -47,7 +47,6 @@ const CategoriesPage = () => {
 
 	const [page, setPage] = useState(1);
 	const [limit, setLimit] = useState(10);
-	const [totalPages, setTotalPages] = useState(1);
 	const [total, setTotal] = useState(0);
 
 	const { data: categoriesData, refetch } = useGetCategoriesQuery({ page, limit });
@@ -65,10 +64,6 @@ const CategoriesPage = () => {
 
 	const [date, setDate] = useState<Date>(new Date());
 
-	const [filterMenu, setFilterMenu] = useState<boolean>(false);
-	const [currentPage, setCurrentPage] = useState<number>(1);
-	const [perPage, setPerPage] = useState<number>(PER_COUNT['10']);
-
 	const handleSaveCategory = async (category: any) => {
 		setIsLoading(true);
 		const { data } = await saveCategory(category);
@@ -80,7 +75,6 @@ const CategoriesPage = () => {
 	};
 
 	const handleChangeStatusCategory = async (categoryId: string) => {
-		console.log(categoryId);
 		setIsLoading(true);
 		const { data } = await changeStatusCategory(categoryId);
 		setIsLoading(false);
@@ -93,7 +87,6 @@ const CategoriesPage = () => {
 		if (categoriesData) {
 			if (categoriesData.meta.status === 200) {
 				setCategories(categoriesData.data);
-				setTotalPages(categoriesData.totalPages);
 				setTotal(categoriesData.total);
 			}
 		}
