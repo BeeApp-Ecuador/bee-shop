@@ -48,8 +48,13 @@ const CategoriesPage = () => {
 	const [page, setPage] = useState(1);
 	const [limit, setLimit] = useState(10);
 	const [total, setTotal] = useState(0);
+	const [statusCategory, setStatusCategory] = useState<boolean>(true);
 
-	const { data: categoriesData, refetch } = useGetCategoriesQuery({ page, limit });
+	const { data: categoriesData, refetch } = useGetCategoriesQuery({
+		page,
+		limit,
+		status: statusCategory,
+	});
 	const [saveCategory] = useCreateCategoryMutation();
 	const [changeStatusCategory] = useChangeStatusCategoryMutation();
 
@@ -141,65 +146,26 @@ const CategoriesPage = () => {
 							<></>
 						</CardLabel>
 						<CardActions>
-							<Dropdown isButtonGroup>
-								<Popovers
-									desc={
-										<DatePicker
-											locale={enUS}
-											onChange={(item) => setDate(item)}
-											date={date}
-											color={import.meta.env.VITE_PRIMARY_COLOR}
-										/>
-									}
-									placement='bottom-end'
-									className='mw-100'
-									trigger='click'>
-									<Button color='success' isLight icon='WaterfallChart'>
-										{dayjs(date).format('MMM D')}
-									</Button>
-								</Popovers>
-								<DropdownToggle>
-									<Button color='success' isLight aria-label='More' />
-								</DropdownToggle>
-								<DropdownMenu isAlignmentEnd>
-									<DropdownItem>
-										<span>Last Hour</span>
-									</DropdownItem>
-									<DropdownItem>
-										<span>Last Day</span>
-									</DropdownItem>
-									<DropdownItem>
-										<span>Last Week</span>
-									</DropdownItem>
-									<DropdownItem>
-										<span>Last Month</span>
-									</DropdownItem>
-								</DropdownMenu>
-							</Dropdown>
-							<Button
-								color='info'
-								icon='CloudDownload'
-								isLight
-								tag='a'
-								to='/somefile.txt'
-								target='_blank'
-								download>
-								Export
-							</Button>
 							<Dropdown className='d-inline'>
-								<DropdownToggle hasIcon={false}>
-									<Button
-										color={themeStatus}
-										icon='MoreHoriz'
-										aria-label='Actions'
-									/>
+								<DropdownToggle hasIcon={true}>
+									<Button color={themeStatus} aria-label='Actions'>
+										{statusCategory ? 'Activas' : 'Inactivas'}
+									</Button>
 								</DropdownToggle>
 								<DropdownMenu isAlignmentEnd>
 									<DropdownItem>
-										<Button icon='Edit'>Edit</Button>
+										<Button
+											icon='CheckCircle'
+											onClick={() => setStatusCategory(true)}>
+											Activas
+										</Button>
 									</DropdownItem>
 									<DropdownItem>
-										<Button icon='Delete'>Delete</Button>
+										<Button
+											icon='Block'
+											onClick={() => setStatusCategory(false)}>
+											Inactivas
+										</Button>
 									</DropdownItem>
 								</DropdownMenu>
 							</Dropdown>
