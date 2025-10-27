@@ -48,6 +48,7 @@ const CategoriesPage = () => {
 	const [page, setPage] = useState(1);
 	const [limit, setLimit] = useState(10);
 	const [totalPages, setTotalPages] = useState(1);
+	const [total, setTotal] = useState(0);
 
 	const { data: categoriesData, refetch } = useGetCategoriesQuery({ page, limit });
 	const [saveCategory] = useCreateCategoryMutation();
@@ -93,6 +94,7 @@ const CategoriesPage = () => {
 			if (categoriesData.meta.status === 200) {
 				setCategories(categoriesData.data);
 				setTotalPages(categoriesData.totalPages);
+				setTotal(categoriesData.total);
 			}
 		}
 	}, [categoriesData]);
@@ -253,11 +255,12 @@ const CategoriesPage = () => {
 					</CardBody>
 					<PaginationButtons
 						data={categories}
-						label='items'
-						setCurrentPage={setCurrentPage}
+						label='categorías'
+						setCurrentPage={setPage}
 						currentPage={page}
 						perPage={limit}
-						setPerPage={setPerPage}
+						setPerPage={setLimit}
+						totalItems={total}
 					/>
 				</Card>
 			</Page>

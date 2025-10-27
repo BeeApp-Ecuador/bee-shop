@@ -23,6 +23,8 @@ interface IPaginationButtonsProps {
 	perPage: number;
 	setPerPage(...args: unknown[]): unknown;
 	data: unknown[];
+	totalItems?: number;
+
 	label?: string;
 }
 const PaginationButtons: FC<IPaginationButtonsProps> = ({
@@ -31,10 +33,11 @@ const PaginationButtons: FC<IPaginationButtonsProps> = ({
 	perPage,
 	setPerPage,
 	data,
+	totalItems,
 	label = 'items',
 }) => {
-	const totalItems = data.length;
-	const totalPage = Math.ceil(totalItems / perPage);
+	const total = totalItems ?? data.length;
+	const totalPage = Math.ceil(total / perPage);
 
 	const pagination = () => {
 		let items = [];
@@ -73,13 +76,13 @@ const PaginationButtons: FC<IPaginationButtonsProps> = ({
 	};
 
 	const getInfo = () => {
-		const start = perPage * (currentPage - 1) + 1;
+		const start = total === 0 ? 0 : perPage * (currentPage - 1) + 1;
 
 		const end = perPage * currentPage;
 
 		return (
 			<span className='pagination__desc'>
-				Showing {start} to {end > totalItems ? totalItems : end} of {totalItems} {label}
+				Showing {start} to {end > total ? total : end} of {total} {label}
 			</span>
 		);
 	};
