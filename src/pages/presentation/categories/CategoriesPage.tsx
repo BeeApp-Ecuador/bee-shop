@@ -35,11 +35,11 @@ import OffCanvas, {
 	OffCanvasHeader,
 	OffCanvasTitle,
 } from '../../../components/bootstrap/OffCanvas';
-import { Badge } from '../../../components/icon/material-icons';
 import AuthContext from '../../../contexts/authContext';
 import Spinner from '../../../components/bootstrap/Spinner';
 import showNotification from '../../../components/extras/showNotification';
 import Icon from '../../../components/icon/Icon';
+import Badge from '../../../components/bootstrap/Badge';
 
 const CategoriesPage = () => {
 	const { user: shop } = useContext(AuthContext);
@@ -47,7 +47,7 @@ const CategoriesPage = () => {
 	const [page, setPage] = useState(1);
 	const [limit, setLimit] = useState(10);
 	const [total, setTotal] = useState(0);
-	const [statusCategory, setStatusCategory] = useState<boolean>(true);
+	const [statusCategory, setStatusCategory] = useState<boolean | null>(true);
 	const [searchTerm, setSearchTerm] = useState<string>('');
 
 	const { data: categoriesData, refetch } = useGetCategoriesQuery({
@@ -214,7 +214,11 @@ const CategoriesPage = () => {
 							<Dropdown className='d-inline'>
 								<DropdownToggle hasIcon={true}>
 									<Button color={themeStatus} aria-label='Actions'>
-										{statusCategory ? 'Activas' : 'Inactivas'}
+										{statusCategory === null
+											? 'Todos'
+											: statusCategory
+												? 'Activas'
+												: 'Inactivas'}
 									</Button>
 								</DropdownToggle>
 								<DropdownMenu isAlignmentEnd>
@@ -230,6 +234,13 @@ const CategoriesPage = () => {
 											icon='Block'
 											onClick={() => setStatusCategory(false)}>
 											Inactivas
+										</Button>
+									</DropdownItem>
+									<DropdownItem>
+										<Button
+											icon='Category'
+											onClick={() => setStatusCategory(null)}>
+											Todos
 										</Button>
 									</DropdownItem>
 								</DropdownMenu>
@@ -296,16 +307,20 @@ const CategoriesPage = () => {
 					<OffCanvasTitle id='edit-panel'>
 						{editItem?.name || 'Nueva Categoría'}{' '}
 						{editItem?.name ? (
-							<Badge color='primary'>Editar</Badge>
+							<Badge color='info' isLight>
+								Editar
+							</Badge>
 						) : (
-							<Badge color='success'>Nueva</Badge>
+							<Badge color='success' isLight>
+								Nueva
+							</Badge>
 						)}
 					</OffCanvasTitle>
 				</OffCanvasHeader>
 				<OffCanvasBody>
 					<Card>
 						<CardHeader>
-							<CardLabel icon='Description' iconColor='success'>
+							<CardLabel icon='Category' iconColor='success'>
 								<CardTitle>Categoría</CardTitle>
 							</CardLabel>
 						</CardHeader>
