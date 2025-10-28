@@ -43,6 +43,12 @@ export const dashboardPagesMenu = {
 		path: 'categories',
 		icon: 'Category',
 	},
+	products: {
+		id: 'ProductsPage',
+		text: 'Productos',
+		path: 'products',
+		icon: 'ShoppingBag',
+	},
 	dashboard: {
 		id: 'dashboard',
 		text: 'Dashboard',
