@@ -500,10 +500,12 @@ const CreateProduct = ({
 									<label
 										className='form-check-label fw-bold'
 										htmlFor='haveOptions'>
-										Tiene opciones adicionales
+										Tiene opciones
 									</label>
 									<small className='text-muted d-block'>
-										Indica si el producto tiene opciones adicionales
+										Indica si el producto tiene opciones. Por ejemplo el
+										producto Combo de 6 Alitas puede tener varios sabores como
+										BBQ, Picante, Miel Mostaza, etc.
 									</small>
 								</div>
 							</div>
