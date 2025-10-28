@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import classNames from 'classnames';
 import { useFormik } from 'formik';
 import SubHeader, { SubHeaderLeft, SubHeaderRight } from '../../../layout/SubHeader/SubHeader';
@@ -16,8 +16,32 @@ import Input from '../../../components/bootstrap/forms/Input';
 import Checks, { ChecksGroup } from '../../../components/bootstrap/forms/Checks';
 import SERVICES from '../../../common/data/serviceDummyData';
 import { demoPagesMenu } from '../../../menu';
+import { useGetProductsQuery } from '../../../store/api/productsApi';
 
 const ProductsPage = () => {
+	const [page, setPage] = useState(1);
+	const [limit, setLimit] = useState(10);
+	const [total, setTotal] = useState(0);
+	const [statusProduct, setStatusProduct] = useState<boolean | null>(true);
+	const [searchTerm, setSearchTerm] = useState('');
+	const [products, setProducts] = useState<any[]>([]);
+	const { data: productsData, refetch } = useGetProductsQuery({
+		page,
+		limit,
+		status: statusProduct,
+		name: searchTerm,
+	});
+
+	useEffect(() => {
+		if (productsData) {
+			console.log('productsData');
+			console.log(productsData);
+			if (productsData.meta.status === 200) {
+				setProducts(productsData.data);
+				setTotal(productsData.total);
+			}
+		}
+	}, [productsData]);
 	const [filterMenu, setFilterMenu] = useState(false);
 
 	const formik = useFormik({
@@ -155,102 +179,106 @@ const ProductsPage = () => {
 				</SubHeaderRight>
 			</SubHeader>
 			<Page container='fluid'>
-				<div className='row row-cols-xxl-3 row-cols-lg-3 row-cols-md-2'>
-					{searchUsers.map((user) => (
-						<div key={user.username} className='col'>
-							<Card>
-								<CardBody>
-									<div className='row g-3'>
-										<div className='col d-flex'>
-											<div className='flex-shrink-0'>
-												<div className='position-relative'>
-													<div
-														className='ratio ratio-1x1'
-														style={{ width: 100 }}>
+				{products.length > 0 ? (
+					<div className='row row-cols-xxl-3 row-cols-lg-3 row-cols-md-2'>
+						{searchUsers.map((user) => (
+							<div key={user.username} className='col'>
+								<Card>
+									<CardBody>
+										<div className='row g-3'>
+											<div className='col d-flex'>
+												<div className='flex-shrink-0'>
+													<div className='position-relative'>
 														<div
-															className={classNames(
-																`bg-l25-${user.color}`,
-																'rounded-2',
-																'd-flex align-items-center justify-content-center',
-																'overflow-hidden',
-																'shadow',
-															)}>
-															<img
-																src={user.src}
-																alt={user.name}
-																width={100}
-															/>
+															className='ratio ratio-1x1'
+															style={{ width: 100 }}>
+															<div
+																className={classNames(
+																	`bg-l25-${user.color}`,
+																	'rounded-2',
+																	'd-flex align-items-center justify-content-center',
+																	'overflow-hidden',
+																	'shadow',
+																)}>
+																<img
+																	src={user.src}
+																	alt={user.name}
+																	width={100}
+																/>
+															</div>
 														</div>
-													</div>
-													{user.isOnline && (
-														<span className='position-absolute top-100 start-85 translate-middle badge border border-2 border-light rounded-circle bg-success p-2'>
-															<span className='visually-hidden'>
-																Online user
+														{user.isOnline && (
+															<span className='position-absolute top-100 start-85 translate-middle badge border border-2 border-light rounded-circle bg-success p-2'>
+																<span className='visually-hidden'>
+																	Online user
+																</span>
 															</span>
-														</span>
-													)}
-												</div>
-											</div>
-											<div className='flex-grow-1 ms-3 d-flex justify-content-between'>
-												<div className='w-100'>
-													<div className='row'>
-														<div className='col'>
-															<div className='d-flex align-items-center'>
-																<div className='fw-bold fs-5 me-2'>
-																	{`${user.name} ${user.surname}`}
-																</div>
-																<small className='border border-success border-2 text-success fw-bold px-2 py-1 rounded-1'>
-																	{user.position}
-																</small>
-															</div>
-
-															<div className='text-muted'>
-																@{user.username}
-															</div>
-														</div>
-														<div className='col-auto'>
-															<Button
-																icon='Info'
-																color='dark'
-																isLight
-																hoverShadow='sm'
-																tag='a'
-																to={`../${demoPagesMenu.appointment.subMenu.employeeID.path}/${user.id}`}
-																data-tour={user.name}
-																aria-label='More info'
-															/>
-														</div>
+														)}
 													</div>
-													{!!user?.services && (
-														<div className='row g-2 mt-3'>
-															{user?.services.map((service) => (
-																<div
-																	key={service.name}
-																	className='col-auto'>
-																	<Badge
-																		isLight
-																		color={service.color}
-																		className='px-3 py-2'>
-																		<Icon
-																			icon={service.icon}
-																			size='lg'
-																			className='me-1'
-																		/>
-																		{service.name}
-																	</Badge>
+												</div>
+												<div className='flex-grow-1 ms-3 d-flex justify-content-between'>
+													<div className='w-100'>
+														<div className='row'>
+															<div className='col'>
+																<div className='d-flex align-items-center'>
+																	<div className='fw-bold fs-5 me-2'>
+																		{`${user.name} ${user.surname}`}
+																	</div>
+																	<small className='border border-success border-2 text-success fw-bold px-2 py-1 rounded-1'>
+																		{user.position}
+																	</small>
 																</div>
-															))}
+
+																<div className='text-muted'>
+																	@{user.username}
+																</div>
+															</div>
+															<div className='col-auto'>
+																<Button
+																	icon='Info'
+																	color='dark'
+																	isLight
+																	hoverShadow='sm'
+																	tag='a'
+																	to={`../${demoPagesMenu.appointment.subMenu.employeeID.path}/${user.id}`}
+																	data-tour={user.name}
+																	aria-label='More info'
+																/>
+															</div>
 														</div>
-													)}
+														{!!user?.services && (
+															<div className='row g-2 mt-3'>
+																{user?.services.map((service) => (
+																	<div
+																		key={service.name}
+																		className='col-auto'>
+																		<Badge
+																			isLight
+																			color={service.color}
+																			className='px-3 py-2'>
+																			<Icon
+																				icon={service.icon}
+																				size='lg'
+																				className='me-1'
+																			/>
+																			{service.name}
+																		</Badge>
+																	</div>
+																))}
+															</div>
+														)}
+													</div>
 												</div>
 											</div>
 										</div>
-									</div>
-								</CardBody>
-							</Card>
-						</div>
-					))}
-				</div>
+									</CardBody>
+								</Card>
+							</div>
+						))}
+					</div>
+				) : (
+					<div className='text-center py-5'>No se encontraron productos</div>
+				)}
 			</Page>
 		</PageWrapper>
 	);
