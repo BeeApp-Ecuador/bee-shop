@@ -36,7 +36,18 @@ export const productsApi = createApi({
 				};
 			},
 		}),
+		createProduct: builder.mutation({
+			query: (product) => ({
+				url: 'api/v2/shop/product',
+				method: 'POST',
+				body: product,
+				headers: {
+					'Content-Type': 'application/json',
+					Authorization: localStorage.getItem('token')!,
+				},
+			}),
+		}),
 	}),
 });
 
-export const { useGetProductsQuery } = productsApi;
+export const { useGetProductsQuery, useCreateProductMutation } = productsApi;
