@@ -133,8 +133,13 @@ const CategoriesPage = () => {
 		},
 		// eslint-disable-next-line @typescript-eslint/no-unused-vars
 		onSubmit: (values) => {
-			const body = { ...values, shop: shop._id };
-			console.log(body);
+			const cleanedValues = Object.fromEntries(
+				Object.entries(values).map(([key, value]) => [
+					key,
+					typeof value === 'string' ? value.trim() : value,
+				]),
+			);
+			const body = { ...cleanedValues, shop: shop._id };
 			if (editItem) {
 				handleUpdateCategory(editItem._id!, body);
 			} else {
