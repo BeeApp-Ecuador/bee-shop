@@ -27,6 +27,7 @@ import {
 	useChangeStatusCategoryMutation,
 	useCreateCategoryMutation,
 	useGetCategoriesQuery,
+	useUpdateCategoryMutation,
 } from '../../../store/api/categoryApi';
 import { ProductCategoryType } from '../../../type/product-category-type';
 import OffCanvas, {
@@ -53,6 +54,7 @@ const CategoriesPage = () => {
 	});
 	const [saveCategory] = useCreateCategoryMutation();
 	const [changeStatusCategory] = useChangeStatusCategoryMutation();
+	const [updateCategory] = useUpdateCategoryMutation();
 
 	const [editPanel, setEditPanel] = useState<boolean>(false);
 	const [editItem, setEditItem] = useState<ProductCategoryType | null>(null);
@@ -68,6 +70,16 @@ const CategoriesPage = () => {
 		const { data } = await saveCategory(category);
 		setIsLoading(false);
 		if (data && data.meta.status === 201) {
+			setEditPanel(false);
+			refetch();
+		}
+	};
+
+	const handleUpdateCategory = async (categoryId: string, category: any) => {
+		setIsLoading(true);
+		const { data } = await updateCategory({ categoryId, category });
+		setIsLoading(false);
+		if (data && data.meta.status === 200) {
 			setEditPanel(false);
 			refetch();
 		}
@@ -109,7 +121,12 @@ const CategoriesPage = () => {
 		// eslint-disable-next-line @typescript-eslint/no-unused-vars
 		onSubmit: (values) => {
 			const body = { ...values, shop: shop._id };
-			handleSaveCategory(body);
+			console.log(body);
+			if (editItem) {
+				handleUpdateCategory(editItem._id!, body);
+			} else {
+				handleSaveCategory(body);
+			}
 		},
 		validateOnMount: true,
 	});
