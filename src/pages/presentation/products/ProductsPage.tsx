@@ -17,6 +17,9 @@ import Checks, { ChecksGroup } from '../../../components/bootstrap/forms/Checks'
 import SERVICES from '../../../common/data/serviceDummyData';
 import { demoPagesMenu } from '../../../menu';
 import { useGetProductsQuery } from '../../../store/api/productsApi';
+import { ProductType } from '../../../type/product-type';
+import Modal, { ModalBody, ModalHeader, ModalTitle } from '../../../components/bootstrap/Modal';
+import CreateProduct from '../../../components/products/CreateProduct';
 
 const ProductsPage = () => {
 	const [page, setPage] = useState(1);
@@ -24,13 +27,14 @@ const ProductsPage = () => {
 	const [total, setTotal] = useState(0);
 	const [statusProduct, setStatusProduct] = useState<boolean | null>(true);
 	const [searchTerm, setSearchTerm] = useState('');
-	const [products, setProducts] = useState<any[]>([]);
+	const [products, setProducts] = useState<ProductType[]>([]);
 	const { data: productsData, refetch } = useGetProductsQuery({
 		page,
 		limit,
 		status: statusProduct,
 		name: searchTerm,
 	});
+	const [isCreatingProduct, setIsCreatingProduct] = useState(false);
 
 	useEffect(() => {
 		if (productsData) {
@@ -172,8 +176,7 @@ const ProductsPage = () => {
 						icon='PersonAdd'
 						color='info'
 						isLight
-						tag='a'
-						to={`../${demoPagesMenu.editPages.subMenu.editWizard.path}`}>
+						onClick={() => setIsCreatingProduct(true)}>
 						Nuevo
 					</Button>
 				</SubHeaderRight>
@@ -279,6 +282,22 @@ const ProductsPage = () => {
 				) : (
 					<div className='text-center py-5'>No se encontraron productos</div>
 				)}
+				<Modal
+					setIsOpen={setIsCreatingProduct}
+					isOpen={isCreatingProduct}
+					isCentered
+					isStaticBackdrop
+					size='xl'>
+					<ModalHeader setIsOpen={setIsCreatingProduct}>
+						<ModalTitle id='preview'>Crear Producto</ModalTitle>
+					</ModalHeader>
+					<ModalBody>
+						<CreateProduct
+							isEditing={false}
+							setIsFillingProfile={setIsCreatingProduct}
+						/>
+					</ModalBody>
+				</Modal>
 			</Page>
 		</PageWrapper>
 	);
