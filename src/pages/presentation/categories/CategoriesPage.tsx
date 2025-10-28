@@ -1,7 +1,5 @@
 import React, { useContext, useEffect, useState } from 'react';
-import dayjs from 'dayjs';
 import { useFormik } from 'formik';
-import { Calendar as DatePicker } from 'react-date-range';
 import SubHeader, { SubHeaderLeft, SubHeaderRight } from '../../../layout/SubHeader/SubHeader';
 import Button from '../../../components/bootstrap/Button';
 import PageWrapper from '../../../layout/PageWrapper/PageWrapper';
@@ -20,17 +18,16 @@ import Dropdown, {
 } from '../../../components/bootstrap/Dropdown';
 import Input from '../../../components/bootstrap/forms/Input';
 import FormGroup from '../../../components/bootstrap/forms/FormGroup';
-import Popovers from '../../../components/bootstrap/Popovers';
 
 import { demoPagesMenu } from '../../../menu';
 import PaginationButtons from '../../../components/PaginationButtons';
 import useDarkMode from '../../../hooks/useDarkMode';
-import { enUS } from 'date-fns/locale';
 import CategoryRow from '../../../components/categories/CategoryRow';
 import {
 	useChangeStatusCategoryMutation,
 	useCreateCategoryMutation,
 	useGetCategoriesQuery,
+	useUpdateCategoryMutation,
 } from '../../../store/api/categoryApi';
 import { ProductCategoryType } from '../../../type/product-category-type';
 import OffCanvas, {
@@ -48,10 +45,16 @@ const CategoriesPage = () => {
 	const [page, setPage] = useState(1);
 	const [limit, setLimit] = useState(10);
 	const [total, setTotal] = useState(0);
+	const [statusCategory, setStatusCategory] = useState<boolean>(true);
 
-	const { data: categoriesData, refetch } = useGetCategoriesQuery({ page, limit });
+	const { data: categoriesData, refetch } = useGetCategoriesQuery({
+		page,
+		limit,
+		status: statusCategory,
+	});
 	const [saveCategory] = useCreateCategoryMutation();
 	const [changeStatusCategory] = useChangeStatusCategoryMutation();
+	const [updateCategory] = useUpdateCategoryMutation();
 
 	const [editPanel, setEditPanel] = useState<boolean>(false);
 	const [editItem, setEditItem] = useState<ProductCategoryType | null>(null);
@@ -62,13 +65,21 @@ const CategoriesPage = () => {
 
 	const { themeStatus, darkModeStatus } = useDarkMode();
 
-	const [date, setDate] = useState<Date>(new Date());
-
 	const handleSaveCategory = async (category: any) => {
 		setIsLoading(true);
 		const { data } = await saveCategory(category);
 		setIsLoading(false);
 		if (data && data.meta.status === 201) {
+			setEditPanel(false);
+			refetch();
+		}
+	};
+
+	const handleUpdateCategory = async (categoryId: string, category: any) => {
+		setIsLoading(true);
+		const { data } = await updateCategory({ categoryId, category });
+		setIsLoading(false);
+		if (data && data.meta.status === 200) {
 			setEditPanel(false);
 			refetch();
 		}
@@ -81,6 +92,11 @@ const CategoriesPage = () => {
 		if (data && data.meta.status === 200) {
 			refetch();
 		}
+	};
+
+	const handleEditCategory = (category: ProductCategoryType) => {
+		setEditItem(category);
+		setEditPanel(true);
 	};
 
 	useEffect(() => {
@@ -105,10 +121,28 @@ const CategoriesPage = () => {
 		// eslint-disable-next-line @typescript-eslint/no-unused-vars
 		onSubmit: (values) => {
 			const body = { ...values, shop: shop._id };
-			handleSaveCategory(body);
+			console.log(body);
+			if (editItem) {
+				handleUpdateCategory(editItem._id!, body);
+			} else {
+				handleSaveCategory(body);
+			}
 		},
 		validateOnMount: true,
 	});
+
+	useEffect(() => {
+		if (editItem) {
+			formikCategory.setValues({
+				name: editItem.name,
+				description: editItem.description,
+			});
+		}
+		return () => {
+			formikCategory.resetForm();
+		};
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [editItem]);
 
 	return (
 		<PageWrapper title={demoPagesMenu.listPages.subMenu.listBoxed.text}>
@@ -141,65 +175,26 @@ const CategoriesPage = () => {
 							<></>
 						</CardLabel>
 						<CardActions>
-							<Dropdown isButtonGroup>
-								<Popovers
-									desc={
-										<DatePicker
-											locale={enUS}
-											onChange={(item) => setDate(item)}
-											date={date}
-											color={import.meta.env.VITE_PRIMARY_COLOR}
-										/>
-									}
-									placement='bottom-end'
-									className='mw-100'
-									trigger='click'>
-									<Button color='success' isLight icon='WaterfallChart'>
-										{dayjs(date).format('MMM D')}
-									</Button>
-								</Popovers>
-								<DropdownToggle>
-									<Button color='success' isLight aria-label='More' />
-								</DropdownToggle>
-								<DropdownMenu isAlignmentEnd>
-									<DropdownItem>
-										<span>Last Hour</span>
-									</DropdownItem>
-									<DropdownItem>
-										<span>Last Day</span>
-									</DropdownItem>
-									<DropdownItem>
-										<span>Last Week</span>
-									</DropdownItem>
-									<DropdownItem>
-										<span>Last Month</span>
-									</DropdownItem>
-								</DropdownMenu>
-							</Dropdown>
-							<Button
-								color='info'
-								icon='CloudDownload'
-								isLight
-								tag='a'
-								to='/somefile.txt'
-								target='_blank'
-								download>
-								Export
-							</Button>
 							<Dropdown className='d-inline'>
-								<DropdownToggle hasIcon={false}>
-									<Button
-										color={themeStatus}
-										icon='MoreHoriz'
-										aria-label='Actions'
-									/>
+								<DropdownToggle hasIcon={true}>
+									<Button color={themeStatus} aria-label='Actions'>
+										{statusCategory ? 'Activas' : 'Inactivas'}
+									</Button>
 								</DropdownToggle>
 								<DropdownMenu isAlignmentEnd>
 									<DropdownItem>
-										<Button icon='Edit'>Edit</Button>
+										<Button
+											icon='CheckCircle'
+											onClick={() => setStatusCategory(true)}>
+											Activas
+										</Button>
 									</DropdownItem>
 									<DropdownItem>
-										<Button icon='Delete'>Delete</Button>
+										<Button
+											icon='Block'
+											onClick={() => setStatusCategory(false)}>
+											Inactivas
+										</Button>
 									</DropdownItem>
 								</DropdownMenu>
 							</Dropdown>
@@ -232,10 +227,7 @@ const CategoriesPage = () => {
 											onDisableOrEnable={() => {
 												handleChangeStatusCategory(category._id!);
 											}}
-											onEdit={() => {
-												setEditItem(category);
-												setEditPanel(true);
-											}}
+											onEdit={() => handleEditCategory(category)}
 										/>
 									))
 								) : (
