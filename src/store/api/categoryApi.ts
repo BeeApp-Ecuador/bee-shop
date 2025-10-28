@@ -19,9 +19,9 @@ export const categoryApi = createApi({
 	}),
 	endpoints: (builder) => ({
 		getCategories: builder.query({
-			query: ({ page = 1, limit = 10, status = true }) => ({
+			query: ({ page = 1, limit = 10, status = true, name = '' }) => ({
 				url: 'api/v2/shop/product/categories',
-				params: { page, limit, status },
+				params: { page, limit, status, name },
 				headers: {
 					'Content-Type': 'application/json',
 					Authorization: localStorage.getItem('token')!,

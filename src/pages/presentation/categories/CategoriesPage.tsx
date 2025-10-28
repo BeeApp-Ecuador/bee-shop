@@ -38,6 +38,8 @@ import OffCanvas, {
 import { Badge } from '../../../components/icon/material-icons';
 import AuthContext from '../../../contexts/authContext';
 import Spinner from '../../../components/bootstrap/Spinner';
+import showNotification from '../../../components/extras/showNotification';
+import Icon from '../../../components/icon/Icon';
 
 const CategoriesPage = () => {
 	const { user: shop } = useContext(AuthContext);
@@ -46,11 +48,13 @@ const CategoriesPage = () => {
 	const [limit, setLimit] = useState(10);
 	const [total, setTotal] = useState(0);
 	const [statusCategory, setStatusCategory] = useState<boolean>(true);
+	const [searchTerm, setSearchTerm] = useState<string>('');
 
 	const { data: categoriesData, refetch } = useGetCategoriesQuery({
 		page,
 		limit,
 		status: statusCategory,
+		name: searchTerm,
 	});
 	const [saveCategory] = useCreateCategoryMutation();
 	const [changeStatusCategory] = useChangeStatusCategoryMutation();
@@ -72,6 +76,7 @@ const CategoriesPage = () => {
 		if (data && data.meta.status === 201) {
 			setEditPanel(false);
 			refetch();
+			formikCategory.resetForm();
 		}
 	};
 
@@ -91,6 +96,14 @@ const CategoriesPage = () => {
 		setIsLoading(false);
 		if (data && data.meta.status === 200) {
 			refetch();
+			showNotification(
+				<span className='d-flex align-items-center'>
+					<Icon icon='Success' size='lg' className='me-1' />
+					<span>Éxito</span>
+				</span>,
+				'Se ha cambiado el estado de la categoría exitosamente.',
+				'success',
+			);
 		}
 	};
 
@@ -132,6 +145,11 @@ const CategoriesPage = () => {
 	});
 
 	useEffect(() => {
+		refetch();
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [statusCategory]);
+
+	useEffect(() => {
 		if (editItem) {
 			formikCategory.setValues({
 				name: editItem.name,
@@ -143,6 +161,17 @@ const CategoriesPage = () => {
 		};
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [editItem]);
+
+	useEffect(() => {
+		const delayDebounce = setTimeout(() => {
+			if (searchTerm.trim().length > 0) {
+				refetch();
+			}
+		}, 500);
+
+		return () => clearTimeout(delayDebounce);
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [searchTerm]);
 
 	return (
 		<PageWrapper title={demoPagesMenu.listPages.subMenu.listBoxed.text}>
@@ -171,9 +200,16 @@ const CategoriesPage = () => {
 			<Page>
 				<Card stretch data-tour='list'>
 					<CardHeader>
-						<CardLabel>
-							<></>
-						</CardLabel>
+						<SubHeaderLeft className='me-3'>
+							<Input
+								placeholder='Buscar categoría...'
+								type='search'
+								value={searchTerm}
+								aria-label='Search categories'
+								onChange={(e) => setSearchTerm(e.target.value)}
+							/>
+						</SubHeaderLeft>
+
 						<CardActions>
 							<Dropdown className='d-inline'>
 								<DropdownToggle hasIcon={true}>
