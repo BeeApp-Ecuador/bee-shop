@@ -461,10 +461,9 @@ const CreateProduct = ({
 						<CardBody>
 							<CardHeader>
 								<CardLabel icon='Build' iconColor='primary'>
-									<CardTitle>Servicios ofrecidos</CardTitle>
+									<CardTitle>Extras</CardTitle>
 									<CardSubTitle>
-										Selecciona los servicios que tu comercio ofrece a los
-										clientes.
+										Configuraciones adicionales para tu producto
 									</CardSubTitle>
 								</CardLabel>
 							</CardHeader>
@@ -475,15 +474,36 @@ const CreateProduct = ({
 									<input
 										className='form-check-input'
 										type='checkbox'
-										id='tax'
-										checked={formikProduct.values.tax}
+										id='restricted'
+										checked={formikProduct.values.restricted}
 										onChange={formikProduct.handleChange}
 									/>
-									<label className='form-check-label fw-bold' htmlFor='tax'>
-										Tiene IVA
+									<label
+										className='form-check-label fw-bold'
+										htmlFor='restricted'>
+										Tiene restricciones de edad
 									</label>
 									<small className='text-muted d-block'>
-										Indica si los precios incluyen el Impuesto al Valor Agregado
+										Indica si el producto tiene restricciones de edad
+									</small>
+								</div>
+							</div>
+							<div className='d-flex flex-column gap-4 px-4 py-2 ms-2 mb-4'>
+								<div className='form-check form-switch'>
+									<input
+										className='form-check-input'
+										type='checkbox'
+										id='haveOptions'
+										checked={formikProduct.values.haveOptions}
+										onChange={formikProduct.handleChange}
+									/>
+									<label
+										className='form-check-label fw-bold'
+										htmlFor='haveOptions'>
+										Tiene opciones adicionales
+									</label>
+									<small className='text-muted d-block'>
+										Indica si el producto tiene opciones adicionales
 									</small>
 								</div>
 							</div>
