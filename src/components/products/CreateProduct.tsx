@@ -2,7 +2,6 @@ import React, { useContext, useEffect, useState } from 'react';
 import Card, {
 	CardActions,
 	CardBody,
-	CardFooter,
 	CardHeader,
 	CardLabel,
 	CardSubTitle,
@@ -35,7 +34,7 @@ const CreateProduct = ({
 	const [categories, setCategories] = useState<ProductCategoryType[]>([]);
 	const [selectedCategory, setSelectedCategory] = useState<ProductCategoryType>();
 
-    const [havePromo, setHavePromo] = useState(false);
+	const [havePromo, setHavePromo] = useState(false);
 
 	const [tags, setTags] = useState([]);
 	const [newTag, setNewTag] = useState('');
@@ -296,11 +295,11 @@ const CreateProduct = ({
 																borderRadius: '8px',
 															}}
 														/>
-														<div
+														{/* <div
 															className='mt-1 text-truncate'
 															style={{ maxWidth: '150px' }}>
 															{formikProduct.values.img.name}
-														</div>
+														</div> */}
 													</div>
 												)}
 
