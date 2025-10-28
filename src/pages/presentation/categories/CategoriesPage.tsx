@@ -35,9 +35,13 @@ import OffCanvas, {
 	OffCanvasHeader,
 	OffCanvasTitle,
 } from '../../../components/bootstrap/OffCanvas';
-import { Badge } from '../../../components/icon/material-icons';
 import AuthContext from '../../../contexts/authContext';
 import Spinner from '../../../components/bootstrap/Spinner';
+import showNotification from '../../../components/extras/showNotification';
+import Icon from '../../../components/icon/Icon';
+import Badge from '../../../components/bootstrap/Badge';
+import { FetchBaseQueryError } from '@reduxjs/toolkit/query';
+import { SerializedError } from '@reduxjs/toolkit';
 
 const CategoriesPage = () => {
 	const { user: shop } = useContext(AuthContext);
@@ -45,12 +49,14 @@ const CategoriesPage = () => {
 	const [page, setPage] = useState(1);
 	const [limit, setLimit] = useState(10);
 	const [total, setTotal] = useState(0);
-	const [statusCategory, setStatusCategory] = useState<boolean>(true);
+	const [statusCategory, setStatusCategory] = useState<boolean | null>(true);
+	const [searchTerm, setSearchTerm] = useState<string>('');
 
 	const { data: categoriesData, refetch } = useGetCategoriesQuery({
 		page,
 		limit,
 		status: statusCategory,
+		name: searchTerm,
 	});
 	const [saveCategory] = useCreateCategoryMutation();
 	const [changeStatusCategory] = useChangeStatusCategoryMutation();
@@ -65,20 +71,46 @@ const CategoriesPage = () => {
 
 	const { themeStatus, darkModeStatus } = useDarkMode();
 
+	const sameNameError = (error: FetchBaseQueryError | SerializedError | undefined) => {
+		const fetchError = error as {
+			status: number;
+			data: { error: string; statusMessage: string };
+		};
+		if (fetchError.status === 409) {
+			showNotification(
+				<span className='d-flex align-items-center'>
+					<Icon icon='Error' size='lg' className='me-1' />
+					<span>Error</span>
+				</span>,
+				'Ya existe una categoría con ese nombre. Por favor, elige otro nombre.',
+				'danger',
+			);
+		}
+	};
+
 	const handleSaveCategory = async (category: any) => {
 		setIsLoading(true);
-		const { data } = await saveCategory(category);
+		const { data, error } = await saveCategory(category);
 		setIsLoading(false);
+		if (error) {
+			sameNameError(error);
+			return;
+		}
 		if (data && data.meta.status === 201) {
 			setEditPanel(false);
 			refetch();
+			formikCategory.resetForm();
 		}
 	};
 
 	const handleUpdateCategory = async (categoryId: string, category: any) => {
 		setIsLoading(true);
-		const { data } = await updateCategory({ categoryId, category });
+		const { data, error } = await updateCategory({ categoryId, category });
 		setIsLoading(false);
+		if (error) {
+			sameNameError(error);
+			return;
+		}
 		if (data && data.meta.status === 200) {
 			setEditPanel(false);
 			refetch();
@@ -91,6 +123,14 @@ const CategoriesPage = () => {
 		setIsLoading(false);
 		if (data && data.meta.status === 200) {
 			refetch();
+			showNotification(
+				<span className='d-flex align-items-center'>
+					<Icon icon='Success' size='lg' className='me-1' />
+					<span>Éxito</span>
+				</span>,
+				'Se ha cambiado el estado de la categoría exitosamente.',
+				'success',
+			);
 		}
 	};
 
@@ -120,8 +160,13 @@ const CategoriesPage = () => {
 		},
 		// eslint-disable-next-line @typescript-eslint/no-unused-vars
 		onSubmit: (values) => {
-			const body = { ...values, shop: shop._id };
-			console.log(body);
+			const cleanedValues = Object.fromEntries(
+				Object.entries(values).map(([key, value]) => [
+					key,
+					typeof value === 'string' ? value.trim() : value,
+				]),
+			);
+			const body = { ...cleanedValues, shop: shop._id };
 			if (editItem) {
 				handleUpdateCategory(editItem._id!, body);
 			} else {
@@ -130,6 +175,11 @@ const CategoriesPage = () => {
 		},
 		validateOnMount: true,
 	});
+
+	useEffect(() => {
+		refetch();
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [statusCategory]);
 
 	useEffect(() => {
 		if (editItem) {
@@ -143,6 +193,17 @@ const CategoriesPage = () => {
 		};
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [editItem]);
+
+	useEffect(() => {
+		const delayDebounce = setTimeout(() => {
+			if (searchTerm.trim().length > 0) {
+				refetch();
+			}
+		}, 500);
+
+		return () => clearTimeout(delayDebounce);
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [searchTerm]);
 
 	return (
 		<PageWrapper title={demoPagesMenu.listPages.subMenu.listBoxed.text}>
@@ -171,14 +232,25 @@ const CategoriesPage = () => {
 			<Page>
 				<Card stretch data-tour='list'>
 					<CardHeader>
-						<CardLabel>
-							<></>
-						</CardLabel>
+						<SubHeaderLeft className='me-3'>
+							<Input
+								placeholder='Buscar categoría...'
+								type='search'
+								value={searchTerm}
+								aria-label='Search categories'
+								onChange={(e) => setSearchTerm(e.target.value)}
+							/>
+						</SubHeaderLeft>
+
 						<CardActions>
 							<Dropdown className='d-inline'>
 								<DropdownToggle hasIcon={true}>
 									<Button color={themeStatus} aria-label='Actions'>
-										{statusCategory ? 'Activas' : 'Inactivas'}
+										{statusCategory === null
+											? 'Todos'
+											: statusCategory
+												? 'Activas'
+												: 'Inactivas'}
 									</Button>
 								</DropdownToggle>
 								<DropdownMenu isAlignmentEnd>
@@ -194,6 +266,13 @@ const CategoriesPage = () => {
 											icon='Block'
 											onClick={() => setStatusCategory(false)}>
 											Inactivas
+										</Button>
+									</DropdownItem>
+									<DropdownItem>
+										<Button
+											icon='Category'
+											onClick={() => setStatusCategory(null)}>
+											Todos
 										</Button>
 									</DropdownItem>
 								</DropdownMenu>
@@ -260,16 +339,20 @@ const CategoriesPage = () => {
 					<OffCanvasTitle id='edit-panel'>
 						{editItem?.name || 'Nueva Categoría'}{' '}
 						{editItem?.name ? (
-							<Badge color='primary'>Editar</Badge>
+							<Badge color='info' isLight>
+								Editar
+							</Badge>
 						) : (
-							<Badge color='success'>Nueva</Badge>
+							<Badge color='success' isLight>
+								Nueva
+							</Badge>
 						)}
 					</OffCanvasTitle>
 				</OffCanvasHeader>
 				<OffCanvasBody>
 					<Card>
 						<CardHeader>
-							<CardLabel icon='Description' iconColor='success'>
+							<CardLabel icon='Category' iconColor='success'>
 								<CardTitle>Categoría</CardTitle>
 							</CardLabel>
 						</CardHeader>
