@@ -40,6 +40,8 @@ import Spinner from '../../../components/bootstrap/Spinner';
 import showNotification from '../../../components/extras/showNotification';
 import Icon from '../../../components/icon/Icon';
 import Badge from '../../../components/bootstrap/Badge';
+import { FetchBaseQueryError } from '@reduxjs/toolkit/query';
+import { SerializedError } from '@reduxjs/toolkit';
 
 const CategoriesPage = () => {
 	const { user: shop } = useContext(AuthContext);
@@ -69,10 +71,31 @@ const CategoriesPage = () => {
 
 	const { themeStatus, darkModeStatus } = useDarkMode();
 
+	const sameNameError = (error: FetchBaseQueryError | SerializedError | undefined) => {
+		const fetchError = error as {
+			status: number;
+			data: { error: string; statusMessage: string };
+		};
+		if (fetchError.status === 409) {
+			showNotification(
+				<span className='d-flex align-items-center'>
+					<Icon icon='Error' size='lg' className='me-1' />
+					<span>Error</span>
+				</span>,
+				'Ya existe una categoría con ese nombre. Por favor, elige otro nombre.',
+				'danger',
+			);
+		}
+	};
+
 	const handleSaveCategory = async (category: any) => {
 		setIsLoading(true);
-		const { data } = await saveCategory(category);
+		const { data, error } = await saveCategory(category);
 		setIsLoading(false);
+		if (error) {
+			sameNameError(error);
+			return;
+		}
 		if (data && data.meta.status === 201) {
 			setEditPanel(false);
 			refetch();
@@ -82,8 +105,12 @@ const CategoriesPage = () => {
 
 	const handleUpdateCategory = async (categoryId: string, category: any) => {
 		setIsLoading(true);
-		const { data } = await updateCategory({ categoryId, category });
+		const { data, error } = await updateCategory({ categoryId, category });
 		setIsLoading(false);
+		if (error) {
+			sameNameError(error);
+			return;
+		}
 		if (data && data.meta.status === 200) {
 			setEditPanel(false);
 			refetch();
