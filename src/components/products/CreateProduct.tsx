@@ -35,6 +35,8 @@ const CreateProduct = ({
 	const [categories, setCategories] = useState<ProductCategoryType[]>([]);
 	const [selectedCategory, setSelectedCategory] = useState<ProductCategoryType>();
 
+    const [havePromo, setHavePromo] = useState(false);
+
 	const [tags, setTags] = useState([]);
 	const [newTag, setNewTag] = useState('');
 
@@ -355,19 +357,105 @@ const CreateProduct = ({
 						</CardBody>
 					</Card>
 				</WizardItem>
-				<WizardItem id='step2' title='Servicios y ubicación'>
+				<WizardItem id='step2' title='Precios y extras'>
 					<Card>
 						<CardBody>
 							<CardHeader>
 								<CardLabel icon='House' iconColor='primary'>
-									<CardTitle>¿Dónde está ubicado tu comercio?</CardTitle>
+									<CardTitle>Precios y descuentos</CardTitle>
 									<CardSubTitle>
-										Proporciona la dirección física de tu comercio para que los
-										clientes puedan encontrarte fácilmente.
+										Define los precios y promociones para tu producto
 									</CardSubTitle>
 								</CardLabel>
 							</CardHeader>
 						</CardBody>
+						<div className='px-5'>
+							<div className='d-flex flex-column gap-4 px-4 py-2 ms-2 mb-4'>
+								<div className='row align-items-center'>
+									<div className='col-12 col-sm-6 d-flex align-items-center'>
+										<div className='form-check form-switch col-12'>
+											<input
+												className='form-check-input'
+												type='checkbox'
+												id='tax'
+												checked={formikProduct.values.tax}
+												onChange={formikProduct.handleChange}
+											/>
+											<label
+												className='form-check-label fw-bold'
+												htmlFor='tax'>
+												Tiene IVA
+											</label>
+											<small className='text-muted d-block'>
+												Indica si los precios incluyen el Impuesto al Valor
+												Agregado
+											</small>
+										</div>
+										<div className='col-12 '>
+											<FormGroup
+												id='priceWithoutVAT'
+												isFloating
+												label='Precio'>
+												<Input
+													type='number'
+													value={formikProduct.values.priceWithoutVAT}
+													isTouched={
+														formikProduct.touched.priceWithoutVAT
+													}
+													invalidFeedback={
+														formikProduct.errors.priceWithoutVAT
+													}
+													isValid={formikProduct.isValid}
+													onChange={formikProduct.handleChange}
+													onBlur={formikProduct.handleBlur}
+												/>
+											</FormGroup>
+										</div>
+									</div>
+								</div>
+							</div>
+							<div className='d-flex flex-column gap-4 px-4 py-2 ms-2 mb-4'>
+								<div className='row align-items-center'>
+									<div className='col-12 col-sm-6 d-flex align-items-center'>
+										<div className='form-check form-switch col-12'>
+											<input
+												className='form-check-input'
+												type='checkbox'
+												id='promo'
+												checked={havePromo}
+												onChange={() => setHavePromo(!havePromo)}
+											/>
+											<label
+												className='form-check-label fw-bold'
+												htmlFor='promo'>
+												Tiene Promociones
+											</label>
+											<small className='text-muted d-block'>
+												Indica si el producto tiene alguna promoción activa
+											</small>
+										</div>
+										<div className='col-12 '>
+											<FormGroup
+												id='percentPromo'
+												isFloating
+												label='Porcentaje de promoción'>
+												<Input
+													type='number'
+													value={formikProduct.values.percentPromo}
+													isTouched={formikProduct.touched.percentPromo}
+													invalidFeedback={
+														formikProduct.errors.percentPromo
+													}
+													isValid={formikProduct.isValid}
+													onChange={formikProduct.handleChange}
+													onBlur={formikProduct.handleBlur}
+												/>
+											</FormGroup>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
 					</Card>
 					<Card>
 						<CardBody>
