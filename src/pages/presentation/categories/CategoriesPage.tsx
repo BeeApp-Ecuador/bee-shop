@@ -1,7 +1,5 @@
 import React, { useContext, useEffect, useState } from 'react';
-import dayjs from 'dayjs';
 import { useFormik } from 'formik';
-import { Calendar as DatePicker } from 'react-date-range';
 import SubHeader, { SubHeaderLeft, SubHeaderRight } from '../../../layout/SubHeader/SubHeader';
 import Button from '../../../components/bootstrap/Button';
 import PageWrapper from '../../../layout/PageWrapper/PageWrapper';
@@ -20,12 +18,10 @@ import Dropdown, {
 } from '../../../components/bootstrap/Dropdown';
 import Input from '../../../components/bootstrap/forms/Input';
 import FormGroup from '../../../components/bootstrap/forms/FormGroup';
-import Popovers from '../../../components/bootstrap/Popovers';
 
 import { demoPagesMenu } from '../../../menu';
 import PaginationButtons from '../../../components/PaginationButtons';
 import useDarkMode from '../../../hooks/useDarkMode';
-import { enUS } from 'date-fns/locale';
 import CategoryRow from '../../../components/categories/CategoryRow';
 import {
 	useChangeStatusCategoryMutation,
@@ -67,8 +63,6 @@ const CategoriesPage = () => {
 
 	const { themeStatus, darkModeStatus } = useDarkMode();
 
-	const [date, setDate] = useState<Date>(new Date());
-
 	const handleSaveCategory = async (category: any) => {
 		setIsLoading(true);
 		const { data } = await saveCategory(category);
@@ -86,6 +80,11 @@ const CategoriesPage = () => {
 		if (data && data.meta.status === 200) {
 			refetch();
 		}
+	};
+
+	const handleEditCategory = (category: ProductCategoryType) => {
+		setEditItem(category);
+		setEditPanel(true);
 	};
 
 	useEffect(() => {
@@ -114,6 +113,19 @@ const CategoriesPage = () => {
 		},
 		validateOnMount: true,
 	});
+
+	useEffect(() => {
+		if (editItem) {
+			formikCategory.setValues({
+				name: editItem.name,
+				description: editItem.description,
+			});
+		}
+		return () => {
+			formikCategory.resetForm();
+		};
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [editItem]);
 
 	return (
 		<PageWrapper title={demoPagesMenu.listPages.subMenu.listBoxed.text}>
@@ -198,10 +210,7 @@ const CategoriesPage = () => {
 											onDisableOrEnable={() => {
 												handleChangeStatusCategory(category._id!);
 											}}
-											onEdit={() => {
-												setEditItem(category);
-												setEditPanel(true);
-											}}
+											onEdit={() => handleEditCategory(category)}
 										/>
 									))
 								) : (
