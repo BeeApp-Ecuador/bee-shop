@@ -1,13 +1,6 @@
 import React, { FC } from 'react';
-import { Link } from 'react-router-dom';
-import classNames from 'classnames';
-import Checks from '../../components/bootstrap/forms/Checks';
 import Button from '../../components/bootstrap/Button';
-import { demoPagesMenu } from '../../menu';
-import useDarkMode from '../../hooks/useDarkMode';
 import Popovers from '../bootstrap/Popovers';
-import Badge from '../bootstrap/Badge';
-import { CheckCircle, Checkroom } from '../icon/material-icons';
 import Icon from '../icon/Icon';
 
 interface ICategoryRowProps {
@@ -29,19 +22,8 @@ const CategoryRow: FC<ICategoryRowProps> = ({
 	onEdit,
 	onDisableOrEnable,
 }) => {
-	const { darkModeStatus } = useDarkMode();
 	return (
 		<tr>
-			{/* <th scope='row' aria-label='Check'>
-				<Checks
-					id={id.toString()}
-					name={selectName}
-					value={id}
-					onChange={selectOnChange}
-					checked={selectChecked}
-					ariaLabel={selectName}
-				/>
-			</th> */}
 			<td className=''>
 				{status ? (
 					<Icon icon='CheckCircle' color='success' size='lg' />
