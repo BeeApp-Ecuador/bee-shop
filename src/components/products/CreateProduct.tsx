@@ -361,7 +361,7 @@ const CreateProduct = ({
 					<Card>
 						<CardBody>
 							<CardHeader>
-								<CardLabel icon='House' iconColor='primary'>
+								<CardLabel icon='AttachMoney' iconColor='primary'>
 									<CardTitle>Precios y descuentos</CardTitle>
 									<CardSubTitle>
 										Define los precios y promociones para tu producto
