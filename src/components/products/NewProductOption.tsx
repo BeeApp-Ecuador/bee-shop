@@ -226,17 +226,29 @@ const NewProductOption = ({
 										<div className={index < 2 ? 'col-5' : 'col-3'}>
 											<FormGroup isFloating label='Precio'>
 												<Input
-													type='number'
+													type='text'
 													name={`items[${index}].priceWithVAT`}
 													value={item.priceWithVAT || ''}
-													onChange={formikOptions.handleChange}
+													onChange={(e: any) => {
+														// solo quiero permitir numeros y el punto, no numeros negativos y maximo un punto decimal
+														const re = /^\d*\.?\d{0,2}$/;
+														if (
+															e.target.value === '' ||
+															re.test(e.target.value)
+														) {
+															formikOptions.setFieldValue(
+																`items[${index}].priceWithVAT`,
+																e.target.value,
+															);
+														}
+													}}
 													placeholder='Ej. 0.50'
 												/>
 											</FormGroup>
 										</div>
 									)}
 									{index >= 2 && (
-										<div className='col-2 d-flex justify-content-center align-items-center'>
+										<div className='col-2 d-flex justify-content-end align-items-center'>
 											<Button
 												type='button'
 												icon='Remove'
@@ -255,10 +267,12 @@ const NewProductOption = ({
 								</div>
 							))}
 
-							<div className='mt-3'>
-								<button
+							<div className='d-flex justify-content-between mt-3'>
+								<Button
 									type='button'
-									className='btn btn-outline-primary btn-sm'
+									icon='Add'
+									color='primary'
+									isOutline
 									onClick={() => {
 										const updated = [
 											...formikOptions.values.items,
@@ -268,8 +282,15 @@ const NewProductOption = ({
 										];
 										formikOptions.setFieldValue('items', updated);
 									}}>
-									➕ Añadir otro ítem
-								</button>
+									Agregar ítem
+								</Button>
+								<Button
+									type='button'
+									icon='Save'
+									color='primary'
+									onClick={() => {}}>
+									Guardar opciones
+								</Button>
 							</div>
 						</CardBody>
 					</Card>
