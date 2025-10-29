@@ -1,7 +1,7 @@
 import React from 'react';
 import Button from '../bootstrap/Button';
-import { OptionType } from './CreateProduct';
 import Card, { CardBody, CardHeader, CardLabel, CardTitle } from '../bootstrap/Card';
+import { OptionType } from '../../type/ItemOptionType';
 
 const ListProductOptions = ({
 	temporaryOptions,

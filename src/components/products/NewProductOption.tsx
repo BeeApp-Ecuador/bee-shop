@@ -6,9 +6,9 @@ import Label from '../bootstrap/forms/Label';
 import Checks, { ChecksGroup } from '../bootstrap/forms/Checks';
 import OPTIONS from '../../common/data/enumOptionsType';
 import { FormikProps } from 'formik';
-import { OptionType } from './CreateProduct';
 import Button from '../bootstrap/Button';
 import Alert from '../bootstrap/Alert';
+import { OptionType } from '../../type/ItemOptionType';
 
 const NewProductOption = ({
 	formikOptions,
