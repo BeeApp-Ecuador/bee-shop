@@ -63,6 +63,7 @@ const CreateProduct = ({
 	const [isError, setIsError] = useState(false);
 
 	const [isLoading, setIsLoading] = useState(false);
+	const [temporaryOptions, setTemporaryOptions] = useState<OptionType[]>([]);
 	// const { setUser } = useContext(AuthContext);
 
 	const handleAddTag = () => {
@@ -175,7 +176,8 @@ const CreateProduct = ({
 			],
 		},
 		onSubmit: () => {
-			// handleFillProfile();
+			console.log('Options submitted:', formikOptions.values);
+			setTemporaryOptions([...temporaryOptions, formikOptions.values]);
 		},
 	});
 
@@ -549,7 +551,7 @@ const CreateProduct = ({
 					</CardBody>
 					<div className='px-5'>
 						{/* Opciones del producto */}
-						<div className='row  mb-4'>
+						<div className='row mb-4'>
 							<NewProductOption
 								formikOptions={formikOptions}
 								optionsHaveTax={optionsHaveTax}
@@ -563,7 +565,43 @@ const CreateProduct = ({
 										</CardLabel>
 									</CardHeader>
 									<CardBody>
-										<h1>fsdf</h1>
+										{temporaryOptions.length === 0 ? (
+											<p>No hay opciones agregadas.</p>
+										) : (
+											<ul className='list-group'>
+												{temporaryOptions.map((item, index) => (
+													<li
+														key={index}
+														className='list-group-item d-flex justify-content-between align-items-center'>
+														<span>{item.title}</span>
+														<span className='badge bg-info rounded-pill'>
+															{item.type === 'SINGLE'
+																? 'Selección Única'
+																: 'Selección Múltiple'}
+														</span>
+														{/* Ver detalles */}
+														<button
+															className='btn btn-link text-primary'
+															onClick={() => {
+																// Aquí puedes manejar la lógica para ver los detalles
+															}}>
+															Ver detalles
+														</button>
+														<button
+															className='btn btn-link text-danger'
+															onClick={() => {
+																setTemporaryOptions((prev) =>
+																	prev.filter(
+																		(_, i) => i !== index,
+																	),
+																);
+															}}>
+															Eliminar
+														</button>
+													</li>
+												))}
+											</ul>
+										)}
 									</CardBody>
 								</Card>
 							</div>
