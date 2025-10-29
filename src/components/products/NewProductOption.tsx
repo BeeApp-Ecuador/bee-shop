@@ -91,9 +91,18 @@ const NewProductOption = ({
 											label='Cantidad máxima'>
 											<Input
 												id='max'
-												type='number'
+												type='text'
 												value={formikOptions.values.max}
-												onChange={formikOptions.handleChange}
+												onChange={(e: any) => {
+													const val = e.target.value;
+													if (/^\d*$/.test(val)) {
+														// solo numeros
+														formikOptions.setFieldValue(
+															'max',
+															val === '' ? '' : parseInt(val),
+														);
+													}
+												}}
 												onBlur={formikOptions.handleBlur}
 												placeholder='Cantidad máxima'
 											/>
