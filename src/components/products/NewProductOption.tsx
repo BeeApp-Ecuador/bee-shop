@@ -10,7 +10,15 @@ import { OptionType } from './CreateProduct';
 import Button from '../bootstrap/Button';
 import Alert from '../bootstrap/Alert';
 
-const NewProductOption = ({ formikOptions }: { formikOptions: FormikProps<OptionType> }) => {
+const NewProductOption = ({
+	formikOptions,
+	optionsHaveTax,
+	setOptionsHaveTax,
+}: {
+	formikOptions: FormikProps<OptionType>;
+	optionsHaveTax: boolean;
+	setOptionsHaveTax: React.Dispatch<React.SetStateAction<boolean>>;
+}) => {
 	const handleIsRequired = () => {
 		return formikOptions.values.isRequired ? 'YES' : 'NO';
 	};
@@ -164,6 +172,10 @@ const NewProductOption = ({ formikOptions }: { formikOptions: FormikProps<Option
 														label='Sí'
 														name='iva'
 														value='YES'
+														checked={optionsHaveTax ? 'YES' : 'NO'}
+														onChange={() => {
+															setOptionsHaveTax(true);
+														}}
 													/>
 													<Checks
 														type='radio'
@@ -171,6 +183,10 @@ const NewProductOption = ({ formikOptions }: { formikOptions: FormikProps<Option
 														label='No'
 														name='iva'
 														value='NO'
+														checked={optionsHaveTax ? 'YES' : 'NO'}
+														onChange={() => {
+															setOptionsHaveTax(false);
+														}}
 													/>
 												</ChecksGroup>
 											</div>
