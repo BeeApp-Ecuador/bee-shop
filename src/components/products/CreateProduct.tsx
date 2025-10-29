@@ -636,9 +636,8 @@ const CreateProduct = ({
 																className='mb-0 flex-grow-1'>
 																<Checks
 																	type='radio'
-																	id='YES'
+																	id='requiredYes'
 																	label='Sí'
-																	name='isRequired'
 																	value='YES'
 																	checked={
 																		formikOptions.values
@@ -655,9 +654,8 @@ const CreateProduct = ({
 																/>
 																<Checks
 																	type='radio'
-																	id='NO'
+																	id='requiredNo'
 																	label='No'
-																	name='isRequired'
 																	value='NO'
 																	checked={
 																		formikOptions.values
