@@ -396,18 +396,25 @@ const CreateProduct = ({
 									<input
 										className='form-check-input'
 										type='checkbox'
-										id='promo'
+										id='havePromo'
 										checked={havePromo}
 										onChange={() => setHavePromo(!havePromo)}
 									/>
-									<label className='form-check-label fw-bold' htmlFor='promo'>
+									<label className='form-check-label fw-bold' htmlFor='havePromo'>
 										Tiene Promociones
 									</label>
 									<small className='text-muted d-block'>
 										Indica si el producto tiene alguna promoción activa
 									</small>
 								</div>
-								<div className='col-12 '>
+
+								<div
+									className='col-12'
+									style={{
+										overflow: 'hidden',
+										opacity: havePromo ? 1 : 0,
+										transition: 'all 0.3s ease-in-out',
+									}}>
 									<FormGroup
 										id='percentPromo'
 										isFloating
@@ -494,6 +501,12 @@ const CreateProduct = ({
 							</CardLabel>
 						</CardHeader>
 					</CardBody>
+					<div className='px-5'>
+						{/* Opciones del producto */}
+						<div className='d-flex flex-column gap-4 px-4 py-2 ms-2 mb-4'>
+							<p>Aquí puedes agregar las diferentes opciones para tu producto.</p>
+						</div>
+					</div>
 				</Card>
 			</WizardItem>,
 		);
