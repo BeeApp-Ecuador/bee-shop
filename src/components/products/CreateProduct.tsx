@@ -20,6 +20,10 @@ import AuthContext from '../../contexts/authContext';
 import { useGetCategoriesQuery } from '../../store/api/categoryApi';
 import { ProductCategoryType } from '../../type/product-category-type';
 import { ProductType } from '../../type/product-type';
+import Label from '../bootstrap/forms/Label';
+import Checks, { ChecksGroup } from '../bootstrap/forms/Checks';
+import PAYMENTS from '../../common/data/enumPaymentMethod';
+import OPTIONS from '../../common/data/enumOptionsType';
 // import { WizardItem } from '../Wizard';
 
 const CreateProduct = ({
@@ -133,6 +137,8 @@ const CreateProduct = ({
 		validateOnChange: false,
 		validateOnBlur: false,
 	});
+
+	const optionsFormik = useFormik({});
 	const steps: ReactElement<IWizardItemProps>[] = [
 		<WizardItem id='step1' title='Categoría y Tags' key='step1'>
 			<Card>
@@ -506,31 +512,57 @@ const CreateProduct = ({
 						<div className='row px-4 py-2 ms-2 mb-4'>
 							<div className='col-12 col-lg-6'>
 								<Card>
+									<CardHeader>
+										<CardLabel icon='Add' iconColor='primary'>
+											<CardTitle>Nueva Opción</CardTitle>
+										</CardLabel>
+									</CardHeader>
 									<CardBody>
-										<CardHeader>
-											<CardLabel icon='Build' iconColor='primary'>
-												<CardTitle>Agregar Opción</CardTitle>
-												<CardSubTitle>
-													Define una opción para el producto, como sabor o
-													tamaño
-												</CardSubTitle>
-											</CardLabel>
-										</CardHeader>
+										<div className='col-12'>
+											<FormGroup id='name' isFloating label='Título'>
+												<Input
+													autoComplete='name'
+													type='text'
+													value={formikProduct.values.name}
+													isTouched={formikProduct.touched.name}
+													invalidFeedback={formikProduct.errors.name}
+													isValid={formikProduct.isValid}
+													onChange={formikProduct.handleChange}
+													onBlur={formikProduct.handleBlur}
+												/>
+											</FormGroup>
+										</div>
+										<div className='col-12'>
+											<FormGroup>
+												<Label htmlFor='optionType'>Tipo</Label>
+												<ChecksGroup isInline>
+													{Object.keys(OPTIONS).map((i) => (
+														<Checks
+															type='radio'
+															key={OPTIONS[i].name}
+															id={OPTIONS[i].name}
+															label={OPTIONS[i].name}
+															name='payoutType'
+															value={OPTIONS[i].name}
+															// onChange={formik.handleChange}
+															// checked={formik.values.payoutType}
+														/>
+													))}
+												</ChecksGroup>
+											</FormGroup>
+										</div>
 									</CardBody>
 								</Card>
 							</div>
 							<div className='col-12 col-lg-6'>
 								<Card>
+									<CardHeader>
+										<CardLabel icon='List' iconColor='primary'>
+											<CardTitle>Listado de Opciones</CardTitle>
+										</CardLabel>
+									</CardHeader>
 									<CardBody>
-										<CardHeader>
-											<CardLabel icon='Build' iconColor='primary'>
-												<CardTitle>Agregar Opción</CardTitle>
-												<CardSubTitle>
-													Define una opción para el producto, como sabor o
-													tamaño
-												</CardSubTitle>
-											</CardLabel>
-										</CardHeader>
+										<h1>fsdf</h1>
 									</CardBody>
 								</Card>
 							</div>
