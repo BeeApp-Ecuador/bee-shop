@@ -23,15 +23,16 @@ import { ProductType } from '../../type/product-type';
 import Label from '../bootstrap/forms/Label';
 import Checks, { ChecksGroup } from '../bootstrap/forms/Checks';
 import OPTIONS from '../../common/data/enumOptionsType';
+import NewProductOption from './NewProductOption';
 // import { WizardItem } from '../Wizard';
 
-interface ItemType {
+export interface ItemType {
 	detail: string;
-	tax: number;
+	tax: boolean;
 	priceWithVAT: number;
 	priceWithoutVAT: number;
 }
-interface OptionType {
+export interface OptionType {
 	title: string;
 	type: string;
 	max: number;
@@ -154,10 +155,23 @@ const CreateProduct = ({
 	const formikOptions = useFormik<OptionType>({
 		initialValues: {
 			title: '',
-			type: '',
+			type: 'SINGLE',
 			max: 0,
 			isRequired: false,
-			items: [],
+			items: [
+				{
+					detail: '',
+					tax: false,
+					priceWithVAT: 0,
+					priceWithoutVAT: 0,
+				},
+				{
+					detail: '',
+					tax: false,
+					priceWithVAT: 0,
+					priceWithoutVAT: 0,
+				},
+			],
 		},
 		onSubmit: () => {
 			// handleFillProfile();
@@ -537,182 +551,9 @@ const CreateProduct = ({
 					</CardBody>
 					<div className='px-5'>
 						{/* Opciones del producto */}
-						<div className='row px-4 py-2 ms-2 mb-4'>
-							<div className='col-12 col-lg-6'>
-								<Card>
-									<CardHeader>
-										<CardLabel icon='Add' iconColor='primary'>
-											<CardTitle>Nueva Opción</CardTitle>
-										</CardLabel>
-									</CardHeader>
-									<CardBody>
-										<div className='col-12 mb-4'>
-											<FormGroup id='title' isFloating label='Título'>
-												<Input
-													autoComplete='title'
-													type='text'
-													value={formikOptions.values.title}
-													isTouched={formikOptions.touched.title}
-													invalidFeedback={formikOptions.errors.title}
-													isValid={formikOptions.isValid}
-													onChange={formikOptions.handleChange}
-													onBlur={formikOptions.handleBlur}
-												/>
-											</FormGroup>
-										</div>
-										<small className='text-muted d-block mb-1'>
-											<b>Única</b>: se elige solo una opción (ej. sabor de
-											bebida).
-											<br />
-											<b>Múltiple</b>: se pueden elegir varias opciones (ej.
-											hasta 3 aderezos).
-											<br />
-											<b>Cantidad máxima</b>: Aplica solo para opción múltiple
-											y define cuántas opciones puede seleccionar el cliente.
-										</small>
-										<div className='col-12 mb-2'>
-											<FormGroup>
-												<Label htmlFor='optionType'>Tipo</Label>
-												<div className='d-flex align-items-center gap-2 justify-content-between'>
-													<ChecksGroup
-														isInline
-														className='mb-0 flex-grow-1'>
-														{Object.keys(OPTIONS).map((i) => (
-															<Checks
-																type='radio'
-																key={i}
-																id={i}
-																label={OPTIONS[i].name}
-																name='type'
-																value={i}
-																checked={formikOptions.values.type}
-																onChange={
-																	formikOptions.handleChange
-																}
-															/>
-														))}
-													</ChecksGroup>
-
-													{/* Input al lado de los checks */}
-													<FormGroup
-														id='max'
-														isFloating
-														className='flex-shrink-0'
-														style={{
-															// overflow: 'hidden',
-															opacity:
-																formikOptions.values.type ===
-																'MULTIPLE'
-																	? 1
-																	: 0,
-															transition: 'all 0.3s ease-in-out',
-														}}
-														label='Cantidad máxima'>
-														<Input
-															id='max'
-															type='number'
-															value={formikOptions.values.max}
-															onChange={formikOptions.handleChange}
-															onBlur={formikOptions.handleBlur}
-															placeholder='Cantidad máxima'
-														/>
-													</FormGroup>
-												</div>
-											</FormGroup>
-										</div>
-										<small className='text-muted d-block mb-1'>
-											<b>Si</b>: opción adicional con costo extra.
-											<br />
-											<b>No</b>: opción incluida en el precio del producto.
-											<br />
-										</small>
-										<div className='col-12 mb-2'>
-											<div className='row'>
-												<div className='col-12 col-md-6'>
-													<FormGroup label='¿Es extra?'>
-														<div className='d-flex align-items-center gap-2 justify-content-between'>
-															<ChecksGroup
-																isInline
-																className='mb-0 flex-grow-1'>
-																<Checks
-																	type='radio'
-																	id='requiredYes'
-																	label='Sí'
-																	value='YES'
-																	checked={
-																		formikOptions.values
-																			.isRequired
-																			? 'YES'
-																			: 'NO'
-																	}
-																	onChange={() => {
-																		formikOptions.setFieldValue(
-																			'isRequired',
-																			true,
-																		);
-																	}}
-																/>
-																<Checks
-																	type='radio'
-																	id='requiredNo'
-																	label='No'
-																	value='NO'
-																	checked={
-																		formikOptions.values
-																			.isRequired
-																			? 'YES'
-																			: 'NO'
-																	}
-																	onChange={() => {
-																		formikOptions.setFieldValue(
-																			'isRequired',
-																			false,
-																		);
-																	}}
-																/>
-															</ChecksGroup>
-														</div>
-													</FormGroup>
-												</div>
-												<div className='col-12 col-md-6'>
-													<FormGroup
-														label='¿Grava IVA?'
-														style={{
-															// overflow: 'hidden',
-															opacity:
-																handleIsRequired() === 'YES'
-																	? 1
-																	: 0,
-															transition: 'all 0.3s ease-in-out',
-														}}>
-														<div className='d-flex align-items-center gap-2 justify-content-between'>
-															<ChecksGroup
-																isInline
-																className='mb-0 flex-grow-1'>
-																<Checks
-																	type='radio'
-																	id='ivaYes'
-																	label='Sí'
-																	name='iva'
-																	value='YES'
-																/>
-																<Checks
-																	type='radio'
-																	id='ivaNo'
-																	label='No'
-																	name='iva'
-																	value='NO'
-																/>
-															</ChecksGroup>
-														</div>
-													</FormGroup>
-												</div>
-											</div>
-										</div>
-									</CardBody>
-								</Card>
-							</div>
-							<div className='col-12 col-lg-6'>
+						<div className='row  mb-4'>
+							<NewProductOption formikOptions={formikOptions} />
+							<div className='col-12 col-lg-5'>
 								<Card>
 									<CardHeader>
 										<CardLabel icon='List' iconColor='primary'>
