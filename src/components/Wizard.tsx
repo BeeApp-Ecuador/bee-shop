@@ -17,7 +17,7 @@ import useDarkMode from '../hooks/useDarkMode';
 import { TColor } from '../type/color-type';
 import Spinner from './bootstrap/Spinner';
 
-interface IWizardItemProps extends React.HTMLAttributes<HTMLDivElement> {
+export interface IWizardItemProps extends React.HTMLAttributes<HTMLDivElement> {
 	id: string;
 	children: ReactNode;
 	title?: string;
