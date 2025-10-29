@@ -64,6 +64,8 @@ const CreateProduct = ({
 
 	const [isLoading, setIsLoading] = useState(false);
 	const [temporaryOptions, setTemporaryOptions] = useState<OptionType[]>([]);
+	const [openItems, setOpenItems] = useState<{ [key: number]: boolean }>({});
+
 	// const { setUser } = useContext(AuthContext);
 
 	const handleAddTag = () => {
@@ -134,16 +136,16 @@ const CreateProduct = ({
 			// 	errors.tags = 'Agrega al menos una etiqueta.';
 			// }
 
-			if (Object.keys(errors).length > 0) {
-				showNotification(
-					<span className='d-flex align-items-center'>
-						<Icon icon='Error' size='lg' className='me-1' />
-						<span>Error</span>
-					</span>,
-					'Los datos del formulario contienen errores. Revisa e intenta nuevamente.',
-					'danger',
-				);
-			}
+			// if (Object.keys(errors).length > 0) {
+			// 	showNotification(
+			// 		<span className='d-flex align-items-center'>
+			// 			<Icon icon='Error' size='lg' className='me-1' />
+			// 			<span>Error</span>
+			// 		</span>,
+			// 		'Los datos del formulario contienen errores. Revisa e intenta nuevamente.',
+			// 		'danger',
+			// 	);
+			// }
 			console.log(errors);
 			return errors;
 		},
@@ -572,32 +574,72 @@ const CreateProduct = ({
 												{temporaryOptions.map((item, index) => (
 													<li
 														key={index}
-														className='list-group-item d-flex justify-content-between align-items-center'>
-														<span>{item.title}</span>
-														<span className='badge bg-info rounded-pill'>
-															{item.type === 'SINGLE'
-																? 'Selección Única'
-																: 'Selección Múltiple'}
-														</span>
-														{/* Ver detalles */}
-														<button
-															className='btn btn-link text-primary'
-															onClick={() => {
-																// Aquí puedes manejar la lógica para ver los detalles
-															}}>
-															Ver detalles
-														</button>
-														<button
-															className='btn btn-link text-danger'
-															onClick={() => {
-																setTemporaryOptions((prev) =>
-																	prev.filter(
-																		(_, i) => i !== index,
-																	),
-																);
-															}}>
-															Eliminar
-														</button>
+														className='list-group-item d-flex flex-column'>
+														<div className='d-flex justify-content-between align-items-center w-100'>
+															<span>{item.title}</span>
+															<span className='badge bg-info rounded-pill'>
+																{item.type === 'SINGLE'
+																	? 'Selección Única'
+																	: 'Selección Múltiple'}
+															</span>
+															<div className='d-flex gap-2'>
+																<Button
+																	type='button'
+																	icon={
+																		openItems[index]
+																			? 'ExpandLess'
+																			: 'ExpandMore'
+																	}
+																	color='info'
+																	isOutline
+																	onClick={() =>
+																		setOpenItems((prev) => ({
+																			...prev,
+																			[index]: !prev[index],
+																		}))
+																	}
+																/>
+
+																<Button
+																	type='button'
+																	icon='Remove'
+																	color='danger'
+																	isOutline
+																	onClick={() =>
+																		setTemporaryOptions(
+																			(prev) =>
+																				prev.filter(
+																					(_, i) =>
+																						i !== index,
+																				),
+																		)
+																	}
+																/>
+															</div>
+														</div>
+
+														{openItems[index] && (
+															<div className='mt-2 border-top pt-2'>
+																<p>
+																	<b>
+																		Opciones:{' '}
+																		{item.type === 'SINGLE'
+																			? 'Selección Única'
+																			: 'Selección Múltiple'}
+																	</b>
+																</p>
+																<ul>
+																	{item.items?.map((opt, i) => (
+																		<li key={i}>
+																			{opt.detail}{' '}
+																			{opt.priceWithVAT
+																				? `- $${opt.priceWithVAT}`
+																				: ''}
+																		</li>
+																	))}
+																</ul>
+															</div>
+														)}
 													</li>
 												))}
 											</ul>
