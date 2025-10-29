@@ -216,7 +216,7 @@ const NewProductOption = ({
 										className={
 											formikOptions.values.isRequired
 												? 'col-7'
-												: index < 2
+												: formikOptions.values.items.length <= 2
 													? 'col-12'
 													: 'col-10'
 										}>
@@ -232,7 +232,12 @@ const NewProductOption = ({
 									</div>
 
 									{formikOptions.values.isRequired && (
-										<div className={index < 2 ? 'col-5' : 'col-3'}>
+										<div
+											className={
+												formikOptions.values.items.length <= 2
+													? 'col-5'
+													: 'col-3'
+											}>
 											<FormGroup isFloating label='Precio'>
 												<Input
 													type='text'
@@ -256,7 +261,7 @@ const NewProductOption = ({
 											</FormGroup>
 										</div>
 									)}
-									{index >= 2 && (
+									{formikOptions.values.items.length > 2 && (
 										<div className='col-2 d-flex justify-content-end align-items-center'>
 											<Button
 												type='button'

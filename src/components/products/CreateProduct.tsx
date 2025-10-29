@@ -549,7 +549,7 @@ const CreateProduct = ({
 					</CardBody>
 					<div className='px-5'>
 						{/* Opciones del producto */}
-						<div className='row  mb-4'>
+						<div className='row mb-4'>
 							<NewProductOption
 								formikOptions={formikOptions}
 								optionsHaveTax={optionsHaveTax}
