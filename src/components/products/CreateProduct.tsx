@@ -503,8 +503,37 @@ const CreateProduct = ({
 					</CardBody>
 					<div className='px-5'>
 						{/* Opciones del producto */}
-						<div className='d-flex flex-column gap-4 px-4 py-2 ms-2 mb-4'>
-							<p>Aquí puedes agregar las diferentes opciones para tu producto.</p>
+						<div className='row px-4 py-2 ms-2 mb-4'>
+							<div className='col-12 col-lg-6'>
+								<Card>
+									<CardBody>
+										<CardHeader>
+											<CardLabel icon='Build' iconColor='primary'>
+												<CardTitle>Agregar Opción</CardTitle>
+												<CardSubTitle>
+													Define una opción para el producto, como sabor o
+													tamaño
+												</CardSubTitle>
+											</CardLabel>
+										</CardHeader>
+									</CardBody>
+								</Card>
+							</div>
+							<div className='col-12 col-lg-6'>
+								<Card>
+									<CardBody>
+										<CardHeader>
+											<CardLabel icon='Build' iconColor='primary'>
+												<CardTitle>Agregar Opción</CardTitle>
+												<CardSubTitle>
+													Define una opción para el producto, como sabor o
+													tamaño
+												</CardSubTitle>
+											</CardLabel>
+										</CardHeader>
+									</CardBody>
+								</Card>
+							</div>
 						</div>
 					</div>
 				</Card>
