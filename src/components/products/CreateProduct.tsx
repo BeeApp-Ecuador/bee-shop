@@ -54,6 +54,7 @@ const CreateProduct = ({
 	const [selectedCategory, setSelectedCategory] = useState<ProductCategoryType>();
 
 	const [havePromo, setHavePromo] = useState(false);
+	const [optionsHaveTax, setOptionsHaveTax] = useState(false);
 
 	const [tags, setTags] = useState([]);
 	const [newTag, setNewTag] = useState('');
@@ -178,9 +179,6 @@ const CreateProduct = ({
 		},
 	});
 
-	const handleIsRequired = () => {
-		return formikOptions.values.isRequired ? 'YES' : 'NO';
-	};
 	const steps: ReactElement<IWizardItemProps>[] = [
 		<WizardItem id='step1' title='Categoría y Tags' key='step1'>
 			<Card>
@@ -552,7 +550,11 @@ const CreateProduct = ({
 					<div className='px-5'>
 						{/* Opciones del producto */}
 						<div className='row  mb-4'>
-							<NewProductOption formikOptions={formikOptions} />
+							<NewProductOption
+								formikOptions={formikOptions}
+								optionsHaveTax={optionsHaveTax}
+								setOptionsHaveTax={setOptionsHaveTax}
+							/>
 							<div className='col-12 col-lg-5'>
 								<Card>
 									<CardHeader>
