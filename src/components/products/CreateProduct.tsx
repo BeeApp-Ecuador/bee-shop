@@ -13,32 +13,14 @@ import Button from '../bootstrap/Button';
 import FormGroup from '../bootstrap/forms/FormGroup';
 import { useFormik } from 'formik';
 import Modal, { ModalBody, ModalFooter, ModalHeader, ModalTitle } from '../bootstrap/Modal';
-import Icon from '../icon/Icon';
-import showNotification from '../extras/showNotification';
 import Textarea from '../bootstrap/forms/Textarea';
 import AuthContext from '../../contexts/authContext';
 import { useGetCategoriesQuery } from '../../store/api/categoryApi';
 import { ProductCategoryType } from '../../type/product-category-type';
 import { ProductType } from '../../type/product-type';
-import Label from '../bootstrap/forms/Label';
-import Checks, { ChecksGroup } from '../bootstrap/forms/Checks';
-import OPTIONS from '../../common/data/enumOptionsType';
 import NewProductOption from './NewProductOption';
-// import { WizardItem } from '../Wizard';
-
-export interface ItemType {
-	detail: string;
-	tax: boolean;
-	priceWithVAT: number;
-	priceWithoutVAT: number;
-}
-export interface OptionType {
-	title: string;
-	type: string;
-	max: number;
-	isRequired: boolean;
-	items: ItemType[];
-}
+import ListProductOptions from './ListProductOptions';
+import { OptionType } from '../../type/ItemOptionType';
 
 const CreateProduct = ({
 	setIsFillingProfile,
@@ -64,6 +46,8 @@ const CreateProduct = ({
 
 	const [isLoading, setIsLoading] = useState(false);
 	const [temporaryOptions, setTemporaryOptions] = useState<OptionType[]>([]);
+	const [openItems, setOpenItems] = useState<{ [key: number]: boolean }>({});
+
 	// const { setUser } = useContext(AuthContext);
 
 	const handleAddTag = () => {
@@ -130,21 +114,6 @@ const CreateProduct = ({
 				errors.productCategory = 'Selecciona al menos una categoría.';
 			}
 
-			// if (!values.tags.length) {
-			// 	errors.tags = 'Agrega al menos una etiqueta.';
-			// }
-
-			if (Object.keys(errors).length > 0) {
-				showNotification(
-					<span className='d-flex align-items-center'>
-						<Icon icon='Error' size='lg' className='me-1' />
-						<span>Error</span>
-					</span>,
-					'Los datos del formulario contienen errores. Revisa e intenta nuevamente.',
-					'danger',
-				);
-			}
-			console.log(errors);
 			return errors;
 		},
 		onSubmit: () => {
@@ -550,61 +519,18 @@ const CreateProduct = ({
 						</CardHeader>
 					</CardBody>
 					<div className='px-5'>
-						{/* Opciones del producto */}
 						<div className='row mb-4'>
 							<NewProductOption
 								formikOptions={formikOptions}
 								optionsHaveTax={optionsHaveTax}
 								setOptionsHaveTax={setOptionsHaveTax}
 							/>
-							<div className='col-12 col-lg-5'>
-								<Card>
-									<CardHeader>
-										<CardLabel icon='List' iconColor='primary'>
-											<CardTitle>Listado de Opciones</CardTitle>
-										</CardLabel>
-									</CardHeader>
-									<CardBody>
-										{temporaryOptions.length === 0 ? (
-											<p>No hay opciones agregadas.</p>
-										) : (
-											<ul className='list-group'>
-												{temporaryOptions.map((item, index) => (
-													<li
-														key={index}
-														className='list-group-item d-flex justify-content-between align-items-center'>
-														<span>{item.title}</span>
-														<span className='badge bg-info rounded-pill'>
-															{item.type === 'SINGLE'
-																? 'Selección Única'
-																: 'Selección Múltiple'}
-														</span>
-														{/* Ver detalles */}
-														<button
-															className='btn btn-link text-primary'
-															onClick={() => {
-																// Aquí puedes manejar la lógica para ver los detalles
-															}}>
-															Ver detalles
-														</button>
-														<button
-															className='btn btn-link text-danger'
-															onClick={() => {
-																setTemporaryOptions((prev) =>
-																	prev.filter(
-																		(_, i) => i !== index,
-																	),
-																);
-															}}>
-															Eliminar
-														</button>
-													</li>
-												))}
-											</ul>
-										)}
-									</CardBody>
-								</Card>
-							</div>
+							<ListProductOptions
+								temporaryOptions={temporaryOptions}
+								openItems={openItems}
+								setOpenItems={setOpenItems}
+								setTemporaryOptions={setTemporaryOptions}
+							/>
 						</div>
 					</div>
 				</Card>
