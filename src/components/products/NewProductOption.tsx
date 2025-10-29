@@ -302,7 +302,9 @@ const NewProductOption = ({
 									type='button'
 									icon='Save'
 									color='primary'
-									onClick={() => {}}>
+									onClick={() => {
+										formikOptions.handleSubmit();
+									}}>
 									Guardar opciones
 								</Button>
 							</div>
