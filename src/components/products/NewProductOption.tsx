@@ -63,13 +63,11 @@ const NewProductOption = ({ formikOptions }: { formikOptions: FormikProps<Option
 									))}
 								</ChecksGroup>
 
-								{/* Input al lado de los checks */}
 								<FormGroup
 									id='max'
 									isFloating
 									className='flex-shrink-0'
 									style={{
-										// overflow: 'hidden',
 										opacity: formikOptions.values.type === 'MULTIPLE' ? 1 : 0,
 										transition: 'all 0.3s ease-in-out',
 									}}
@@ -133,7 +131,6 @@ const NewProductOption = ({ formikOptions }: { formikOptions: FormikProps<Option
 								<FormGroup
 									label='¿Grava IVA?'
 									style={{
-										// overflow: 'hidden',
 										opacity: handleIsRequired() === 'YES' ? 1 : 0,
 										transition: 'all 0.3s ease-in-out',
 									}}>
@@ -165,15 +162,12 @@ const NewProductOption = ({ formikOptions }: { formikOptions: FormikProps<Option
 							<div
 								className={
 									formikOptions.values.isRequired
-										? 'col-5'
+										? 'col-7'
 										: index < 2
 											? 'col-12'
 											: 'col-10'
 								}>
-								<FormGroup
-									// className='flex-grow-1 col-5'
-									isFloating
-									label='Nombre del ítem'>
+								<FormGroup isFloating label='Nombre del ítem'>
 									<Input
 										type='text'
 										name={`items[${index}].detail`}
@@ -185,11 +179,8 @@ const NewProductOption = ({ formikOptions }: { formikOptions: FormikProps<Option
 							</div>
 
 							{formikOptions.values.isRequired && (
-								<div className={index < 2 ? 'col-7' : 'col-5'}>
-									<FormGroup
-										// className='flex-grow-1 col-5'
-										isFloating
-										label='Precio adicional'>
+								<div className={index < 2 ? 'col-5' : 'col-3'}>
+									<FormGroup isFloating label='Precio'>
 										<Input
 											type='number'
 											name={`items[${index}].priceWithVAT`}
@@ -206,7 +197,7 @@ const NewProductOption = ({ formikOptions }: { formikOptions: FormikProps<Option
 										type='button'
 										icon='Remove'
 										isOutline
-										color='danger' // className='btn btn-outline-danger btn-sm w-100'
+										color='danger'
 										onClick={() => {
 											const updated = formikOptions.values.items.filter(
 												(_: any, i: number) => i !== index,
@@ -219,7 +210,6 @@ const NewProductOption = ({ formikOptions }: { formikOptions: FormikProps<Option
 						</div>
 					))}
 
-					{/* Botón añadir */}
 					<div className='mt-3'>
 						<button
 							type='button'
@@ -236,7 +226,6 @@ const NewProductOption = ({ formikOptions }: { formikOptions: FormikProps<Option
 							➕ Añadir otro ítem
 						</button>
 					</div>
-					{/* </div> */}
 				</CardBody>
 			</Card>
 		</div>
