@@ -146,6 +146,17 @@ const NewProductOption = ({
 																'isRequired',
 																true,
 															);
+															formikOptions.setFieldValue(
+																'items',
+																formikOptions.values.items.map(
+																	(item) => ({
+																		...item,
+																		tax: optionsHaveTax,
+																		priceWithVAT: '',
+																		priceWithoutVAT: '',
+																	}),
+																),
+															);
 														}}
 													/>
 													<Checks
@@ -162,6 +173,17 @@ const NewProductOption = ({
 															formikOptions.setFieldValue(
 																'isRequired',
 																false,
+															);
+															formikOptions.setFieldValue(
+																'items',
+																formikOptions.values.items.map(
+																	(item) => ({
+																		...item,
+																		tax: optionsHaveTax,
+																		priceWithVAT: '',
+																		priceWithoutVAT: '',
+																	}),
+																),
 															);
 														}}
 													/>
@@ -187,6 +209,17 @@ const NewProductOption = ({
 														checked={optionsHaveTax ? 'YES' : 'NO'}
 														onChange={() => {
 															setOptionsHaveTax(true);
+															formikOptions.setFieldValue(
+																'items',
+																formikOptions.values.items.map(
+																	(item) => ({
+																		...item,
+																		tax: true,
+																		priceWithVAT: '',
+																		priceWithoutVAT: '',
+																	}),
+																),
+															);
 														}}
 													/>
 													<Checks
@@ -198,6 +231,17 @@ const NewProductOption = ({
 														checked={optionsHaveTax ? 'YES' : 'NO'}
 														onChange={() => {
 															setOptionsHaveTax(false);
+															formikOptions.setFieldValue(
+																'items',
+																formikOptions.values.items.map(
+																	(item) => ({
+																		...item,
+																		tax: false,
+																		priceWithVAT: '',
+																		priceWithoutVAT: '',
+																	}),
+																),
+															);
 														}}
 													/>
 												</ChecksGroup>
@@ -244,17 +288,27 @@ const NewProductOption = ({
 											<FormGroup isFloating label='Precio'>
 												<Input
 													type='text'
-													name={`items[${index}].priceWithVAT`}
-													value={item.priceWithVAT || ''}
+													name={
+														optionsHaveTax
+															? `items[${index}].priceWithVAT`
+															: `items[${index}].priceWithoutVAT`
+													}
+													value={
+														optionsHaveTax
+															? item.priceWithVAT || ''
+															: item.priceWithoutVAT || ''
+													}
 													onChange={(e: any) => {
-														// solo quiero permitir numeros y el punto, no numeros negativos y maximo un punto decimal
+														console.log(e.target.value);
 														const re = /^\d*\.?\d{0,2}$/;
 														if (
 															e.target.value === '' ||
 															re.test(e.target.value)
 														) {
 															formikOptions.setFieldValue(
-																`items[${index}].priceWithVAT`,
+																optionsHaveTax
+																	? `items[${index}].priceWithVAT`
+																	: `items[${index}].priceWithoutVAT`,
 																e.target.value,
 															);
 														}
@@ -283,7 +337,6 @@ const NewProductOption = ({
 									)}
 								</div>
 							))}
-
 							<div className='d-flex justify-content-between mt-3'>
 								<Button
 									type='button'
@@ -294,7 +347,7 @@ const NewProductOption = ({
 										const updated = [
 											...formikOptions.values.items,
 											formikOptions.values.isRequired
-												? { name: '', price: '' }
+												? { name: '', price: '', tax: optionsHaveTax }
 												: { name: '' },
 										];
 										formikOptions.setFieldValue('items', updated);
