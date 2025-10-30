@@ -96,6 +96,14 @@ const CreateProduct = ({
 	// 	// eslint-disable-next-line react-hooks/exhaustive-deps
 	// }, [isEditing, shop, categories, tags]);
 
+	const handleSaveProduct = () => {
+		const values = formikProduct.values;
+		const formData = new FormData();
+		for (const key in values) {
+			formData.append(key, values[key]);
+		}
+	};
+
 	const formikProduct = useFormik<ProductType>({
 		initialValues: {
 			productCategory: isEditing ? shop.category!.toString() : selectedCategory?._id || '',
@@ -138,6 +146,18 @@ const CreateProduct = ({
 					errors.percentPromo = 'El porcentaje de promoción es obligatorio';
 				}
 			}
+			if (values.haveOptions) {
+				if (temporaryOptions.length === 0) {
+					showNotification(
+						<span className='d-flex align-items-center'>
+							<Icon icon='Error' size='lg' className='me-1' />
+							<span>Error</span>
+						</span>,
+						'Agrega al menos una opción',
+						'danger',
+					);
+				}
+			}
 			if (Object.keys(errors).length > 0) {
 				showNotification(
 					<span className='d-flex align-items-center'>
@@ -151,9 +171,7 @@ const CreateProduct = ({
 
 			return errors;
 		},
-		onSubmit: () => {
-			// handleFillProfile();
-		},
+		onSubmit: handleSaveProduct,
 		validateOnChange: false,
 		validateOnBlur: false,
 	});
