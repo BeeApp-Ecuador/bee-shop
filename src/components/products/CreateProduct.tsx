@@ -23,6 +23,8 @@ import ListProductOptions from './ListProductOptions';
 import { OptionType } from '../../type/ItemOptionType';
 import showNotification from '../extras/showNotification';
 import Icon from '../icon/Icon';
+import { createApi } from '@reduxjs/toolkit/query/react';
+import { useCreateProductMutation } from '../../store/api/productsApi';
 
 const CreateProduct = ({
 	setIsFillingProfile,
@@ -49,6 +51,8 @@ const CreateProduct = ({
 	const [isLoading, setIsLoading] = useState(false);
 	const [temporaryOptions, setTemporaryOptions] = useState<OptionType[]>([]);
 	const [openItems, setOpenItems] = useState<{ [key: number]: boolean }>({});
+
+	const [createProduct] = useCreateProductMutation();
 
 	// const { setUser } = useContext(AuthContext);
 
@@ -96,6 +100,29 @@ const CreateProduct = ({
 	// 	// eslint-disable-next-line react-hooks/exhaustive-deps
 	// }, [isEditing, shop, categories, tags]);
 
+	const handleSaveProduct = async () => {
+		setIsLoading(true);
+		const values = formikProduct.values;
+		const formData = new FormData();
+		for (const key in values) {
+			formData.append(key, values[key]);
+		}
+		const { data, error } = await createProduct(formData);
+		setIsLoading(false);
+		if (error) {
+			if (error && 'status' in error) {
+				// mostrar error
+			}
+		}
+		if (data && data.statusCode === 201) {
+			setIsError(false);
+			setShowModal(true);
+			if (formikProduct.values.haveOptions) {
+				// Guardar opciones del producto
+			}
+		}
+	};
+
 	const formikProduct = useFormik<ProductType>({
 		initialValues: {
 			productCategory: isEditing ? shop.category!.toString() : selectedCategory?._id || '',
@@ -138,6 +165,18 @@ const CreateProduct = ({
 					errors.percentPromo = 'El porcentaje de promoción es obligatorio';
 				}
 			}
+			if (values.haveOptions) {
+				if (temporaryOptions.length === 0) {
+					showNotification(
+						<span className='d-flex align-items-center'>
+							<Icon icon='Error' size='lg' className='me-1' />
+							<span>Error</span>
+						</span>,
+						'Agrega al menos una opción',
+						'danger',
+					);
+				}
+			}
 			if (Object.keys(errors).length > 0) {
 				showNotification(
 					<span className='d-flex align-items-center'>
@@ -151,9 +190,7 @@ const CreateProduct = ({
 
 			return errors;
 		},
-		onSubmit: () => {
-			// handleFillProfile();
-		},
+		onSubmit: handleSaveProduct,
 		validateOnChange: false,
 		validateOnBlur: false,
 	});
