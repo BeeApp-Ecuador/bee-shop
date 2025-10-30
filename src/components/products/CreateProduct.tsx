@@ -222,8 +222,22 @@ const CreateProduct = ({
 				}
 			}
 
-			// verificar si existe un campo vacio en los items
-			console.log(errors);
+			// verificar que no haya items repetidos
+			const details = values.items.map((item) => item.detail.toLowerCase().trim());
+			const hasDuplicates = details.some(
+				(item, index) => details.indexOf(item) !== index && item.length > 0,
+			);
+			if (hasDuplicates) {
+				showNotification(
+					<span className='d-flex align-items-center'>
+						<Icon icon='Error' size='lg' className='me-1' />
+						<span>Error</span>
+					</span>,
+					'No se permiten ítems repetidos',
+					'danger',
+				);
+				errors.items = 'No se permiten ítems repetidos.';
+			}
 
 			return errors;
 		},
