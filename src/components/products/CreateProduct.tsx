@@ -23,6 +23,8 @@ import ListProductOptions from './ListProductOptions';
 import { OptionType } from '../../type/ItemOptionType';
 import showNotification from '../extras/showNotification';
 import Icon from '../icon/Icon';
+import { createApi } from '@reduxjs/toolkit/query/react';
+import { useCreateProductMutation } from '../../store/api/productsApi';
 
 const CreateProduct = ({
 	setIsFillingProfile,
@@ -49,6 +51,8 @@ const CreateProduct = ({
 	const [isLoading, setIsLoading] = useState(false);
 	const [temporaryOptions, setTemporaryOptions] = useState<OptionType[]>([]);
 	const [openItems, setOpenItems] = useState<{ [key: number]: boolean }>({});
+
+	const [createProduct] = useCreateProductMutation();
 
 	// const { setUser } = useContext(AuthContext);
 
@@ -96,11 +100,26 @@ const CreateProduct = ({
 	// 	// eslint-disable-next-line react-hooks/exhaustive-deps
 	// }, [isEditing, shop, categories, tags]);
 
-	const handleSaveProduct = () => {
+	const handleSaveProduct = async () => {
+		setIsLoading(true);
 		const values = formikProduct.values;
 		const formData = new FormData();
 		for (const key in values) {
 			formData.append(key, values[key]);
+		}
+		const { data, error } = await createProduct(formData);
+		setIsLoading(false);
+		if (error) {
+			if (error && 'status' in error) {
+				// mostrar error
+			}
+		}
+		if (data && data.statusCode === 201) {
+			setIsError(false);
+			setShowModal(true);
+			if (formikProduct.values.haveOptions) {
+				// Guardar opciones del producto
+			}
 		}
 	};
 
