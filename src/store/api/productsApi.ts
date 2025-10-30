@@ -47,6 +47,17 @@ export const productsApi = createApi({
 				},
 			}),
 		}),
+		addOptionsToProduct: builder.mutation({
+			query: ({ productId, options }) => ({
+				url: `api/v2/shop/product/options/${productId}`,
+				method: 'PUT',
+				body: options,
+				headers: {
+					'Content-Type': 'application/json',
+					Authorization: localStorage.getItem('token')!,
+				},
+			}),
+		}),
 	}),
 });
 

@@ -1,8 +1,7 @@
 export interface ItemType {
 	detail: string;
 	tax: boolean;
-	priceWithVAT: number;
-	priceWithoutVAT: number;
+	price: number;
 }
 export interface OptionType {
 	title: string;
