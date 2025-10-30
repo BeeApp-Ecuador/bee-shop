@@ -131,6 +131,12 @@ const CreateProduct = ({
 				errors.priceWithoutVAT = 'El precio debe ser mayor a 0';
 			}
 			if (havePromo) {
+				if (
+					values.percentPromo.toString().trim().length === 0 ||
+					Number(values.percentPromo) <= 0
+				) {
+					errors.percentPromo = 'El porcentaje de promoción es obligatorio';
+				}
 			}
 			if (Object.keys(errors).length > 0) {
 				showNotification(
@@ -304,7 +310,7 @@ const CreateProduct = ({
 
 							const handleToggle = () => {
 								setSelectedCategory(category);
-								formikProduct.setFieldValue('category', category._id);
+								formikProduct.setFieldValue('productCategory', category._id);
 							};
 
 							return (
