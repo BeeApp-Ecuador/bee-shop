@@ -154,7 +154,6 @@ const CreateProduct = ({
 			if (values.title.trim().length === 0) {
 				errors.title = 'El título es obligatorio';
 			}
-			// verificas que el titulo no exista ya en las opciones temporales
 			const titleExists = temporaryOptions.find(
 				(option) => option.title.toLowerCase().trim() === values.title.toLowerCase().trim(),
 			);
@@ -169,7 +168,6 @@ const CreateProduct = ({
 			if (!values.isRequired) {
 				const filledItems = values.items.filter((item) => item.detail?.trim().length > 0);
 				if (filledItems.length < 2) {
-					console.log('aqui');
 					showNotification(
 						<span className='d-flex align-items-center'>
 							<Icon icon='Error' size='lg' className='me-1' />
@@ -191,7 +189,6 @@ const CreateProduct = ({
 						item.priceWithVAT !== 0,
 				);
 				if (filledItems.length < 2) {
-					console.log('aqui');
 					showNotification(
 						<span className='d-flex align-items-center'>
 							<Icon icon='Error' size='lg' className='me-1' />
@@ -222,7 +219,6 @@ const CreateProduct = ({
 				}
 			}
 
-			// verificar que no haya items repetidos
 			const details = values.items.map((item) => item.detail.toLowerCase().trim());
 			const hasDuplicates = details.some(
 				(item, index) => details.indexOf(item) !== index && item.length > 0,
@@ -242,7 +238,6 @@ const CreateProduct = ({
 			return errors;
 		},
 		onSubmit: () => {
-			// limpiar los items que esten vacios
 			formikOptions.values.items = formikOptions.values.items.filter(
 				(item) => item.detail?.trim().length > 0,
 			);
