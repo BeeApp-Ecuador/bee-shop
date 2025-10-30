@@ -21,6 +21,8 @@ import { ProductType } from '../../type/product-type';
 import NewProductOption from './NewProductOption';
 import ListProductOptions from './ListProductOptions';
 import { OptionType } from '../../type/ItemOptionType';
+import showNotification from '../extras/showNotification';
+import Icon from '../icon/Icon';
 
 const CreateProduct = ({
 	setIsFillingProfile,
@@ -144,9 +146,111 @@ const CreateProduct = ({
 				},
 			],
 		},
+		validateOnChange: false,
+		validateOnBlur: false,
+
+		validate: (values) => {
+			const errors: Partial<Record<keyof OptionType, string>> = {};
+			if (values.title.trim().length === 0) {
+				errors.title = 'El título es obligatorio';
+			}
+			const titleExists = temporaryOptions.find(
+				(option) => option.title.toLowerCase().trim() === values.title.toLowerCase().trim(),
+			);
+			if (titleExists) {
+				errors.title = 'Ya existe una opción con este título';
+			}
+			if (values.type === 'MULTIPLE') {
+				if (values.max <= 1) {
+					errors.max = 'El campo es obligatorio';
+				}
+			}
+			if (!values.isRequired) {
+				const filledItems = values.items.filter((item) => item.detail?.trim().length > 0);
+				if (filledItems.length < 2) {
+					showNotification(
+						<span className='d-flex align-items-center'>
+							<Icon icon='Error' size='lg' className='me-1' />
+							<span>Error</span>
+						</span>,
+						'Agrega al menos dos ítems',
+						'danger',
+					);
+					errors.items = 'Agrega al menos dos ítems.';
+				}
+			}
+
+			if (values.isRequired) {
+				const filledItems = values.items.filter(
+					(item) =>
+						item.detail?.trim().length > 0 &&
+						item.priceWithVAT !== undefined &&
+						item.priceWithVAT !== null &&
+						item.priceWithVAT !== 0,
+				);
+				if (filledItems.length < 2) {
+					showNotification(
+						<span className='d-flex align-items-center'>
+							<Icon icon='Error' size='lg' className='me-1' />
+							<span>Error</span>
+						</span>,
+						'Agrega al menos dos ítems con precio',
+						'danger',
+					);
+					errors.items = 'Agrega al menos dos ítems con precio.';
+				}
+				const invalidPriceItem = values.items.find(
+					(item) =>
+						item.detail.trim().length > 0 &&
+						(item.priceWithVAT === undefined ||
+							item.priceWithVAT === null ||
+							item.priceWithVAT === 0),
+				);
+				if (invalidPriceItem) {
+					showNotification(
+						<span className='d-flex align-items-center'>
+							<Icon icon='Error' size='lg' className='me-1' />
+							<span>Error</span>
+						</span>,
+						'Todos los ítems deben tener un precio válido',
+						'danger',
+					);
+					errors.items = 'Todos los ítems deben tener un precio válido.';
+				}
+			}
+
+			const details = values.items.map((item) => item.detail.toLowerCase().trim());
+			const hasDuplicates = details.some(
+				(item, index) => details.indexOf(item) !== index && item.length > 0,
+			);
+			if (hasDuplicates) {
+				showNotification(
+					<span className='d-flex align-items-center'>
+						<Icon icon='Error' size='lg' className='me-1' />
+						<span>Error</span>
+					</span>,
+					'No se permiten ítems repetidos',
+					'danger',
+				);
+				errors.items = 'No se permiten ítems repetidos.';
+			}
+
+			return errors;
+		},
 		onSubmit: () => {
-			console.log('Options submitted:', formikOptions.values);
+			formikOptions.values.items = formikOptions.values.items.filter(
+				(item) => item.detail?.trim().length > 0,
+			);
 			setTemporaryOptions([...temporaryOptions, formikOptions.values]);
+			showNotification(
+				<span className='d-flex align-items-center'>
+					<Icon icon='Success' size='lg' className='me-1' />
+					<span>Éxito</span>
+				</span>,
+				'La opción ha sido agregada exitosamente.',
+				'success',
+			);
+			formikOptions.resetForm();
 		},
 	});
 

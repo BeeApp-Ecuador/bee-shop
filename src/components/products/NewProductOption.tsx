@@ -105,6 +105,9 @@ const NewProductOption = ({
 												}}
 												onBlur={formikOptions.handleBlur}
 												placeholder='Cantidad máxima'
+												isTouched={formikOptions.touched.max}
+												invalidFeedback={formikOptions.errors.max}
+												isValid={formikOptions.isValid}
 											/>
 										</FormGroup>
 									</div>
