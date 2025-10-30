@@ -115,6 +115,39 @@ const CreateProduct = ({
 			if (values.productCategory.length === 0) {
 				errors.productCategory = 'Selecciona al menos una categoría.';
 			}
+			if (values.name.trim().length === 0) {
+				errors.name = 'El nombre del producto es obligatorio.';
+			}
+			if (values.description.trim().length === 0) {
+				errors.description = 'La descripción del producto es obligatoria.';
+			}
+			if (!values.img) {
+				errors.img = 'Requerido';
+			}
+			if (values.img === undefined) {
+				errors.img = 'Requerido';
+			}
+			if (values.priceWithoutVAT <= 0) {
+				errors.priceWithoutVAT = 'El precio debe ser mayor a 0';
+			}
+			if (havePromo) {
+				if (
+					values.percentPromo.toString().trim().length === 0 ||
+					Number(values.percentPromo) <= 0
+				) {
+					errors.percentPromo = 'El porcentaje de promoción es obligatorio';
+				}
+			}
+			if (Object.keys(errors).length > 0) {
+				showNotification(
+					<span className='d-flex align-items-center'>
+						<Icon icon='Error' size='lg' className='me-1' />
+						<span>Error</span>
+					</span>,
+					'Los datos del formulario contienen errores. Revisa e intenta nuevamente.',
+					'danger',
+				);
+			}
 
 			return errors;
 		},
@@ -181,12 +214,14 @@ const CreateProduct = ({
 			}
 
 			if (values.isRequired) {
-				const filledItems = values.items.filter(
-					(item) =>
-						item.detail?.trim().length > 0 &&
-						item.priceWithVAT !== undefined &&
-						item.priceWithVAT !== null &&
-						item.priceWithVAT !== 0,
+				const filledItems = values.items.filter((item) =>
+					item.detail?.trim().length > 0 && optionsHaveTax
+						? item.priceWithVAT !== undefined &&
+							item.priceWithVAT !== null &&
+							item.priceWithVAT !== 0
+						: item.priceWithoutVAT !== undefined &&
+							item.priceWithoutVAT !== null &&
+							item.priceWithoutVAT !== 0,
 				);
 				if (filledItems.length < 2) {
 					showNotification(
@@ -199,12 +234,14 @@ const CreateProduct = ({
 					);
 					errors.items = 'Agrega al menos dos ítems con precio.';
 				}
-				const invalidPriceItem = values.items.find(
-					(item) =>
-						item.detail.trim().length > 0 &&
-						(item.priceWithVAT === undefined ||
+				const invalidPriceItem = values.items.find((item) =>
+					item.detail?.trim().length > 0 && optionsHaveTax
+						? item.priceWithVAT === undefined ||
 							item.priceWithVAT === null ||
-							item.priceWithVAT === 0),
+							item.priceWithVAT === 0
+						: item.priceWithoutVAT === undefined ||
+							item.priceWithoutVAT === null ||
+							item.priceWithoutVAT === 0,
 				);
 				if (invalidPriceItem) {
 					showNotification(
@@ -219,7 +256,7 @@ const CreateProduct = ({
 				}
 			}
 
-			const details = values.items.map((item) => item.detail.toLowerCase().trim());
+			const details = values.items.map((item) => item.detail?.toLowerCase().trim());
 			const hasDuplicates = details.some(
 				(item, index) => details.indexOf(item) !== index && item.length > 0,
 			);
@@ -273,7 +310,7 @@ const CreateProduct = ({
 
 							const handleToggle = () => {
 								setSelectedCategory(category);
-								formikProduct.setFieldValue('category', category._id);
+								formikProduct.setFieldValue('productCategory', category._id);
 							};
 
 							return (
@@ -497,12 +534,27 @@ const CreateProduct = ({
 								<div className='col-12 '>
 									<FormGroup id='priceWithoutVAT' isFloating label='Precio'>
 										<Input
-											type='number'
+											// type='number'
 											value={formikProduct.values.priceWithoutVAT}
 											isTouched={formikProduct.touched.priceWithoutVAT}
 											invalidFeedback={formikProduct.errors.priceWithoutVAT}
 											isValid={formikProduct.isValid}
-											onChange={formikProduct.handleChange}
+											// onChange={formikProduct.handleChange}
+											onChange={(e: any) => {
+												let value = e.target.value;
+
+												// Permitir solo números y hasta 2 decimales con punto
+												if (!/^\d*\.?\d{0,2}$/.test(value)) return;
+												// Limitar el valor máximo a 100
+												if (parseFloat(value) > 100) {
+													value = '100';
+												}
+
+												formikProduct.setFieldValue(
+													'priceWithoutVAT',
+													value,
+												);
+											}}
 											onBlur={formikProduct.handleBlur}
 										/>
 									</FormGroup>
@@ -541,12 +593,23 @@ const CreateProduct = ({
 										isFloating
 										label='Porcentaje de promoción'>
 										<Input
-											type='number'
+											type='text'
 											value={formikProduct.values.percentPromo}
 											isTouched={formikProduct.touched.percentPromo}
 											invalidFeedback={formikProduct.errors.percentPromo}
 											isValid={formikProduct.isValid}
-											onChange={formikProduct.handleChange}
+											onChange={(e) => {
+												let value = e.target.value;
+
+												// Permitir solo números y hasta 2 decimales con punto
+												if (!/^\d*\.?\d{0,2}$/.test(value)) return;
+												// Limitar el valor máximo a 100
+												if (parseFloat(value) > 100) {
+													value = '100';
+												}
+
+												formikProduct.setFieldValue('percentPromo', value);
+											}}
 											onBlur={formikProduct.handleBlur}
 										/>
 									</FormGroup>

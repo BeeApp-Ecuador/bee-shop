@@ -2,6 +2,7 @@ import React from 'react';
 import Button from '../bootstrap/Button';
 import Card, { CardBody, CardHeader, CardLabel, CardTitle } from '../bootstrap/Card';
 import { OptionType } from '../../type/ItemOptionType';
+import Badge from '../bootstrap/Badge';
 
 const ListProductOptions = ({
 	temporaryOptions,
@@ -31,11 +32,16 @@ const ListProductOptions = ({
 								<li key={index} className='list-group-item d-flex flex-column'>
 									<div className='d-flex justify-content-between align-items-center w-100'>
 										<span>{item.title}</span>
-										<span className='badge bg-info rounded-pill'>
+										<Badge color='info'>
 											{item.type === 'SINGLE'
 												? 'Selección Única'
 												: 'Selección Múltiple'}
-										</span>
+										</Badge>
+										{item.isRequired && (
+											<Badge color='primary'>
+												{item.items[0].tax ? 'Con IVA' : 'Sin IVA'}
+											</Badge>
+										)}
 										<div className='d-flex gap-2'>
 											<Button
 												type='button'
@@ -80,9 +86,13 @@ const ListProductOptions = ({
 												{item.items?.map((opt, i) => (
 													<li key={i}>
 														{opt.detail}{' '}
-														{opt.priceWithVAT
-															? `- $${opt.priceWithVAT}`
-															: ''}
+														{opt.tax
+															? opt.priceWithVAT
+																? `- $${opt.priceWithVAT}`
+																: ''
+															: opt.priceWithoutVAT
+																? `- $${opt.priceWithoutVAT}`
+																: ''}
 													</li>
 												))}
 											</ul>
