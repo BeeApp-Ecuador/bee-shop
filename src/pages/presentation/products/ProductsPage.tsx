@@ -25,7 +25,7 @@ const ProductsPage = () => {
 	const [page, setPage] = useState(1);
 	const [limit, setLimit] = useState(10);
 	const [total, setTotal] = useState(0);
-	const [statusProduct, setStatusProduct] = useState<boolean | null>(true);
+	const [statusProduct, setStatusProduct] = useState<string | null>('AVAILABLE');
 	const [searchTerm, setSearchTerm] = useState('');
 	const [products, setProducts] = useState<ProductType[]>([]);
 	const { data: productsData, refetch } = useGetProductsQuery({

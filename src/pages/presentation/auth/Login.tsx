@@ -134,6 +134,19 @@ const Login: FC<ILoginProps> = ({ isSignUp }) => {
 		for (const key in values) {
 			formData.append(key, values[key]);
 		}
+
+		let prefix = values.prefix;
+		if (!prefix.startsWith('+')) {
+			prefix = `+${prefix}`;
+		}
+		let prefixLegalAgent = values.prefixLegalAgent;
+		if (!prefixLegalAgent.startsWith('+')) {
+			prefixLegalAgent = `+${prefixLegalAgent}`;
+		}
+
+		formData.set('prefix', prefix);
+		formData.set('prefixLegalAgent', prefixLegalAgent);
+
 		const { data, error } = await registerShop(formData);
 		if (error) {
 			setIsLoading(false);
@@ -237,6 +250,7 @@ const Login: FC<ILoginProps> = ({ isSignUp }) => {
 		},
 		validate: (values) => {
 			const errors: Partial<Record<keyof RegisterFormValues, string>> = {};
+			console.log(values);
 
 			// Legal Agent Info Validations
 			if (!values.nameLegalAgent) {
