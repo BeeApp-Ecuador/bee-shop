@@ -205,8 +205,10 @@ const ProductsPage = () => {
 																	className='position-absolute top-0 start-0 w-100 h-100'
 																	style={{
 																		objectFit: 'cover',
-																		filter: 'blur(10px)', // control del nivel de blur y brillo
-																		transform: 'scale(1)', // evita bordes duros
+																		filter: 'blur(10px)',
+																		transform: 'scale(1)',
+																		transition:
+																			'filter 0.3s ease',
 																	}}
 																/>
 
