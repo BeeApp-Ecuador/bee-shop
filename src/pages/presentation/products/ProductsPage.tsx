@@ -148,7 +148,7 @@ const ProductsPage = () => {
 											</ChecksGroup>
 										</FormGroup>
 									</div>
-									<div className='col-6'>
+									<div className='col-12'>
 										<Button
 											color='primary'
 											isOutline
@@ -160,11 +160,11 @@ const ProductsPage = () => {
 											Reset
 										</Button>
 									</div>
-									<div className='col-6'>
+									{/* <div className='col-6'>
 										<Button color='primary' className='w-100' type='submit'>
 											Filter
 										</Button>
-									</div>
+									</div> */}
 								</form>
 							</div>
 						</DropdownMenu>
