@@ -140,6 +140,7 @@ const ProductsPage = () => {
 														checked={categoryFilter}
 														onChange={() => {
 															setCategoryFilter(category._id!);
+															setPage(1);
 														}}
 														// ariaLabel={category.name}
 													/>
@@ -272,7 +273,7 @@ const ProductsPage = () => {
 																<div
 																	key={product._id}
 																	className='col-auto ms-auto d-flex align-items-center gap-2'>
-																	{!product?.haveOptions && (
+																	{product?.haveOptions && (
 																		<Badge
 																			isLight
 																			color='info'
