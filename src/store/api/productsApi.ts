@@ -19,13 +19,20 @@ export const productsApi = createApi({
 	}),
 	endpoints: (builder) => ({
 		getProducts: builder.query({
-			query: ({ page = 1, limit = 10, status = 'AVAILABLE', name = '' }) => {
+			query: ({
+				page = 1,
+				limit = 10,
+				status = 'AVAILABLE',
+				search = '',
+				productCategory = '',
+			}) => {
 				const params: Record<string, any> = {
 					page,
 					limit,
-					name,
+					search,
 				};
 				if (status !== null && status !== undefined) params.status = status;
+				if (productCategory !== '') params.productCategory = productCategory;
 				return {
 					url: 'api/v2/shop/products',
 					params,
