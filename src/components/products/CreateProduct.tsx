@@ -107,20 +107,24 @@ const CreateProduct = ({
 		for (const key in values) {
 			formData.append(key, values[key]);
 		}
-		const { data, error } = await createProduct(formData);
+		console.log(values);
+
+		// const { data, error } = await createProduct(formData);
 		setIsLoading(false);
-		if (error) {
-			if (error && 'status' in error) {
-				// mostrar error
-			}
+		// if (error) {
+		// 	if (error && 'status' in error) {
+		// 		// mostrar error
+		// 	}
+		// }
+
+		// if (data && data.statusCode === 201) {
+		// 	setIsError(false);
+		// 	setShowModal(true);
+		if (formikProduct.values.haveOptions) {
+			console.log('Con opciones:');
+			console.log(temporaryOptions);
 		}
-		if (data && data.statusCode === 201) {
-			setIsError(false);
-			setShowModal(true);
-			if (formikProduct.values.haveOptions) {
-				// Guardar opciones del producto
-			}
-		}
+		// }
 	};
 
 	const formikProduct = useFormik<ProductType>({
@@ -131,8 +135,7 @@ const CreateProduct = ({
 			description: '',
 			restricted: false,
 			tax: false,
-			priceWithoutVAT: 0,
-			priceWithVAT: 0,
+			price: 0,
 			percentPromo: 0,
 			img: null,
 			haveOptions: false,
@@ -154,8 +157,8 @@ const CreateProduct = ({
 			if (values.img === undefined) {
 				errors.img = 'Requerido';
 			}
-			if (values.priceWithoutVAT <= 0) {
-				errors.priceWithoutVAT = 'El precio debe ser mayor a 0';
+			if (values.price <= 0) {
+				errors.price = 'El precio debe ser mayor a 0';
 			}
 			if (havePromo) {
 				if (
@@ -205,14 +208,12 @@ const CreateProduct = ({
 				{
 					detail: '',
 					tax: false,
-					priceWithVAT: 0,
-					priceWithoutVAT: 0,
+					price: 0,
 				},
 				{
 					detail: '',
 					tax: false,
-					priceWithVAT: 0,
-					priceWithoutVAT: 0,
+					price: 0,
 				},
 			],
 		},
@@ -253,12 +254,8 @@ const CreateProduct = ({
 			if (values.isRequired) {
 				const filledItems = values.items.filter((item) =>
 					item.detail?.trim().length > 0 && optionsHaveTax
-						? item.priceWithVAT !== undefined &&
-							item.priceWithVAT !== null &&
-							item.priceWithVAT !== 0
-						: item.priceWithoutVAT !== undefined &&
-							item.priceWithoutVAT !== null &&
-							item.priceWithoutVAT !== 0,
+						? item.price !== undefined && item.price !== null && item.price !== 0
+						: item.price !== undefined && item.price !== null && item.price !== 0,
 				);
 				if (filledItems.length < 2) {
 					showNotification(
@@ -273,12 +270,8 @@ const CreateProduct = ({
 				}
 				const invalidPriceItem = values.items.find((item) =>
 					item.detail?.trim().length > 0 && optionsHaveTax
-						? item.priceWithVAT === undefined ||
-							item.priceWithVAT === null ||
-							item.priceWithVAT === 0
-						: item.priceWithoutVAT === undefined ||
-							item.priceWithoutVAT === null ||
-							item.priceWithoutVAT === 0,
+						? item.price === undefined || item.price === null || item.price === 0
+						: item.price === undefined || item.price === null || item.price === 0,
 				);
 				if (invalidPriceItem) {
 					showNotification(
@@ -315,6 +308,8 @@ const CreateProduct = ({
 			formikOptions.values.items = formikOptions.values.items.filter(
 				(item) => item.detail?.trim().length > 0,
 			);
+			// de formikOptions.values cambiar isrequired por su negacion
+			formikOptions.values.isRequired = !formikOptions.values.isRequired;
 			setTemporaryOptions([...temporaryOptions, formikOptions.values]);
 			showNotification(
 				<span className='d-flex align-items-center'>
@@ -569,12 +564,12 @@ const CreateProduct = ({
 									</small>
 								</div>
 								<div className='col-12 '>
-									<FormGroup id='priceWithoutVAT' isFloating label='Precio'>
+									<FormGroup id='price' isFloating label='Precio final'>
 										<Input
 											// type='number'
-											value={formikProduct.values.priceWithoutVAT}
-											isTouched={formikProduct.touched.priceWithoutVAT}
-											invalidFeedback={formikProduct.errors.priceWithoutVAT}
+											value={formikProduct.values.price}
+											isTouched={formikProduct.touched.price}
+											invalidFeedback={formikProduct.errors.price}
 											isValid={formikProduct.isValid}
 											// onChange={formikProduct.handleChange}
 											onChange={(e: any) => {
@@ -587,10 +582,7 @@ const CreateProduct = ({
 													value = '100';
 												}
 
-												formikProduct.setFieldValue(
-													'priceWithoutVAT',
-													value,
-												);
+												formikProduct.setFieldValue('price', value);
 											}}
 											onBlur={formikProduct.handleBlur}
 										/>

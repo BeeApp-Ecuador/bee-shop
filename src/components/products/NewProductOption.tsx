@@ -152,8 +152,7 @@ const NewProductOption = ({
 																	(item) => ({
 																		...item,
 																		tax: optionsHaveTax,
-																		priceWithVAT: '',
-																		priceWithoutVAT: '',
+																		price: '',
 																	}),
 																),
 															);
@@ -180,8 +179,7 @@ const NewProductOption = ({
 																	(item) => ({
 																		...item,
 																		tax: optionsHaveTax,
-																		priceWithVAT: '',
-																		priceWithoutVAT: '',
+																		price: 0,
 																	}),
 																),
 															);
@@ -215,8 +213,7 @@ const NewProductOption = ({
 																	(item) => ({
 																		...item,
 																		tax: true,
-																		priceWithVAT: '',
-																		priceWithoutVAT: '',
+																		price: '',
 																	}),
 																),
 															);
@@ -237,8 +234,7 @@ const NewProductOption = ({
 																	(item) => ({
 																		...item,
 																		tax: false,
-																		priceWithVAT: '',
-																		priceWithoutVAT: '',
+																		price: '',
 																	}),
 																),
 															);
@@ -288,16 +284,8 @@ const NewProductOption = ({
 											<FormGroup isFloating label='Precio'>
 												<Input
 													type='text'
-													name={
-														optionsHaveTax
-															? `items[${index}].priceWithVAT`
-															: `items[${index}].priceWithoutVAT`
-													}
-													value={
-														optionsHaveTax
-															? item.priceWithVAT || ''
-															: item.priceWithoutVAT || ''
-													}
+													name={`items[${index}].price`}
+													value={item.price || ''}
 													onChange={(e: any) => {
 														console.log(e.target.value);
 														const re = /^\d*\.?\d{0,2}$/;
@@ -306,9 +294,7 @@ const NewProductOption = ({
 															re.test(e.target.value)
 														) {
 															formikOptions.setFieldValue(
-																optionsHaveTax
-																	? `items[${index}].priceWithVAT`
-																	: `items[${index}].priceWithoutVAT`,
+																`items[${index}].price`,
 																e.target.value,
 															);
 														}
@@ -347,7 +333,7 @@ const NewProductOption = ({
 										const updated = [
 											...formikOptions.values.items,
 											formikOptions.values.isRequired
-												? { name: '', price: '', tax: optionsHaveTax }
+												? { name: '', price: 0, tax: optionsHaveTax }
 												: { name: '' },
 										];
 										formikOptions.setFieldValue('items', updated);

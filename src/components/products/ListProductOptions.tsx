@@ -86,13 +86,7 @@ const ListProductOptions = ({
 												{item.items?.map((opt, i) => (
 													<li key={i}>
 														{opt.detail}{' '}
-														{opt.tax
-															? opt.priceWithVAT
-																? `- $${opt.priceWithVAT}`
-																: ''
-															: opt.priceWithoutVAT
-																? `- $${opt.priceWithoutVAT}`
-																: ''}
+														{opt.price ? `- $${opt.price}` : ''}
 													</li>
 												))}
 											</ul>

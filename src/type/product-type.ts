@@ -4,8 +4,7 @@ export interface ProductType {
 	description: string;
 	restricted: boolean;
 	tax: boolean;
-	priceWithoutVAT: number;
-	priceWithVAT: number;
+	price: number;
 	percentPromo: number;
 	img: File | null;
 	productCategory: string;
