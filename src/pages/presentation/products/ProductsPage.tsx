@@ -140,6 +140,7 @@ const ProductsPage = () => {
 														checked={categoryFilter}
 														onChange={() => {
 															setCategoryFilter(category._id!);
+															setPage(1);
 														}}
 														// ariaLabel={category.name}
 													/>
@@ -147,7 +148,7 @@ const ProductsPage = () => {
 											</ChecksGroup>
 										</FormGroup>
 									</div>
-									<div className='col-6'>
+									<div className='col-12'>
 										<Button
 											color='primary'
 											isOutline
@@ -159,11 +160,11 @@ const ProductsPage = () => {
 											Reset
 										</Button>
 									</div>
-									<div className='col-6'>
+									{/* <div className='col-6'>
 										<Button color='primary' className='w-100' type='submit'>
 											Filter
 										</Button>
-									</div>
+									</div> */}
 								</form>
 							</div>
 						</DropdownMenu>
@@ -272,7 +273,7 @@ const ProductsPage = () => {
 																<div
 																	key={product._id}
 																	className='col-auto ms-auto d-flex align-items-center gap-2'>
-																	{!product?.haveOptions && (
+																	{product?.haveOptions && (
 																		<Badge
 																			isLight
 																			color='info'
