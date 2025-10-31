@@ -11,5 +11,5 @@ export interface ProductType {
 	haveOptions: boolean;
 	tags?: string[];
 	options?: [];
-	status: 'AVAILABLE' | 'UNAVAILABLE' | 'DELETED';
+	status?: 'AVAILABLE' | 'UNAVAILABLE' | 'DELETED';
 }

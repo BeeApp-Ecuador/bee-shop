@@ -287,7 +287,6 @@ const NewProductOption = ({
 													name={`items[${index}].price`}
 													value={item.price || ''}
 													onChange={(e: any) => {
-														console.log(e.target.value);
 														const re = /^\d*\.?\d{0,2}$/;
 														if (
 															e.target.value === '' ||

@@ -23,7 +23,6 @@ import ListProductOptions from './ListProductOptions';
 import { OptionType } from '../../type/ItemOptionType';
 import showNotification from '../extras/showNotification';
 import Icon from '../icon/Icon';
-import { createApi } from '@reduxjs/toolkit/query/react';
 import {
 	useAddOptionsToProductMutation,
 	useCreateProductMutation,
@@ -82,7 +81,6 @@ const CreateProduct = ({
 
 	useEffect(() => {
 		if (data) {
-			console.log(data);
 			setCategories(data.data as ProductCategoryType[]);
 		}
 	}, [data]);
@@ -111,23 +109,19 @@ const CreateProduct = ({
 		for (const key in values) {
 			formData.append(key, values[key]);
 		}
-		console.log(values);
 
 		const { data, error } = await createProduct(formData);
 		setIsLoading(false);
 		if (error) {
-			console.log(error);
 			if (error && 'status' in error) {
 				// mostrar error
 			}
 		}
 
-		console.log(data);
 		if (data && data.meta.status === 201) {
 			if (formikProduct.values.haveOptions) {
 				setIsLoading(true);
 
-				// TODO: obtener el id del producto creado
 				const productId = data.data._id;
 				const { data: optionsData, error: optionsError } = await addOptionsToProduct({
 					productId,
@@ -135,7 +129,6 @@ const CreateProduct = ({
 				});
 				setIsLoading(false);
 				if (optionsError) {
-					console.log(optionsError);
 					if (optionsError && 'status' in optionsError) {
 						setIsError(true);
 						setShowModal(true);
@@ -143,7 +136,6 @@ const CreateProduct = ({
 					}
 				}
 			}
-			console.log('llega aca');
 			setIsError(false);
 			setShowModal(true);
 		}
@@ -776,7 +768,7 @@ const CreateProduct = ({
 				size='sm'
 				isStaticBackdrop
 				isAnimation={true}>
-				<ModalHeader setIsOpen={() => setShowModal(!showModal)}>
+				<ModalHeader>
 					<ModalTitle id='fillModal'>{isError ? 'Error' : 'Éxito'}</ModalTitle>
 				</ModalHeader>
 				<ModalBody>
