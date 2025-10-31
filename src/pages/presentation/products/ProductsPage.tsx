@@ -294,7 +294,7 @@ const ProductsPage = () => {
 					<ModalBody>
 						<CreateProduct
 							isEditing={false}
-							setIsFillingProfile={setIsCreatingProduct}
+							setIsCreatingProduct={setIsCreatingProduct}
 						/>
 					</ModalBody>
 				</Modal>

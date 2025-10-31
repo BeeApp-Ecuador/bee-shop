@@ -42,13 +42,12 @@ export const productsApi = createApi({
 				method: 'POST',
 				body: product,
 				headers: {
-					'Content-Type': 'application/json',
 					Authorization: localStorage.getItem('token')!,
 				},
 			}),
 		}),
 		addOptionsToProduct: builder.mutation({
-			query: ({ productId, options }) => ({
+			query: ({ productId, options }: { productId: string; options: any }) => ({
 				url: `api/v2/shop/product/options/${productId}`,
 				method: 'PUT',
 				body: options,
@@ -61,4 +60,5 @@ export const productsApi = createApi({
 	}),
 });
 
-export const { useGetProductsQuery, useCreateProductMutation } = productsApi;
+export const { useGetProductsQuery, useCreateProductMutation, useAddOptionsToProductMutation } =
+	productsApi;
