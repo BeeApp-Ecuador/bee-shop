@@ -1,12 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import classNames from 'classnames';
-import { useFormik } from 'formik';
 import SubHeader, { SubHeaderLeft, SubHeaderRight } from '../../../layout/SubHeader/SubHeader';
 import Icon from '../../../components/icon/Icon';
 import Page from '../../../layout/Page/Page';
 import PageWrapper from '../../../layout/PageWrapper/PageWrapper';
 import Card, { CardBody } from '../../../components/bootstrap/Card';
-import USERS from '../../../common/data/userDummyData';
 import Badge from '../../../components/bootstrap/Badge';
 import Button from '../../../components/bootstrap/Button';
 import Dropdown, { DropdownMenu, DropdownToggle } from '../../../components/bootstrap/Dropdown';
@@ -14,29 +12,45 @@ import FormGroup from '../../../components/bootstrap/forms/FormGroup';
 import Label from '../../../components/bootstrap/forms/Label';
 import Input from '../../../components/bootstrap/forms/Input';
 import Checks, { ChecksGroup } from '../../../components/bootstrap/forms/Checks';
-import SERVICES from '../../../common/data/serviceDummyData';
 import { demoPagesMenu } from '../../../menu';
 import { useGetProductsQuery } from '../../../store/api/productsApi';
 import { ProductType } from '../../../type/product-type';
 import Modal, { ModalBody, ModalHeader, ModalTitle } from '../../../components/bootstrap/Modal';
 import CreateProduct from '../../../components/products/CreateProduct';
+import PaginationButtons from '../../../components/PaginationButtons';
+import { ProductCategoryType } from '../../../type/product-category-type';
+import { useGetCategoriesQuery } from '../../../store/api/categoryApi';
 
 const ProductsPage = () => {
 	const [page, setPage] = useState(1);
 	const [limit, setLimit] = useState(10);
 	const [total, setTotal] = useState(0);
+	const { data: categoriesData } = useGetCategoriesQuery({
+		page: 1,
+		limit: 500,
+		status: true,
+		name: '',
+	});
+	const [categories, setCategories] = useState<ProductCategoryType[]>([]);
+
 	const [statusProduct, setStatusProduct] = useState<string | null>('AVAILABLE');
 	const [searchTerm, setSearchTerm] = useState('');
 	const [products, setProducts] = useState<ProductType[]>([]);
+	const [categoryFilter, setCategoryFilter] = useState<string>('');
 	const { data: productsData, refetch } = useGetProductsQuery({
 		page,
 		limit,
 		status: statusProduct,
-		name: searchTerm,
+		search: searchTerm,
+		productCategory: categoryFilter,
 	});
 	const [isCreatingProduct, setIsCreatingProduct] = useState(false);
 
 	useEffect(() => {
+		if (categoriesData) {
+			console.log(categoriesData);
+			setCategories(categoriesData.data as ProductCategoryType[]);
+		}
 		if (productsData) {
 			console.log('productsData');
 			console.log(productsData);
@@ -45,52 +59,39 @@ const ProductsPage = () => {
 				setTotal(productsData.total);
 			}
 		}
-	}, [productsData]);
+	}, [productsData, categoriesData]);
+
+	useEffect(() => {
+		const delayDebounce = setTimeout(() => {
+			if (searchTerm.trim().length > 0) {
+				refetch();
+			}
+		}, 500);
+
+		return () => clearTimeout(delayDebounce);
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [searchTerm]);
+
 	const [filterMenu, setFilterMenu] = useState(false);
 
-	const formik = useFormik({
-		initialValues: {
-			available: false,
-			searchInput: '',
-			services: [],
-		},
-		// eslint-disable-next-line @typescript-eslint/no-unused-vars
-		onSubmit: (values) => {
-			setFilterMenu(false);
-			// alert(JSON.stringify(values, null, 2));
-		},
-	});
-
-	const searchUsers = Object.keys(USERS)
-		.filter(
-			(key) =>
-				USERS[key].username
-					.toLowerCase()
-					.includes(formik.values.searchInput.toLowerCase()) ||
-				USERS[key].name.toLowerCase().includes(formik.values.searchInput.toLowerCase()) ||
-				USERS[key].surname
-					.toLowerCase()
-					.includes(formik.values.searchInput.toLowerCase()) ||
-				USERS[key].position.toLowerCase().includes(formik.values.searchInput.toLowerCase()),
-		)
-		.filter((key2) => (formik.values.available ? USERS[key2].isOnline : key2))
-		.map((i) => USERS[i]);
 	return (
 		<PageWrapper title={demoPagesMenu.appointment.subMenu.employeeList.text}>
 			<SubHeader>
 				<SubHeaderLeft>
 					<label
 						className='border-0 bg-transparent cursor-pointer me-0'
-						htmlFor='searchInput'>
+						htmlFor='searchTerm'>
 						<Icon icon='Search' size='2x' color='primary' />
 					</label>
 					<Input
-						id='searchInput'
+						id='searchTerm'
 						type='search'
 						className='border-0 shadow-none bg-transparent'
-						placeholder='Search...'
-						onChange={formik.handleChange}
-						value={formik.values.searchInput}
+						placeholder='Buscar...'
+						onChange={(e: any) => {
+							setSearchTerm(e.target.value);
+						}}
+						value={searchTerm}
 					/>
 				</SubHeaderLeft>
 				<SubHeaderRight>
@@ -100,55 +101,45 @@ const ProductsPage = () => {
 						</DropdownToggle>
 						<DropdownMenu isAlignmentEnd size='lg' isCloseAfterLeave={false}>
 							<div className='container py-2'>
-								<form className='row g-3' onSubmit={formik.handleSubmit}>
+								<form className='row g-3'>
 									<div className='col-12'>
 										<FormGroup>
-											<Label htmlFor='available'>Available employee</Label>
+											<Label htmlFor='available'>Disponibilidad</Label>
 											<Checks
 												id='available'
 												type='switch'
-												label='Available'
-												onChange={formik.handleChange}
-												checked={formik.values.available}
+												label='Disponible'
+												onChange={() => {
+													if (statusProduct === 'AVAILABLE') {
+														setStatusProduct('UNAVAILABLE');
+													} else {
+														setStatusProduct('AVAILABLE');
+													}
+												}}
+												checked={statusProduct === 'AVAILABLE'}
 												ariaLabel='Available status'
 											/>
 										</FormGroup>
 									</div>
+
 									<div className='col-12'>
 										<FormGroup>
-											<Label htmlFor='name'>Name</Label>
-											<Input
-												id='searchInput2'
-												name='searchInput'
-												ariaLabel='name'
-												placeholder='Employee Name'
-												list={[
-													...Object.keys(USERS).map(
-														(u) =>
-															`${USERS[u].name} ${USERS[u].surname}`,
-													),
-												]}
-												onChange={formik.handleChange}
-												value={formik.values.searchInput}
-											/>
-										</FormGroup>
-									</div>
-									<div className='col-12'>
-										<FormGroup>
-											<Label>Services</Label>
+											<Label>Categorías</Label>
 											<ChecksGroup>
-												{Object.keys(SERVICES).map((service) => (
+												{categories?.map((category) => (
+													// <h1>ds</h1>
 													<Checks
-														key={SERVICES[service].name}
-														id={SERVICES[service].name}
-														label={SERVICES[service].name}
-														name='services'
-														value={SERVICES[service].name}
-														onChange={formik.handleChange}
-														checked={formik.values.services.includes(
-															// @ts-ignore
-															SERVICES[service].name,
-														)}
+														type='radio'
+														key={category._id}
+														id={category._id}
+														label={category.name}
+														name='categories'
+														value={category._id}
+														checked={categoryFilter}
+														onChange={() => {
+															setCategoryFilter(category._id!);
+														}}
+														// ariaLabel={category.name}
 													/>
 												))}
 											</ChecksGroup>
@@ -159,7 +150,10 @@ const ProductsPage = () => {
 											color='primary'
 											isOutline
 											className='w-100'
-											onClick={formik.resetForm}>
+											onClick={() => {
+												setStatusProduct('AVAILABLE');
+												setCategoryFilter('');
+											}}>
 											Reset
 										</Button>
 									</div>
@@ -184,8 +178,8 @@ const ProductsPage = () => {
 			<Page container='fluid'>
 				{products.length > 0 ? (
 					<div className='row row-cols-xxl-3 row-cols-lg-3 row-cols-md-2'>
-						{searchUsers.map((user) => (
-							<div key={user.username} className='col'>
+						{products.map((product) => (
+							<div key={product._id} className='col'>
 								<Card>
 									<CardBody>
 										<div className='row g-3'>
@@ -196,24 +190,45 @@ const ProductsPage = () => {
 															className='ratio ratio-1x1'
 															style={{ width: 100 }}>
 															<div
-																className={classNames(
-																	`bg-l25-${user.color}`,
-																	'rounded-2',
-																	'd-flex align-items-center justify-content-center',
-																	'overflow-hidden',
-																	'shadow',
-																)}>
+															// className={classNames(
+															// 	`bg-l25-success`,
+															// 	'rounded-2',
+															// 	'd-flex align-items-center justify-content-center',
+															// 	'overflow-hidden',
+															// 	'shadow',
+															// 	)
+															// }
+															>
 																<img
-																	src={user.src}
-																	alt={user.name}
-																	width={100}
+																	src={product.img!.toString()}
+																	alt='blur background'
+																	className='position-absolute top-0 start-0 w-100 h-100'
+																	style={{
+																		objectFit: 'cover',
+																		filter: 'blur(10px)',
+																		transform: 'scale(1)',
+																		transition:
+																			'filter 0.3s ease',
+																	}}
+																/>
+
+																<img
+																	src={product.img!.toString()}
+																	alt={product.name}
+																	width={95}
+																	height={95}
+																	className='rounded-2 position-relative m-auto d-block shadow'
+																	style={{
+																		objectFit: 'cover',
+																		// zIndex: 1,
+																	}}
 																/>
 															</div>
 														</div>
-														{user.isOnline && (
+														{product.status === 'AVAILABLE' && (
 															<span className='position-absolute top-100 start-85 translate-middle badge border border-2 border-light rounded-circle bg-success p-2'>
 																<span className='visually-hidden'>
-																	Online user
+																	Disponible
 																</span>
 															</span>
 														)}
@@ -224,52 +239,53 @@ const ProductsPage = () => {
 														<div className='row'>
 															<div className='col'>
 																<div className='d-flex align-items-center'>
-																	<div className='fw-bold fs-5 me-2'>
-																		{`${user.name} ${user.surname}`}
+																	<div className='fw-bold fs-5 me-2 truncate-line-1'>
+																		{product.name}
 																	</div>
-																	<small className='border border-success border-2 text-success fw-bold px-2 py-1 rounded-1'>
-																		{user.position}
-																	</small>
 																</div>
 
-																<div className='text-muted'>
-																	@{user.username}
+																<div className='text-muted truncate-line-2'>
+																	{product.description}
 																</div>
 															</div>
 															<div className='col-auto'>
 																<Button
-																	icon='Info'
-																	color='dark'
+																	icon='RemoveRedEye'
+																	color='info'
 																	isLight
 																	hoverShadow='sm'
 																	tag='a'
-																	to={`../${demoPagesMenu.appointment.subMenu.employeeID.path}/${user.id}`}
-																	data-tour={user.name}
+																	// to={`../${demoPagesMenu.appointment.subMenu.employeeID.path}/${user.id}`}
+																	// data-tour={user.name}
 																	aria-label='More info'
 																/>
 															</div>
 														</div>
-														{!!user?.services && (
-															<div className='row g-2 mt-3'>
-																{user?.services.map((service) => (
-																	<div
-																		key={service.name}
-																		className='col-auto'>
-																		<Badge
-																			isLight
-																			color={service.color}
-																			className='px-3 py-2'>
-																			<Icon
-																				icon={service.icon}
-																				size='lg'
-																				className='me-1'
-																			/>
-																			{service.name}
-																		</Badge>
-																	</div>
-																))}
+														<div className='row g-2 mt-3'>
+															<div
+																key={product._id}
+																className='col-auto ms-auto d-flex align-items-center gap-2'>
+																{!product?.haveOptions && (
+																	<Badge
+																		isLight
+																		color='info'
+																		className='px-3 py-2'>
+																		<Icon
+																			icon='List'
+																			size='lg'
+																			className='me-1'
+																		/>
+																		Opciones
+																	</Badge>
+																)}
+																<small className='border border-success border-2 text-success fw-bold px-2 py-1 rounded-1'>
+																	$
+																	{Number(product.price).toFixed(
+																		2,
+																	)}
+																</small>
 															</div>
-														)}
+														</div>
 													</div>
 												</div>
 											</div>
@@ -298,6 +314,15 @@ const ProductsPage = () => {
 						/>
 					</ModalBody>
 				</Modal>
+				<PaginationButtons
+					data={products}
+					label='productos'
+					setCurrentPage={setPage}
+					currentPage={page}
+					perPage={limit}
+					setPerPage={setLimit}
+					totalItems={total}
+				/>
 			</Page>
 		</PageWrapper>
 	);
