@@ -24,13 +24,16 @@ import { OptionType } from '../../type/ItemOptionType';
 import showNotification from '../extras/showNotification';
 import Icon from '../icon/Icon';
 import { createApi } from '@reduxjs/toolkit/query/react';
-import { useCreateProductMutation } from '../../store/api/productsApi';
+import {
+	useAddOptionsToProductMutation,
+	useCreateProductMutation,
+} from '../../store/api/productsApi';
 
 const CreateProduct = ({
-	setIsFillingProfile,
+	setIsCreatingProduct,
 	isEditing,
 }: {
-	setIsFillingProfile: React.Dispatch<React.SetStateAction<boolean>>;
+	setIsCreatingProduct: React.Dispatch<React.SetStateAction<boolean>>;
 	isEditing: boolean;
 }) => {
 	const { user: shop } = useContext(AuthContext);
@@ -53,6 +56,7 @@ const CreateProduct = ({
 	const [openItems, setOpenItems] = useState<{ [key: number]: boolean }>({});
 
 	const [createProduct] = useCreateProductMutation();
+	const [addOptionsToProduct] = useAddOptionsToProductMutation();
 
 	// const { setUser } = useContext(AuthContext);
 
@@ -109,22 +113,40 @@ const CreateProduct = ({
 		}
 		console.log(values);
 
-		// const { data, error } = await createProduct(formData);
+		const { data, error } = await createProduct(formData);
 		setIsLoading(false);
-		// if (error) {
-		// 	if (error && 'status' in error) {
-		// 		// mostrar error
-		// 	}
-		// }
-
-		// if (data && data.statusCode === 201) {
-		// 	setIsError(false);
-		// 	setShowModal(true);
-		if (formikProduct.values.haveOptions) {
-			console.log('Con opciones:');
-			console.log(temporaryOptions);
+		if (error) {
+			console.log(error);
+			if (error && 'status' in error) {
+				// mostrar error
+			}
 		}
-		// }
+
+		console.log(data);
+		if (data && data.meta.status === 201) {
+			if (formikProduct.values.haveOptions) {
+				setIsLoading(true);
+
+				// TODO: obtener el id del producto creado
+				const productId = data.data._id;
+				const { data: optionsData, error: optionsError } = await addOptionsToProduct({
+					productId,
+					options: temporaryOptions,
+				});
+				setIsLoading(false);
+				if (optionsError) {
+					console.log(optionsError);
+					if (optionsError && 'status' in optionsError) {
+						setIsError(true);
+						setShowModal(true);
+						return;
+					}
+				}
+			}
+			console.log('llega aca');
+			setIsError(false);
+			setShowModal(true);
+		}
 	};
 
 	const formikProduct = useFormik<ProductType>({
@@ -311,6 +333,7 @@ const CreateProduct = ({
 			// de formikOptions.values cambiar isrequired por su negacion
 			formikOptions.values.isRequired = !formikOptions.values.isRequired;
 			setTemporaryOptions([...temporaryOptions, formikOptions.values]);
+			setOptionsHaveTax(false);
 			showNotification(
 				<span className='d-flex align-items-center'>
 					<Icon icon='Success' size='lg' className='me-1' />
@@ -627,7 +650,7 @@ const CreateProduct = ({
 											isTouched={formikProduct.touched.percentPromo}
 											invalidFeedback={formikProduct.errors.percentPromo}
 											isValid={formikProduct.isValid}
-											onChange={(e) => {
+											onChange={(e: any) => {
 												let value = e.target.value;
 
 												// Permitir solo números y hasta 2 decimales con punto
@@ -751,6 +774,7 @@ const CreateProduct = ({
 				titleId='fillModal'
 				isCentered={true}
 				size='sm'
+				isStaticBackdrop
 				isAnimation={true}>
 				<ModalHeader setIsOpen={() => setShowModal(!showModal)}>
 					<ModalTitle id='fillModal'>{isError ? 'Error' : 'Éxito'}</ModalTitle>
@@ -768,7 +792,7 @@ const CreateProduct = ({
 						isOutline
 						className='border-0'
 						onClick={() => {
-							if (!isError) setIsFillingProfile(false);
+							if (!isError) setIsCreatingProduct(false);
 							setIsError(false);
 							return setShowModal(false);
 						}}>

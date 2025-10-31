@@ -332,9 +332,7 @@ const NewProductOption = ({
 									onClick={() => {
 										const updated = [
 											...formikOptions.values.items,
-											formikOptions.values.isRequired
-												? { name: '', price: 0, tax: optionsHaveTax }
-												: { name: '' },
+											{ detail: '', tax: optionsHaveTax, price: 0 },
 										];
 										formikOptions.setFieldValue('items', updated);
 									}}>

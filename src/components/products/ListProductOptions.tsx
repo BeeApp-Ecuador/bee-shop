@@ -37,7 +37,7 @@ const ListProductOptions = ({
 												? 'Selección Única'
 												: 'Selección Múltiple'}
 										</Badge>
-										{item.isRequired && (
+										{!item.isRequired && (
 											<Badge color='primary'>
 												{item.items[0].tax ? 'Con IVA' : 'Sin IVA'}
 											</Badge>
