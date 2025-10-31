@@ -19,7 +19,7 @@ export const productsApi = createApi({
 	}),
 	endpoints: (builder) => ({
 		getProducts: builder.query({
-			query: ({ page = 1, limit = 10, status = true, name = '' }) => {
+			query: ({ page = 1, limit = 10, status = AVAILABLE, name = '' }) => {
 				const params: Record<string, any> = {
 					page,
 					limit,
