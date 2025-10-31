@@ -20,6 +20,7 @@ import CreateProduct from '../../../components/products/CreateProduct';
 import PaginationButtons from '../../../components/PaginationButtons';
 import { ProductCategoryType } from '../../../type/product-category-type';
 import { useGetCategoriesQuery } from '../../../store/api/categoryApi';
+import Spinner from '../../../components/bootstrap/Spinner';
 
 const ProductsPage = () => {
 	const [page, setPage] = useState(1);
@@ -37,7 +38,11 @@ const ProductsPage = () => {
 	const [searchTerm, setSearchTerm] = useState('');
 	const [products, setProducts] = useState<ProductType[]>([]);
 	const [categoryFilter, setCategoryFilter] = useState<string>('');
-	const { data: productsData, refetch } = useGetProductsQuery({
+	const {
+		data: productsData,
+		refetch,
+		isLoading: isLoadingProducts,
+	} = useGetProductsQuery({
 		page,
 		limit,
 		status: statusProduct,
@@ -175,155 +180,161 @@ const ProductsPage = () => {
 					</Button>
 				</SubHeaderRight>
 			</SubHeader>
-			<Page container='fluid'>
-				{products.length > 0 ? (
-					<div className='row row-cols-xxl-3 row-cols-lg-3 row-cols-md-2'>
-						{products.map((product) => (
-							<div key={product._id} className='col'>
-								<Card>
-									<CardBody>
-										<div className='row g-3'>
-											<div className='col d-flex'>
-												<div className='flex-shrink-0'>
-													<div className='position-relative'>
-														<div
-															className='ratio ratio-1x1'
-															style={{ width: 100 }}>
+			{isLoadingProducts ? (
+				<div className='d-flex justify-content-center align-items-center vh-100'>
+					<Spinner isGrow />
+				</div>
+			) : (
+				<Page container='fluid'>
+					{products.length > 0 ? (
+						<div className='row row-cols-xxl-3 row-cols-lg-3 row-cols-md-2'>
+							{products.map((product) => (
+								<div key={product._id} className='col'>
+									<Card>
+										<CardBody>
+											<div className='row g-3'>
+												<div className='col d-flex'>
+													<div className='flex-shrink-0'>
+														<div className='position-relative'>
 															<div
-															// className={classNames(
-															// 	`bg-l25-success`,
-															// 	'rounded-2',
-															// 	'd-flex align-items-center justify-content-center',
-															// 	'overflow-hidden',
-															// 	'shadow',
-															// 	)
-															// }
-															>
-																<img
-																	src={product.img!.toString()}
-																	alt='blur background'
-																	className='position-absolute top-0 start-0 w-100 h-100'
-																	style={{
-																		objectFit: 'cover',
-																		filter: 'blur(10px)',
-																		transform: 'scale(1)',
-																		transition:
-																			'filter 0.3s ease',
-																	}}
-																/>
+																className='ratio ratio-1x1'
+																style={{ width: 100 }}>
+																<div
+																// className={classNames(
+																// 	`bg-l25-success`,
+																// 	'rounded-2',
+																// 	'd-flex align-items-center justify-content-center',
+																// 	'overflow-hidden',
+																// 	'shadow',
+																// 	)
+																// }
+																>
+																	<img
+																		src={product.img!.toString()}
+																		alt='blur background'
+																		className='position-absolute top-0 start-0 w-100 h-100'
+																		style={{
+																			objectFit: 'cover',
+																			filter: 'blur(10px)',
+																			transform: 'scale(1)',
+																			transition:
+																				'filter 0.3s ease',
+																		}}
+																	/>
 
-																<img
-																	src={product.img!.toString()}
-																	alt={product.name}
-																	width={95}
-																	height={95}
-																	className='rounded-2 position-relative m-auto d-block shadow'
-																	style={{
-																		objectFit: 'cover',
-																		// zIndex: 1,
-																	}}
-																/>
+																	<img
+																		src={product.img!.toString()}
+																		alt={product.name}
+																		width={95}
+																		height={95}
+																		className='rounded-2 position-relative m-auto d-block shadow'
+																		style={{
+																			objectFit: 'cover',
+																			// zIndex: 1,
+																		}}
+																	/>
+																</div>
 															</div>
-														</div>
-														{product.status === 'AVAILABLE' && (
-															<span className='position-absolute top-100 start-85 translate-middle badge border border-2 border-light rounded-circle bg-success p-2'>
-																<span className='visually-hidden'>
-																	Disponible
+															{product.status === 'AVAILABLE' && (
+																<span className='position-absolute top-100 start-85 translate-middle badge border border-2 border-light rounded-circle bg-success p-2'>
+																	<span className='visually-hidden'>
+																		Disponible
+																	</span>
 																</span>
-															</span>
-														)}
+															)}
+														</div>
 													</div>
-												</div>
-												<div className='flex-grow-1 ms-3 d-flex justify-content-between'>
-													<div className='w-100'>
-														<div className='row'>
-															<div className='col'>
-																<div className='d-flex align-items-center'>
-																	<div className='fw-bold fs-5 me-2 truncate-line-1'>
-																		{product.name}
+													<div className='flex-grow-1 ms-3 d-flex justify-content-between'>
+														<div className='w-100'>
+															<div className='row'>
+																<div className='col'>
+																	<div className='d-flex align-items-center'>
+																		<div className='fw-bold fs-5 me-2 truncate-line-1'>
+																			{product.name}
+																		</div>
+																	</div>
+
+																	<div className='text-muted truncate-line-2'>
+																		{product.description}
 																	</div>
 																</div>
-
-																<div className='text-muted truncate-line-2'>
-																	{product.description}
+																<div className='col-auto'>
+																	<Button
+																		icon='RemoveRedEye'
+																		color='info'
+																		isLight
+																		hoverShadow='sm'
+																		tag='a'
+																		// to={`../${demoPagesMenu.appointment.subMenu.employeeID.path}/${user.id}`}
+																		// data-tour={user.name}
+																		aria-label='More info'
+																	/>
 																</div>
 															</div>
-															<div className='col-auto'>
-																<Button
-																	icon='RemoveRedEye'
-																	color='info'
-																	isLight
-																	hoverShadow='sm'
-																	tag='a'
-																	// to={`../${demoPagesMenu.appointment.subMenu.employeeID.path}/${user.id}`}
-																	// data-tour={user.name}
-																	aria-label='More info'
-																/>
-															</div>
-														</div>
-														<div className='row g-2 mt-3'>
-															<div
-																key={product._id}
-																className='col-auto ms-auto d-flex align-items-center gap-2'>
-																{!product?.haveOptions && (
-																	<Badge
-																		isLight
-																		color='info'
-																		className='px-3 py-2'>
-																		<Icon
-																			icon='List'
-																			size='lg'
-																			className='me-1'
-																		/>
-																		Opciones
-																	</Badge>
-																)}
-																<small className='border border-success border-2 text-success fw-bold px-2 py-1 rounded-1'>
-																	$
-																	{Number(product.price).toFixed(
-																		2,
+															<div className='row g-2 mt-3'>
+																<div
+																	key={product._id}
+																	className='col-auto ms-auto d-flex align-items-center gap-2'>
+																	{!product?.haveOptions && (
+																		<Badge
+																			isLight
+																			color='info'
+																			className='px-3 py-2'>
+																			<Icon
+																				icon='List'
+																				size='lg'
+																				className='me-1'
+																			/>
+																			Opciones
+																		</Badge>
 																	)}
-																</small>
+																	<small className='border border-success border-2 text-success fw-bold px-2 py-1 rounded-1'>
+																		$
+																		{Number(
+																			product.price,
+																		).toFixed(2)}
+																	</small>
+																</div>
 															</div>
 														</div>
 													</div>
 												</div>
 											</div>
-										</div>
-									</CardBody>
-								</Card>
-							</div>
-						))}
-					</div>
-				) : (
-					<div className='text-center py-5'>No se encontraron productos</div>
-				)}
-				<Modal
-					setIsOpen={setIsCreatingProduct}
-					isOpen={isCreatingProduct}
-					isCentered
-					isStaticBackdrop
-					size='xl'>
-					<ModalHeader setIsOpen={setIsCreatingProduct}>
-						<ModalTitle id='preview'>Crear Producto</ModalTitle>
-					</ModalHeader>
-					<ModalBody>
-						<CreateProduct
-							isEditing={false}
-							setIsCreatingProduct={setIsCreatingProduct}
-						/>
-					</ModalBody>
-				</Modal>
-				<PaginationButtons
-					data={products}
-					label='productos'
-					setCurrentPage={setPage}
-					currentPage={page}
-					perPage={limit}
-					setPerPage={setLimit}
-					totalItems={total}
-				/>
-			</Page>
+										</CardBody>
+									</Card>
+								</div>
+							))}
+						</div>
+					) : (
+						<div className='text-center py-5'>No se encontraron productos</div>
+					)}
+					<Modal
+						setIsOpen={setIsCreatingProduct}
+						isOpen={isCreatingProduct}
+						isCentered
+						isStaticBackdrop
+						size='xl'>
+						<ModalHeader setIsOpen={setIsCreatingProduct}>
+							<ModalTitle id='preview'>Crear Producto</ModalTitle>
+						</ModalHeader>
+						<ModalBody>
+							<CreateProduct
+								isEditing={false}
+								setIsCreatingProduct={setIsCreatingProduct}
+							/>
+						</ModalBody>
+					</Modal>
+					<PaginationButtons
+						data={products}
+						label='productos'
+						setCurrentPage={setPage}
+						currentPage={page}
+						perPage={limit}
+						setPerPage={setLimit}
+						totalItems={total}
+					/>
+				</Page>
+			)}
 		</PageWrapper>
 	);
 };
