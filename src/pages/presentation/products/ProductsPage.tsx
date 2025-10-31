@@ -20,6 +20,7 @@ import { useGetProductsQuery } from '../../../store/api/productsApi';
 import { ProductType } from '../../../type/product-type';
 import Modal, { ModalBody, ModalHeader, ModalTitle } from '../../../components/bootstrap/Modal';
 import CreateProduct from '../../../components/products/CreateProduct';
+import PaginationButtons from '../../../components/PaginationButtons';
 
 const ProductsPage = () => {
 	const [page, setPage] = useState(1);
@@ -184,8 +185,8 @@ const ProductsPage = () => {
 			<Page container='fluid'>
 				{products.length > 0 ? (
 					<div className='row row-cols-xxl-3 row-cols-lg-3 row-cols-md-2'>
-						{searchUsers.map((user) => (
-							<div key={user.username} className='col'>
+						{products.map((product) => (
+							<div key={product._id} className='col'>
 								<Card>
 									<CardBody>
 										<div className='row g-3'>
@@ -197,26 +198,26 @@ const ProductsPage = () => {
 															style={{ width: 100 }}>
 															<div
 																className={classNames(
-																	`bg-l25-${user.color}`,
+																	`bg-l25-primary`,
 																	'rounded-2',
 																	'd-flex align-items-center justify-content-center',
 																	'overflow-hidden',
 																	'shadow',
 																)}>
 																<img
-																	src={user.src}
-																	alt={user.name}
+																	src={product.img!}
+																	alt={product.name}
 																	width={100}
 																/>
 															</div>
 														</div>
-														{user.isOnline && (
+														{/* {product.isOnline && (
 															<span className='position-absolute top-100 start-85 translate-middle badge border border-2 border-light rounded-circle bg-success p-2'>
 																<span className='visually-hidden'>
 																	Online user
 																</span>
 															</span>
-														)}
+														)} */}
 													</div>
 												</div>
 												<div className='flex-grow-1 ms-3 d-flex justify-content-between'>
@@ -225,15 +226,18 @@ const ProductsPage = () => {
 															<div className='col'>
 																<div className='d-flex align-items-center'>
 																	<div className='fw-bold fs-5 me-2'>
-																		{`${user.name} ${user.surname}`}
+																		{product.name}
 																	</div>
 																	<small className='border border-success border-2 text-success fw-bold px-2 py-1 rounded-1'>
-																		{user.position}
+																		$
+																		{Number(
+																			product.price,
+																		).toFixed(2)}
 																	</small>
 																</div>
 
-																<div className='text-muted'>
-																	@{user.username}
+																<div className='text-muted truncated-text'>
+																	{product.description}
 																</div>
 															</div>
 															<div className='col-auto'>
@@ -243,13 +247,13 @@ const ProductsPage = () => {
 																	isLight
 																	hoverShadow='sm'
 																	tag='a'
-																	to={`../${demoPagesMenu.appointment.subMenu.employeeID.path}/${user.id}`}
-																	data-tour={user.name}
+																	// to={`../${demoPagesMenu.appointment.subMenu.employeeID.path}/${user.id}`}
+																	// data-tour={user.name}
 																	aria-label='More info'
 																/>
 															</div>
 														</div>
-														{!!user?.services && (
+														{/* {!!user?.services && (
 															<div className='row g-2 mt-3'>
 																{user?.services.map((service) => (
 																	<div
@@ -268,8 +272,8 @@ const ProductsPage = () => {
 																		</Badge>
 																	</div>
 																))}
-															</div>
-														)}
+															</div> */}
+														{/* )} */}
 													</div>
 												</div>
 											</div>
@@ -298,6 +302,15 @@ const ProductsPage = () => {
 						/>
 					</ModalBody>
 				</Modal>
+				<PaginationButtons
+					data={products}
+					label='productos'
+					setCurrentPage={setPage}
+					currentPage={page}
+					perPage={limit}
+					setPerPage={setLimit}
+					totalItems={total}
+				/>
 			</Page>
 		</PageWrapper>
 	);
