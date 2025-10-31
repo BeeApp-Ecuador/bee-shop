@@ -308,6 +308,8 @@ const CreateProduct = ({
 			formikOptions.values.items = formikOptions.values.items.filter(
 				(item) => item.detail?.trim().length > 0,
 			);
+			// de formikOptions.values cambiar isrequired por su negacion
+			formikOptions.values.isRequired = !formikOptions.values.isRequired;
 			setTemporaryOptions([...temporaryOptions, formikOptions.values]);
 			showNotification(
 				<span className='d-flex align-items-center'>

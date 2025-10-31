@@ -179,7 +179,7 @@ const NewProductOption = ({
 																	(item) => ({
 																		...item,
 																		tax: optionsHaveTax,
-																		price: '',
+																		price: 0,
 																	}),
 																),
 															);
@@ -333,7 +333,7 @@ const NewProductOption = ({
 										const updated = [
 											...formikOptions.values.items,
 											formikOptions.values.isRequired
-												? { name: '', price: '', tax: optionsHaveTax }
+												? { name: '', price: 0, tax: optionsHaveTax }
 												: { name: '' },
 										];
 										formikOptions.setFieldValue('items', updated);
