@@ -53,12 +53,9 @@ const ProductsPage = () => {
 
 	useEffect(() => {
 		if (categoriesData) {
-			console.log(categoriesData);
 			setCategories(categoriesData.data as ProductCategoryType[]);
 		}
 		if (productsData) {
-			console.log('productsData');
-			console.log(productsData);
 			if (productsData.meta.status === 200) {
 				setProducts(productsData.data);
 				setTotal(productsData.total);
