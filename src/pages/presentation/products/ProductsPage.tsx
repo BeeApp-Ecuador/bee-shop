@@ -174,7 +174,10 @@ const ProductsPage = () => {
 						icon='PersonAdd'
 						color='info'
 						isLight
-						onClick={() => setIsCreatingProduct(true)}>
+						onClick={() => {
+							setEditingProduct(null);
+							return setIsCreatingProduct(true);
+						}}>
 						Nuevo
 					</Button>
 				</SubHeaderRight>
@@ -324,6 +327,7 @@ const ProductsPage = () => {
 							<CreateProduct
 								isEditing={editingProduct !== null}
 								setIsCreatingProduct={setIsCreatingProduct}
+								productToEdit={editingProduct!}
 							/>
 						</ModalBody>
 					</Modal>
