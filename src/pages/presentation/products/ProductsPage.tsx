@@ -50,6 +50,7 @@ const ProductsPage = () => {
 		productCategory: categoryFilter,
 	});
 	const [isCreatingProduct, setIsCreatingProduct] = useState(false);
+	const [editingProduct, setEditingProduct] = useState<ProductType | null>(null);
 
 	useEffect(() => {
 		if (categoriesData) {
@@ -258,14 +259,18 @@ const ProductsPage = () => {
 																</div>
 																<div className='col-auto'>
 																	<Button
-																		icon='RemoveRedEye'
+																		icon='edit'
 																		color='info'
 																		isLight
 																		hoverShadow='sm'
-																		tag='a'
-																		// to={`../${demoPagesMenu.appointment.subMenu.employeeID.path}/${user.id}`}
-																		// data-tour={user.name}
-																		aria-label='More info'
+																		onClick={() => {
+																			setEditingProduct(
+																				product,
+																			);
+																			return setIsCreatingProduct(
+																				true,
+																			);
+																		}}
 																	/>
 																</div>
 															</div>
@@ -317,7 +322,7 @@ const ProductsPage = () => {
 						</ModalHeader>
 						<ModalBody>
 							<CreateProduct
-								isEditing={false}
+								isEditing={editingProduct !== null}
 								setIsCreatingProduct={setIsCreatingProduct}
 							/>
 						</ModalBody>
