@@ -12,7 +12,7 @@ import Label from '../../../components/bootstrap/forms/Label';
 import Input from '../../../components/bootstrap/forms/Input';
 import Checks, { ChecksGroup } from '../../../components/bootstrap/forms/Checks';
 import { demoPagesMenu } from '../../../menu';
-import { useGetProductsQuery } from '../../../store/api/productsApi';
+import { useDeleteProductMutation, useGetProductsQuery } from '../../../store/api/productsApi';
 import { ProductType } from '../../../type/product-type';
 import Modal, { ModalBody, ModalHeader, ModalTitle } from '../../../components/bootstrap/Modal';
 import CreateProduct from '../../../components/products/CreateProduct';
@@ -49,8 +49,14 @@ const ProductsPage = () => {
 		search: searchTerm,
 		productCategory: categoryFilter,
 	});
+	const [changeStatus] = useDeleteProductMutation();
 	const [isCreatingProduct, setIsCreatingProduct] = useState(false);
 	const [editingProduct, setEditingProduct] = useState<ProductType | null>(null);
+
+	useEffect(() => {
+		refetch();
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [statusProduct]);
 
 	useEffect(() => {
 		if (categoriesData) {
@@ -58,7 +64,8 @@ const ProductsPage = () => {
 		}
 		if (productsData) {
 			if (productsData.meta.status === 200) {
-				setProducts(productsData.data);
+				console.log('se actualioza');
+				setProducts([...productsData.data]);
 				setTotal(productsData.total);
 			}
 		}
@@ -73,9 +80,26 @@ const ProductsPage = () => {
 
 		return () => clearTimeout(delayDebounce);
 		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [searchTerm]);
+	}, [searchTerm, statusProduct, categoryFilter]);
 
 	const [filterMenu, setFilterMenu] = useState(false);
+
+	const enableDisableProduct = async (
+		productId: string,
+		newStatus: 'AVAILABLE' | 'UNAVAILABLE',
+	) => {
+		try {
+			await changeStatus({
+				productId,
+				body: {
+					status: newStatus,
+				},
+			});
+			refetch();
+		} catch (error) {
+			console.error('Error changing product status:', error);
+		}
+	};
 
 	return (
 		<PageWrapper title={demoPagesMenu.appointment.subMenu.employeeList.text}>
@@ -113,11 +137,12 @@ const ProductsPage = () => {
 												type='switch'
 												label='Disponible'
 												onChange={() => {
-													if (statusProduct === 'AVAILABLE') {
-														setStatusProduct('UNAVAILABLE');
-													} else {
-														setStatusProduct('AVAILABLE');
-													}
+													setPage(1);
+													setStatusProduct((prev) =>
+														prev === 'AVAILABLE'
+															? 'UNAVAILABLE'
+															: 'AVAILABLE',
+													);
 												}}
 												checked={statusProduct === 'AVAILABLE'}
 												ariaLabel='Available status'
@@ -245,16 +270,39 @@ const ProductsPage = () => {
 															<div className='fw-bold fs-5 me-3 truncate-line-2'>
 																{product.name}
 															</div>
-															<div className='d-flex gap-2'>
+															<div className='d-flex gap-1'>
 																<Popovers
-																	desc='Deshabilitar'
+																	desc={
+																		statusProduct ===
+																		'AVAILABLE'
+																			? 'Deshabilitar'
+																			: 'Habilitar'
+																	}
 																	trigger='hover'>
 																	<Button
-																		icon='Block'
-																		color='danger'
+																		icon={
+																			statusProduct ===
+																			'AVAILABLE'
+																				? 'Block'
+																				: 'CheckCircle'
+																		}
+																		color={
+																			statusProduct ===
+																			'AVAILABLE'
+																				? 'danger'
+																				: 'success'
+																		}
 																		isLight
 																		hoverShadow='sm'
-																		onClick={() => {}}
+																		onClick={() =>
+																			enableDisableProduct(
+																				product._id!,
+																				statusProduct ===
+																					'AVAILABLE'
+																					? 'UNAVAILABLE'
+																					: 'AVAILABLE',
+																			)
+																		}
 																	/>
 																</Popovers>
 																<Popovers

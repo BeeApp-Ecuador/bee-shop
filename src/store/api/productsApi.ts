@@ -42,6 +42,8 @@ export const productsApi = createApi({
 					},
 				};
 			},
+			keepUnusedDataFor: 0,
+			// refetchOnMountOrArgChange: true,
 		}),
 		createProduct: builder.mutation({
 			query: (product) => ({
@@ -57,7 +59,7 @@ export const productsApi = createApi({
 			query: ({ productId, options }: { productId: string; options: any }) => ({
 				url: `api/v2/shop/product/options/${productId}`,
 				method: 'PUT',
-				body: options,
+				body: { options: options },
 				headers: {
 					'Content-Type': 'application/json',
 					Authorization: localStorage.getItem('token')!,
