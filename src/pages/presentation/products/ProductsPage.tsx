@@ -20,6 +20,7 @@ import PaginationButtons from '../../../components/PaginationButtons';
 import { ProductCategoryType } from '../../../type/product-category-type';
 import { useGetCategoriesQuery } from '../../../store/api/categoryApi';
 import Spinner from '../../../components/bootstrap/Spinner';
+import Popovers from '../../../components/bootstrap/Popovers';
 
 const ProductsPage = () => {
 	const [page, setPage] = useState(1);
@@ -245,23 +246,35 @@ const ProductsPage = () => {
 																{product.name}
 															</div>
 															<div className='d-flex gap-2'>
-																<Button
-																	icon='delete'
-																	color='danger'
-																	isLight
-																	hoverShadow='sm'
-																	onClick={() => {}}
-																/>
-																<Button
-																	icon='edit'
-																	color='info'
-																	isLight
-																	hoverShadow='sm'
-																	onClick={() => {
-																		setEditingProduct(product);
-																		setIsCreatingProduct(true);
-																	}}
-																/>
+																<Popovers
+																	desc='Deshabilitar'
+																	trigger='hover'>
+																	<Button
+																		icon='Block'
+																		color='danger'
+																		isLight
+																		hoverShadow='sm'
+																		onClick={() => {}}
+																	/>
+																</Popovers>
+																<Popovers
+																	desc='Editar'
+																	trigger='hover'>
+																	<Button
+																		icon='edit'
+																		color='info'
+																		isLight
+																		hoverShadow='sm'
+																		onClick={() => {
+																			setEditingProduct(
+																				product,
+																			);
+																			setIsCreatingProduct(
+																				true,
+																			);
+																		}}
+																	/>
+																</Popovers>
 															</div>
 														</div>
 
