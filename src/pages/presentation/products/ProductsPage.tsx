@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from 'react';
-import classNames from 'classnames';
 import SubHeader, { SubHeaderLeft, SubHeaderRight } from '../../../layout/SubHeader/SubHeader';
 import Icon from '../../../components/icon/Icon';
 import Page from '../../../layout/Page/Page';
@@ -195,22 +194,14 @@ const ProductsPage = () => {
 									<Card>
 										<CardBody>
 											<div className='row g-3'>
+												{/* Imagen */}
 												<div className='col d-flex'>
 													<div className='flex-shrink-0'>
 														<div className='position-relative'>
 															<div
 																className='ratio ratio-1x1'
 																style={{ width: 100 }}>
-																<div
-																// className={classNames(
-																// 	`bg-l25-success`,
-																// 	'rounded-2',
-																// 	'd-flex align-items-center justify-content-center',
-																// 	'overflow-hidden',
-																// 	'shadow',
-																// 	)
-																// }
-																>
+																<div>
 																	<img
 																		src={product.img!.toString()}
 																		alt='blur background'
@@ -223,21 +214,19 @@ const ProductsPage = () => {
 																				'filter 0.3s ease',
 																		}}
 																	/>
-
 																	<img
 																		src={product.img!.toString()}
 																		alt={product.name}
 																		width={95}
 																		height={95}
-																		// className='rounded-2 position-relative m-auto d-block shadow'
 																		className='rounded-2 position-relative m-auto d-block'
 																		style={{
 																			objectFit: 'cover',
-																			// zIndex: 1,
 																		}}
 																	/>
 																</div>
 															</div>
+
 															{product.status === 'AVAILABLE' && (
 																<span className='position-absolute top-100 start-85 translate-middle badge border border-2 border-light rounded-circle bg-success p-2'>
 																	<span className='visually-hidden'>
@@ -247,68 +236,62 @@ const ProductsPage = () => {
 															)}
 														</div>
 													</div>
-													<div className='flex-grow-1 ms-3 d-flex justify-content-between'>
-														<div className='w-100'>
-															<div className='row'>
-																<div className='col'>
-																	<div className='d-flex align-items-center'>
-																		<div className='fw-bold fs-5 me-2 truncate-line-1'>
-																			{product.name}
-																		</div>
-																	</div>
 
-																	<div className='text-muted truncate-line-2'>
-																		{product.description}
-																	</div>
-																</div>
-																<div className='col-auto d-flex gap-1'>
-																	<Button
-																		icon='delete'
-																		color='danger'
-																		isLight
-																		hoverShadow='sm'
-																		onClick={() => {}}
-																	/>
-																	<Button
-																		icon='edit'
-																		color='info'
-																		isLight
-																		hoverShadow='sm'
-																		onClick={() => {
-																			setEditingProduct(
-																				product,
-																			);
-																			return setIsCreatingProduct(
-																				true,
-																			);
-																		}}
-																	/>
-																</div>
+													{/* Información */}
+													<div className='flex-grow-1 ms-3'>
+														{/* Fila superior: nombre + botones alineados */}
+														<div className='d-flex justify-content-between align-items-start'>
+															<div className='fw-bold fs-5 me-3 truncate-line-2'>
+																{product.name}
 															</div>
-															<div className='row g-2 mt-3'>
-																<div
-																	key={product._id}
-																	className='col-auto ms-auto d-flex align-items-center gap-2'>
-																	{product?.haveOptions && (
-																		<Badge
-																			isLight
-																			color='info'
-																			className='px-3 py-2'>
-																			<Icon
-																				icon='List'
-																				size='lg'
-																				className='me-1'
-																			/>
-																			Opciones
-																		</Badge>
+															<div className='d-flex gap-2'>
+																<Button
+																	icon='delete'
+																	color='danger'
+																	isLight
+																	hoverShadow='sm'
+																	onClick={() => {}}
+																/>
+																<Button
+																	icon='edit'
+																	color='info'
+																	isLight
+																	hoverShadow='sm'
+																	onClick={() => {
+																		setEditingProduct(product);
+																		setIsCreatingProduct(true);
+																	}}
+																/>
+															</div>
+														</div>
+
+														<div className='text-muted truncate-line-2 mt-1'>
+															{product.description}
+														</div>
+
+														<div className='row g-2 mt-3'>
+															<div
+																key={product._id}
+																className='col-auto ms-auto d-flex align-items-center gap-2'>
+																{product?.haveOptions && (
+																	<Badge
+																		isLight
+																		color='info'
+																		className='px-3 py-2'>
+																		<Icon
+																			icon='List'
+																			size='lg'
+																			className='me-1'
+																		/>
+																		Opciones
+																	</Badge>
+																)}
+																<small className='border border-success border-2 text-success fw-bold px-2 py-1 rounded-1'>
+																	$
+																	{Number(product.price).toFixed(
+																		2,
 																	)}
-																	<small className='border border-success border-2 text-success fw-bold px-2 py-1 rounded-1'>
-																		$
-																		{Number(
-																			product.price,
-																		).toFixed(2)}
-																	</small>
-																</div>
+																</small>
 															</div>
 														</div>
 													</div>
