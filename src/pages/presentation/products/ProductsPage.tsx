@@ -50,6 +50,7 @@ const ProductsPage = () => {
 		productCategory: categoryFilter,
 	});
 	const [isCreatingProduct, setIsCreatingProduct] = useState(false);
+	const [editingProduct, setEditingProduct] = useState<ProductType | null>(null);
 
 	useEffect(() => {
 		if (categoriesData) {
@@ -173,7 +174,10 @@ const ProductsPage = () => {
 						icon='PersonAdd'
 						color='info'
 						isLight
-						onClick={() => setIsCreatingProduct(true)}>
+						onClick={() => {
+							setEditingProduct(null);
+							return setIsCreatingProduct(true);
+						}}>
 						Nuevo
 					</Button>
 				</SubHeaderRight>
@@ -225,7 +229,8 @@ const ProductsPage = () => {
 																		alt={product.name}
 																		width={95}
 																		height={95}
-																		className='rounded-2 position-relative m-auto d-block shadow'
+																		// className='rounded-2 position-relative m-auto d-block shadow'
+																		className='rounded-2 position-relative m-auto d-block'
 																		style={{
 																			objectFit: 'cover',
 																			// zIndex: 1,
@@ -256,16 +261,27 @@ const ProductsPage = () => {
 																		{product.description}
 																	</div>
 																</div>
-																<div className='col-auto'>
+																<div className='col-auto d-flex gap-1'>
 																	<Button
-																		icon='RemoveRedEye'
+																		icon='delete'
+																		color='danger'
+																		isLight
+																		hoverShadow='sm'
+																		onClick={() => {}}
+																	/>
+																	<Button
+																		icon='edit'
 																		color='info'
 																		isLight
 																		hoverShadow='sm'
-																		tag='a'
-																		// to={`../${demoPagesMenu.appointment.subMenu.employeeID.path}/${user.id}`}
-																		// data-tour={user.name}
-																		aria-label='More info'
+																		onClick={() => {
+																			setEditingProduct(
+																				product,
+																			);
+																			return setIsCreatingProduct(
+																				true,
+																			);
+																		}}
 																	/>
 																</div>
 															</div>
@@ -317,8 +333,9 @@ const ProductsPage = () => {
 						</ModalHeader>
 						<ModalBody>
 							<CreateProduct
-								isEditing={false}
+								isEditing={editingProduct !== null}
 								setIsCreatingProduct={setIsCreatingProduct}
+								productToEdit={editingProduct!}
 							/>
 						</ModalBody>
 					</Modal>

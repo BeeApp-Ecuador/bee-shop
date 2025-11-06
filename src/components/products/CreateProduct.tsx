@@ -31,11 +31,13 @@ import {
 const CreateProduct = ({
 	setIsCreatingProduct,
 	isEditing,
+	productToEdit,
 }: {
 	setIsCreatingProduct: React.Dispatch<React.SetStateAction<boolean>>;
 	isEditing: boolean;
+	productToEdit?: ProductType;
 }) => {
-	const { user: shop } = useContext(AuthContext);
+	// const { user: shop } = useContext(AuthContext);
 
 	const { data } = useGetCategoriesQuery({ page: 1, limit: 500, status: true, name: '' });
 	const [categories, setCategories] = useState<ProductCategoryType[]>([]);
@@ -85,29 +87,48 @@ const CreateProduct = ({
 		}
 	}, [data]);
 
-	// useEffect(() => {
-	// 	if (isEditing && shop?.category) {
-	// 		const selected = categories.filter((cat) =>
-	// 			shop.category!.some((c) => c === cat._id || c === cat._id),
-	// 		);
-	// 		setSelectedCategories(selected);
-	// 		formikFillProfile.setFieldValue(
-	// 			'category',
-	// 			selected.map((c) => c._id),
-	// 		);
-	// 		const shopTags = shop.tags || [];
-	// 		setTags(shopTags);
-	// 		formikFillProfile.setFieldValue('tags', shopTags);
-	// 	}
-	// 	// eslint-disable-next-line react-hooks/exhaustive-deps
-	// }, [isEditing, shop, categories, tags]);
+	useEffect(() => {
+		if (isEditing && productToEdit && categories.length > 0) {
+			console.log('voy a editar un producto');
+			console.log(productToEdit);
+			console.log(categories);
+			const selected = categories.find((cat) => cat._id === productToEdit.productCategory);
+			setSelectedCategory(selected);
+			formikProduct.setFieldValue('productCategory', productToEdit.productCategory);
+			const productTags = productToEdit.tags || [];
+			// if (productTags.length > 0) {
+			// 	setTags([...productTags]);
+			// }
+
+			// setTags([anOldHope, ...productTags]);
+			formikProduct.setFieldValue('tags', productTags);
+			// formikProduct.setFieldValue('name', productToEdit.name);
+			// const selected = categories.filter((cat) =>
+			// 	shop.category!.some((c) => c === cat._id || c === cat._id),
+			// );
+			// setSelectedCategories(selected);
+			// formikFillProfile.setFieldValue(
+			// 	'category',
+			// 	selected.map((c) => c._id),
+			// );
+			// const shopTags = shop.tags || [];
+			// setTags(shopTags);
+			// formikFillProfile.setFieldValue('tags', shopTags);
+		}
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [isEditing, categories]);
 
 	const handleSaveProduct = async () => {
 		setIsLoading(true);
 		const values = formikProduct.values;
+		console.log(values);
 		const formData = new FormData();
 		for (const key in values) {
 			formData.append(key, values[key]);
+		}
+		// imprimir el formdata
+		for (const [key, value] of formData.entries()) {
+			console.log(`${key}: ${value}`);
 		}
 
 		const { data, error } = await createProduct(formData);
@@ -143,16 +164,20 @@ const CreateProduct = ({
 
 	const formikProduct = useFormik<ProductType>({
 		initialValues: {
-			productCategory: isEditing ? shop.category!.toString() : selectedCategory?._id || '',
-			tags: isEditing ? [] : [],
-			name: '',
-			description: '',
-			restricted: false,
-			tax: false,
-			price: 0,
-			percentPromo: 0,
+			productCategory: isEditing
+				? productToEdit!.productCategory || ''
+				: selectedCategory?._id || '',
+			tags: isEditing ? productToEdit!.tags : [],
+			name: isEditing ? productToEdit!.name : '',
+			description: isEditing ? productToEdit!.description : '',
+			restricted: isEditing ? productToEdit!.restricted : false,
+			tax: isEditing ? productToEdit!.tax : false,
+			price: isEditing ? productToEdit!.price : 0,
+			percentPromo:
+				isEditing && productToEdit!.percentPromo > 0 ? productToEdit!.percentPromo : 0,
+			// img: isEditing ? productToEdit!.img : null,
 			img: null,
-			haveOptions: false,
+			haveOptions: isEditing ? productToEdit!.haveOptions : false,
 		},
 		validate: (values) => {
 			const errors: Partial<Record<keyof ProductType, string>> = {};
