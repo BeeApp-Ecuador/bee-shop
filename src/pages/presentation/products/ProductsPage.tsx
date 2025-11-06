@@ -229,7 +229,8 @@ const ProductsPage = () => {
 																		alt={product.name}
 																		width={95}
 																		height={95}
-																		className='rounded-2 position-relative m-auto d-block shadow'
+																		// className='rounded-2 position-relative m-auto d-block shadow'
+																		className='rounded-2 position-relative m-auto d-block'
 																		style={{
 																			objectFit: 'cover',
 																			// zIndex: 1,
@@ -260,7 +261,14 @@ const ProductsPage = () => {
 																		{product.description}
 																	</div>
 																</div>
-																<div className='col-auto'>
+																<div className='col-auto d-flex gap-1'>
+																	<Button
+																		icon='delete'
+																		color='danger'
+																		isLight
+																		hoverShadow='sm'
+																		onClick={() => {}}
+																	/>
 																	<Button
 																		icon='edit'
 																		color='info'
