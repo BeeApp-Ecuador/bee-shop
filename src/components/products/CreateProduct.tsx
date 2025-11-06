@@ -121,9 +121,14 @@ const CreateProduct = ({
 	const handleSaveProduct = async () => {
 		setIsLoading(true);
 		const values = formikProduct.values;
+		console.log(values);
 		const formData = new FormData();
 		for (const key in values) {
 			formData.append(key, values[key]);
+		}
+		// imprimir el formdata
+		for (const [key, value] of formData.entries()) {
+			console.log(`${key}: ${value}`);
 		}
 
 		const { data, error } = await createProduct(formData);
