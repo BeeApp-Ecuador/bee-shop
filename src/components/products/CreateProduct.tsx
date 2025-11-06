@@ -77,7 +77,7 @@ const CreateProduct = ({
 	};
 
 	const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-		const value = e.target.value.replace(/\s/g, '');
+		const value = e.target.value.toLowerCase().replace(/[^a-z0-9]/g, '');
 		setNewTag(value);
 	};
 
@@ -96,12 +96,14 @@ const CreateProduct = ({
 			setSelectedCategory(selected);
 			formikProduct.setFieldValue('productCategory', productToEdit.productCategory);
 			const productTags = productToEdit.tags || [];
-			// if (productTags.length > 0) {
-			// 	setTags([...productTags]);
-			// }
+			if (productTags.length > 0) {
+				setTags([...productTags]);
+			}
 
 			// setTags([anOldHope, ...productTags]);
 			formikProduct.setFieldValue('tags', productTags);
+			setTemporaryOptions(productToEdit.options || []);
+
 			// formikProduct.setFieldValue('name', productToEdit.name);
 			// const selected = categories.filter((cat) =>
 			// 	shop.category!.some((c) => c === cat._id || c === cat._id),
@@ -140,6 +142,8 @@ const CreateProduct = ({
 		}
 
 		if (data && data.meta.status === 201) {
+			console.log('formikProduct.values.haveOptions');
+			console.log(formikProduct.values.haveOptions);
 			if (formikProduct.values.haveOptions) {
 				setIsLoading(true);
 
@@ -175,8 +179,8 @@ const CreateProduct = ({
 			price: isEditing ? productToEdit!.price : 0,
 			percentPromo:
 				isEditing && productToEdit!.percentPromo > 0 ? productToEdit!.percentPromo : 0,
-			// img: isEditing ? productToEdit!.img : null,
-			img: null,
+			img: isEditing ? productToEdit!.img!.toString() : null,
+			// img: null,
 			haveOptions: isEditing ? productToEdit!.haveOptions : false,
 		},
 		validate: (values) => {
@@ -232,10 +236,26 @@ const CreateProduct = ({
 
 			return errors;
 		},
-		onSubmit: handleSaveProduct,
+		onSubmit: () => {
+			// if (isEditing) {
+			// 	console.log('update product');
+			// } else {
+			handleSaveProduct();
+			// }
+		},
 		validateOnChange: false,
 		validateOnBlur: false,
 	});
+
+	useEffect(() => {
+		let objectUrl;
+		if (formikProduct.values.img && typeof formikProduct.values.img !== 'string') {
+			objectUrl = URL.createObjectURL(formikProduct.values.img);
+		}
+		return () => {
+			if (objectUrl) URL.revokeObjectURL(objectUrl);
+		};
+	}, [formikProduct.values.img]);
 
 	const formikOptions = useFormik<OptionType>({
 		initialValues: {
@@ -503,9 +523,13 @@ const CreateProduct = ({
 										{formikProduct.values.img && (
 											<div className='mt-2 text-center'>
 												<img
-													src={URL.createObjectURL(
-														formikProduct.values.img,
-													)}
+													src={
+														typeof formikProduct.values.img === 'string'
+															? formikProduct.values.img // URL del servidor
+															: URL.createObjectURL(
+																	formikProduct.values.img,
+																) // Nueva imagen local
+													}
 													alt='Vista previa'
 													className='rounded'
 													style={{
