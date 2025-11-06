@@ -182,18 +182,20 @@ const ProfilePage = () => {
 								</div>
 							</CardBody>
 						</Card>
-						<Card>
-							<CardBody>
-								<div className='d-flex justify-content-between'>
-									<p>
-										Estamos verificando tu información, te avisaremos cuando
-										todo esté listo.
-									</p>
-									<p className='fw-bold'>70%</p>
-								</div>
-								<Progress value={70} />
-							</CardBody>
-						</Card>
+						{shop.status === 'PENDING' && (
+							<Card>
+								<CardBody>
+									<div className='d-flex justify-content-between'>
+										<p>
+											Estamos verificando tu información, te avisaremos cuando
+											todo esté listo.
+										</p>
+										<p className='fw-bold'>70%</p>
+									</div>
+									<Progress value={70} />
+								</CardBody>
+							</Card>
+						)}
 						<Card>
 							<CardHeader>
 								<CardLabel>
