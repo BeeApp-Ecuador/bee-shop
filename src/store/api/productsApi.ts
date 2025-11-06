@@ -65,12 +65,13 @@ export const productsApi = createApi({
 			}),
 		}),
 		deleteProduct: builder.mutation({
-			query: (productId) => ({
+			query: ({ productId, body }: { productId: string; body: any }) => ({
 				url: `api/v2/shop/product/${productId}`,
 				method: 'DELETE',
 				headers: {
 					Authorization: localStorage.getItem('token')!,
 				},
+				body: body,
 			}),
 		}),
 	}),
