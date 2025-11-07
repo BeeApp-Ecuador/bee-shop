@@ -56,10 +56,10 @@ export const productsApi = createApi({
 			}),
 		}),
 		addOptionsToProduct: builder.mutation({
-			query: ({ productId, options }: { productId: string; options: any }) => ({
+			query: ({ productId, body }: { productId: string; body: any }) => ({
 				url: `api/v2/shop/product/options/${productId}`,
 				method: 'PUT',
-				body: { options: options },
+				body: body,
 				headers: {
 					'Content-Type': 'application/json',
 					Authorization: localStorage.getItem('token')!,

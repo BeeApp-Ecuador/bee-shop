@@ -32,10 +32,12 @@ const CreateProduct = ({
 	setIsCreatingProduct,
 	isEditing,
 	productToEdit,
+	refetchProducts,
 }: {
 	setIsCreatingProduct: React.Dispatch<React.SetStateAction<boolean>>;
 	isEditing: boolean;
 	productToEdit?: ProductType;
+	refetchProducts: () => void;
 }) => {
 	// const { user: shop } = useContext(AuthContext);
 
@@ -58,6 +60,7 @@ const CreateProduct = ({
 
 	const [createProduct] = useCreateProductMutation();
 	const [addOptionsToProduct] = useAddOptionsToProductMutation();
+	const [updateProduct] = useAddOptionsToProductMutation();
 
 	// const { setUser } = useContext(AuthContext);
 
@@ -120,6 +123,41 @@ const CreateProduct = ({
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [isEditing, categories]);
 
+	const handleUpdateProduct = async () => {
+		setIsLoading(true);
+		const values = formikProduct.values;
+		const body = {
+			...values,
+			options: [] as OptionType[],
+		};
+		delete body.img;
+		if (formikProduct.values.haveOptions) {
+			console.log('rntra al if');
+			if (temporaryOptions.length === 0) {
+				setIsLoading(false);
+				return;
+			}
+			body.options = temporaryOptions;
+		}
+		console.log(body);
+		const { data: optionsData, error: optionsError } = await updateProduct({
+			productId: productToEdit!._id!,
+			body: body,
+		});
+		setIsLoading(false);
+		if (optionsError) {
+			if (optionsError && 'status' in optionsError) {
+				setIsError(true);
+				setShowModal(true);
+				return;
+			}
+		}
+		if (optionsData) {
+			setIsError(false);
+			setShowModal(true);
+		}
+	};
+
 	const handleSaveProduct = async () => {
 		setIsLoading(true);
 		const values = formikProduct.values;
@@ -148,10 +186,14 @@ const CreateProduct = ({
 				setIsLoading(true);
 
 				const productId = data.data._id;
-				const { data: optionsData, error: optionsError } = await addOptionsToProduct({
-					productId,
+				console.log({
 					options: temporaryOptions,
 				});
+				const { data: optionsData, error: optionsError } = await addOptionsToProduct({
+					productId,
+					body: { options: temporaryOptions },
+				});
+
 				setIsLoading(false);
 				if (optionsError) {
 					if (optionsError && 'status' in optionsError) {
@@ -237,11 +279,11 @@ const CreateProduct = ({
 			return errors;
 		},
 		onSubmit: () => {
-			// if (isEditing) {
-			// 	console.log('update product');
-			// } else {
-			handleSaveProduct();
-			// }
+			if (isEditing) {
+				handleUpdateProduct();
+			} else {
+				handleSaveProduct();
+			}
 		},
 		validateOnChange: false,
 		validateOnBlur: false,
@@ -821,10 +863,12 @@ const CreateProduct = ({
 					<ModalTitle id='fillModal'>{isError ? 'Error' : 'Éxito'}</ModalTitle>
 				</ModalHeader>
 				<ModalBody>
-					{isEditing ? (
+					{isError ? (
+						<p>Ocurrió un error al registrar el producto.</p>
+					) : isEditing ? (
 						<p>Los cambios han sido guardados exitosamente.</p>
 					) : (
-						<p>Has completado tu perfil exitosamente, ya puedes cargar productos.</p>
+						<p>Producto registrado exitosamente</p>
 					)}
 				</ModalBody>
 				<ModalFooter>
@@ -835,6 +879,7 @@ const CreateProduct = ({
 						onClick={() => {
 							if (!isError) setIsCreatingProduct(false);
 							setIsError(false);
+							refetchProducts();
 							return setShowModal(false);
 						}}>
 						Ok
