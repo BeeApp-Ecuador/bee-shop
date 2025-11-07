@@ -380,6 +380,7 @@ const ProductsPage = () => {
 								isEditing={editingProduct !== null}
 								setIsCreatingProduct={setIsCreatingProduct}
 								productToEdit={editingProduct!}
+								refetchProducts={refetch}
 							/>
 						</ModalBody>
 					</Modal>
