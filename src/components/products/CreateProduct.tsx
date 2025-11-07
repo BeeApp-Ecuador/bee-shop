@@ -132,6 +132,11 @@ const CreateProduct = ({
 		};
 		delete body.img;
 		if (formikProduct.values.haveOptions) {
+			console.log('rntra al if');
+			if (temporaryOptions.length === 0) {
+				setIsLoading(false);
+				return;
+			}
 			body.options = temporaryOptions;
 		}
 		console.log(body);
