@@ -15,7 +15,7 @@ const children = (
 	<AuthContextProvider>
 		<ThemeContextProvider>
 			<Provider store={store}>
-				<Router>
+				<Router basename='shopv2'>
 					<React.StrictMode>
 						<App />
 					</React.StrictMode>
