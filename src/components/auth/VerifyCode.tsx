@@ -18,6 +18,7 @@ const VerifyCode = ({ onComplete, resendCode, email }: VerifyCodeProps) => {
 	const [error, setError] = useState<string | null>(null);
 	const [success, setSuccess] = useState<string | null>(null);
 	const [isLoading, setIsLoading] = useState(false);
+	const [isCreating, setIsCreating] = useState(false);
 
 	const [timeLeft, setTimeLeft] = useState(120);
 	const [expired, setExpired] = useState(false);
@@ -65,9 +66,8 @@ const VerifyCode = ({ onComplete, resendCode, email }: VerifyCodeProps) => {
 
 			if (data && data.statusCode === 200) {
 				setSuccess('Un momento, estamos creando tu cuenta...');
-				setIsLoading(true);
+				setIsCreating(true);
 				onComplete();
-				setIsLoading(false);
 			}
 		}
 	};
@@ -115,28 +115,30 @@ const VerifyCode = ({ onComplete, resendCode, email }: VerifyCodeProps) => {
 					)}
 				</p>
 
-				<div className='d-flex justify-content-center gap-3'>
-					{[0, 1, 2, 3].map((index) => (
-						<FormGroup key={index} className='text-center' id={`digit-${index}`}>
-							<Input
-								type='text'
-								maxLength={1}
-								value={values[index]}
-								onChange={(e) => handleChange(index, e.target.value)}
-								onKeyDown={(e) => handleKeyDown(e, index)}
-								ref={(el) => (inputRefs.current[index] = el)}
-								className='text-center fs-4'
-								style={{
-									width: '3rem',
-									height: '3rem',
-									borderRadius: '0.5rem',
-									fontWeight: 600,
-								}}
-								disabled={isLoading || expired}
-							/>
-						</FormGroup>
-					))}
-				</div>
+				{!isCreating && (
+					<div className='d-flex justify-content-center gap-3'>
+						{[0, 1, 2, 3].map((index) => (
+							<FormGroup key={index} className='text-center' id={`digit-${index}`}>
+								<Input
+									type='text'
+									maxLength={1}
+									value={values[index]}
+									onChange={(e) => handleChange(index, e.target.value)}
+									onKeyDown={(e) => handleKeyDown(e, index)}
+									ref={(el) => (inputRefs.current[index] = el)}
+									className='text-center fs-4'
+									style={{
+										width: '3rem',
+										height: '3rem',
+										borderRadius: '0.5rem',
+										fontWeight: 600,
+									}}
+									disabled={isLoading || expired}
+								/>
+							</FormGroup>
+						))}
+					</div>
+				)}
 
 				<div className='mt-3'>
 					{isLoading && <p className='text-primary'>Verificando código...</p>}
