@@ -65,7 +65,9 @@ const VerifyCode = ({ onComplete, resendCode, email }: VerifyCodeProps) => {
 
 			if (data && data.statusCode === 200) {
 				setSuccess('Un momento, estamos creando tu cuenta...');
+				setIsLoading(true);
 				onComplete();
+				setIsLoading(false);
 			}
 		}
 	};
