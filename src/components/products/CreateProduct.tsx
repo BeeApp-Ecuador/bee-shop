@@ -160,8 +160,15 @@ const CreateProduct = ({
 
 	const handleSaveProduct = async () => {
 		setIsLoading(true);
-		const values = formikProduct.values;
-		console.log(values);
+		let values = { ...formikProduct.values };
+
+		// Normalizar percentPromo
+		if (!values.percentPromo || values.percentPromo === '') {
+			values.percentPromo = 0;
+			formikProduct.setFieldValue('percentPromo', 0, false);
+		}
+		// const values = formikProduct.values;
+		// console.log(values);
 		const formData = new FormData();
 		for (const key in values) {
 			formData.append(key, values[key]);
@@ -742,6 +749,7 @@ const CreateProduct = ({
 												if (parseFloat(value) > 100) {
 													value = '100';
 												}
+												console.log('value', value);
 
 												formikProduct.setFieldValue('percentPromo', value);
 											}}
@@ -808,7 +816,7 @@ const CreateProduct = ({
 	];
 	if (formikProduct.values.haveOptions) {
 		steps.push(
-			<WizardItem id='step3' title='Horarios' key='step3'>
+			<WizardItem id='step3' title='Opciones' key='step3'>
 				<Card>
 					<CardBody>
 						<CardHeader>
