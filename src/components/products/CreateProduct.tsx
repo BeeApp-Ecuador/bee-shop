@@ -684,9 +684,9 @@ const CreateProduct = ({
 												// Permitir solo números y hasta 2 decimales con punto
 												if (!/^\d*\.?\d{0,2}$/.test(value)) return;
 												// Limitar el valor máximo a 100
-												if (parseFloat(value) > 100) {
-													value = '100';
-												}
+												// if (parseFloat(value) > 100) {
+												// 	value = '100';
+												// }
 
 												formikProduct.setFieldValue('price', value);
 											}}
