@@ -22,7 +22,7 @@ export const AuthContextProvider: FC<IAuthContextProviderProps> = ({ children })
 		return saved ? (JSON.parse(saved) as ShopType) : ({} as ShopType);
 	});
 	const [token, setToken] = useState<string | null>(() => {
-		const savedToken = localStorage.getItem('token');
+		const savedToken = localStorage.getItem('tokenShop');
 		return savedToken ? savedToken : null;
 	});
 
@@ -31,7 +31,7 @@ export const AuthContextProvider: FC<IAuthContextProviderProps> = ({ children })
 	// 🔹 Guarda el valor en localStorage cuando cambia
 	useEffect(() => {
 		localStorage.setItem('facit_authUsername', JSON.stringify(shop));
-		localStorage.setItem('token', token ?? '');
+		localStorage.setItem('tokenShop', token ?? '');
 	}, [shop, token]);
 
 	// 🔹 Actualiza los datos del usuario cuando cambia shop

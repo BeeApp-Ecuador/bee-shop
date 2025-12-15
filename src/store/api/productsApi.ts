@@ -38,7 +38,7 @@ export const productsApi = createApi({
 					params,
 					headers: {
 						'Content-Type': 'application/json',
-						Authorization: localStorage.getItem('token')!,
+						Authorization: localStorage.getItem('tokenShop')!,
 					},
 				};
 			},
@@ -51,7 +51,7 @@ export const productsApi = createApi({
 				method: 'POST',
 				body: product,
 				headers: {
-					Authorization: localStorage.getItem('token')!,
+					Authorization: localStorage.getItem('tokenShop')!,
 				},
 			}),
 		}),
@@ -62,7 +62,7 @@ export const productsApi = createApi({
 				body: body,
 				headers: {
 					'Content-Type': 'application/json',
-					Authorization: localStorage.getItem('token')!,
+					Authorization: localStorage.getItem('tokenShop')!,
 				},
 			}),
 		}),
@@ -71,7 +71,7 @@ export const productsApi = createApi({
 				url: `api/v2/shop/product/${productId}`,
 				method: 'DELETE',
 				headers: {
-					Authorization: localStorage.getItem('token')!,
+					Authorization: localStorage.getItem('tokenShop')!,
 				},
 				body: body,
 			}),
