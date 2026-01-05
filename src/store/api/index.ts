@@ -3,3 +3,4 @@ export { geoApi } from './geoApi';
 export { profileApi } from './profileApi';
 export { categoryApi } from './categoryApi';
 export { productsApi } from './productsApi';
+export { ordersApi } from './ordersApi';

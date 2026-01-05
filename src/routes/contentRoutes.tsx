@@ -16,6 +16,7 @@ const LANDING = {
 	PROFILE: lazy(() => import('../pages/presentation/profile/ProfilePage')),
 	CATEGORIES: lazy(() => import('../pages/presentation/categories/CategoriesPage')),
 	PRODUCTS: lazy(() => import('../pages/presentation/products/ProductsPage')),
+	ORDERS: lazy(() => import('../pages/presentation/orders/OrdersPage')),
 };
 const SINGLE = {
 	BOXED: lazy(() => import('../pages/presentation/single-pages/SingleBoxedPage')),
@@ -207,6 +208,10 @@ const presentation: RouteProps[] = [
 	{
 		path: dashboardPagesMenu.products.path,
 		element: <LANDING.PRODUCTS />,
+	},
+	{
+		path: dashboardPagesMenu.orders.path,
+		element: <LANDING.ORDERS />,
 	},
 	{
 		path: dashboardPagesMenu.dashboard.path,
