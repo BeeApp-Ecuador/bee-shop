@@ -30,7 +30,7 @@ export const profileApi = createApi({
 				body,
 				headers: {
 					'Content-Type': 'application/json',
-					Authorization: localStorage.getItem('token')!,
+					Authorization: localStorage.getItem('tokenShop')!,
 				},
 			}),
 		}),

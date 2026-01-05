@@ -54,7 +54,7 @@ export const authApi = createApi({
 				body,
 				headers: {
 					'Content-Type': 'application/json',
-					Authorization: localStorage.getItem('token')!,
+					Authorization: localStorage.getItem('tokenShop')!,
 				},
 			}),
 		}),
@@ -65,7 +65,7 @@ export const authApi = createApi({
 				method: 'GET',
 				headers: {
 					'Content-Type': 'application/json',
-					Authorization: localStorage.getItem('token')!,
+					Authorization: localStorage.getItem('tokenShop')!,
 				},
 			}),
 		}),
@@ -76,7 +76,7 @@ export const authApi = createApi({
 				method: 'DELETE',
 				headers: {
 					'Content-Type': 'application/json',
-					Authorization: localStorage.getItem('token')!,
+					Authorization: localStorage.getItem('tokenShop')!,
 				},
 			}),
 		}),

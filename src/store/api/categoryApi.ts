@@ -33,7 +33,7 @@ export const categoryApi = createApi({
 					params,
 					headers: {
 						'Content-Type': 'application/json',
-						Authorization: localStorage.getItem('token')!,
+						Authorization: localStorage.getItem('tokenShop')!,
 					},
 				};
 			},
@@ -46,7 +46,7 @@ export const categoryApi = createApi({
 				body: category,
 				headers: {
 					'Content-Type': 'application/json',
-					Authorization: localStorage.getItem('token')!,
+					Authorization: localStorage.getItem('tokenShop')!,
 				},
 			}),
 		}),
@@ -56,7 +56,7 @@ export const categoryApi = createApi({
 				method: 'DELETE',
 				headers: {
 					'Content-Type': 'application/json',
-					Authorization: localStorage.getItem('token')!,
+					Authorization: localStorage.getItem('tokenShop')!,
 				},
 			}),
 		}),
@@ -67,7 +67,7 @@ export const categoryApi = createApi({
 				body: category,
 				headers: {
 					'Content-Type': 'application/json',
-					Authorization: localStorage.getItem('token')!,
+					Authorization: localStorage.getItem('tokenShop')!,
 				},
 			}),
 		}),

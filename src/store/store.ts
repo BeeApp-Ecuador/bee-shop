@@ -1,5 +1,5 @@
 import { configureStore } from '@reduxjs/toolkit';
-import { authApi, categoryApi, geoApi, productsApi, profileApi } from './api/';
+import { authApi, categoryApi, geoApi, ordersApi, productsApi, profileApi } from './api/';
 
 export const store = configureStore({
 	reducer: {
@@ -8,6 +8,7 @@ export const store = configureStore({
 		[profileApi.reducerPath]: profileApi.reducer,
 		[categoryApi.reducerPath]: categoryApi.reducer,
 		[productsApi.reducerPath]: productsApi.reducer,
+		[ordersApi.reducerPath]: ordersApi.reducer,
 	},
 	middleware: (getDefaultMiddleware) =>
 		getDefaultMiddleware()
@@ -15,5 +16,6 @@ export const store = configureStore({
 			.concat(geoApi.middleware)
 			.concat(profileApi.middleware)
 			.concat(categoryApi.middleware)
-			.concat(productsApi.middleware),
+			.concat(productsApi.middleware)
+			.concat(ordersApi.middleware),
 });
