@@ -11,6 +11,7 @@ import AuthContext from '../../../contexts/authContext';
 import {
 	useLoginMutation,
 	useRegisterMutation,
+	useSaveFcmTokenMutation,
 	useSendEmailVerificationMutation,
 } from '../../../store/api/authApi';
 import { File } from 'buffer';
@@ -33,6 +34,7 @@ import {
 } from '../../../components/auth';
 import showNotification from '../../../components/extras/showNotification';
 import Icon from '../../../components/icon/Icon';
+import { getFcmToken } from '../../../firebase/getFcmToken';
 
 export interface RegisterFormValues {
 	nameLegalAgent: string;
@@ -90,7 +92,7 @@ interface ILoginProps {
 	isSignUp?: boolean;
 }
 const Login: FC<ILoginProps> = ({ isSignUp }) => {
-	const { setUser, setToken } = useContext(AuthContext);
+	const { setUser, setToken, setFcmToken } = useContext(AuthContext);
 
 	const { darkModeStatus } = useDarkMode();
 
@@ -106,6 +108,7 @@ const Login: FC<ILoginProps> = ({ isSignUp }) => {
 	const [showSuccess, setShowSuccess] = useState(false);
 
 	const [login] = useLoginMutation();
+	const [saveFcmToken] = useSaveFcmTokenMutation();
 
 	const handleSendCode = async (email: string) => {
 		const { data, error } = await sendCode({ email, role: 'SHOP' });
@@ -191,6 +194,13 @@ const Login: FC<ILoginProps> = ({ isSignUp }) => {
 			setIsLoading(false);
 			setUser(data.shop!);
 			setToken(data.token!);
+			const token = await getFcmToken();
+			setFcmToken(token);
+
+			// if (!token) return;
+			console.log(token);
+			await saveFcmToken({ fcm: token === null ? '' : token });
+			// send fcm
 			handleOnClick();
 		}
 	};

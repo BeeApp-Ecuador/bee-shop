@@ -15,11 +15,19 @@ import AuthContext from '../../contexts/authContext';
 import ThemeContext from '../../contexts/themeContext';
 import { ShopType } from '../../type/shop-type';
 import { useLogoutMutation } from '../../store/api/authApi';
+import { getFcmToken } from '../../firebase/getFcmToken';
 
 const User = () => {
 	const { width } = useWindowSize();
 	const { setAsideStatus } = useContext(ThemeContext);
-	const { userData, setUser, user: shop, setToken } = useContext(AuthContext);
+	const {
+		userData,
+		setUser,
+		user: shop,
+		setToken,
+		fcmToken,
+		setFcmToken,
+	} = useContext(AuthContext);
 
 	const navigate = useNavigate();
 	const handleItem = useNavigationItemHandle();
@@ -31,10 +39,12 @@ const User = () => {
 	const [logout] = useLogoutMutation();
 
 	const handleLogout = async () => {
-		const { data } = await logout({});
+		const { data } = await logout({ fcm: fcmToken === null ? '' : fcmToken });
+
 		if (data && data.statusCode === 200) {
 			if (setUser) setUser({} as ShopType);
 			if (setToken) setToken('');
+			if (setFcmToken) setFcmToken('');
 			if (width < Number(import.meta.env.VITE_MOBILE_BREAKPOINT_SIZE)) {
 				setAsideStatus(false);
 			}

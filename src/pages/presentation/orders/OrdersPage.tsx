@@ -14,6 +14,7 @@ import Page from '../../../layout/Page/Page';
 import useDarkMode from '../../../hooks/useDarkMode';
 import { OrderType } from '../../../type/order-type';
 
+
 const OrdersPage = () => {
 	const [page, setPage] = useState(1);
 	const [limit, setLimit] = useState(10);
@@ -136,7 +137,7 @@ const OrdersPage = () => {
 
 												<div className='fw-semibold'>{product.name}</div>
 												<div className='text-muted small'>
-													X {product.quantity}
+													X Í{product.quantity}
 												</div>
 											</div>
 

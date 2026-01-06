@@ -1,22 +1,22 @@
 import React, { useContext, useEffect, useLayoutEffect, useRef } from 'react';
 import { ThemeProvider } from 'react-jss';
 import { ReactNotifications } from 'react-notifications-component';
-import { useFullscreen } from 'react-use';
-import { TourProvider } from '@reactour/tour';
 import dayjs from 'dayjs';
 import localizedFormat from 'dayjs/plugin/localizedFormat';
 import relativeTime from 'dayjs/plugin/relativeTime';
 import { ToastContainer } from 'react-toastify';
-import ThemeContext from '../contexts/themeContext';
 import Wrapper from '../layout/Wrapper/Wrapper';
 import Portal from '../layout/Portal/Portal';
 import useDarkMode from '../hooks/useDarkMode';
 import COLORS from '../common/data/enumColors';
 import { getOS } from '../helpers/helpers';
-import steps, { styles } from '../steps';
 import AsideRoutes from '../layout/Aside/AsideRoutes';
 import { ToastCloseButton } from '../components/bootstrap/Toasts';
 import AuthContext from '../contexts/authContext';
+import { playOrderSound } from '../notifications/notificationSound';
+import { useSocket } from '../hooks/useSocket';
+import { getEnvVariables } from '../helpers/getEnvVariables';
+// import { getFcmToken } from '../firebase/getFcmToken';
 
 const App = () => {
 	getOS();
@@ -24,9 +24,6 @@ const App = () => {
 	dayjs.extend(localizedFormat);
 	dayjs.extend(relativeTime);
 
-	/**
-	 * Dark Mode
-	 */
 	const { themeStatus, darkModeStatus } = useDarkMode();
 	const theme = {
 		theme: themeStatus,
@@ -51,18 +48,33 @@ const App = () => {
 		};
 	}, [darkModeStatus]);
 
-	/**
-	 * Full Screen
-	 */
-	const { fullScreenStatus, setFullScreenStatus } = useContext(ThemeContext);
-	const ref = useRef(null);
-	useFullscreen(ref, fullScreenStatus, {
-		onClose: () => setFullScreenStatus(false),
-	});
+	// useEffect(() => {
+	// 	const initFcm = async () => {
+	// 		const token = await getFcmToken();
 
-	/**
-	 * Modern Design
-	 */
+	// 		if (!token) return;
+	// 		console.log(token);
+
+	// 		// await sendTokenToBackend(token);
+	// 	};
+	// 	console.log('dsad');
+	// 	initFcm();
+	// 	console.log('dsaddsa');
+	// }, []);
+
+	useEffect(() => {
+		const handler = (event: MessageEvent) => {
+			if (event.data?.type === 'NEW_ORDER') {
+				playOrderSound();
+			}
+		};
+
+		navigator.serviceWorker.addEventListener('message', handler);
+		return () => navigator.serviceWorker.removeEventListener('message', handler);
+	}, []);
+
+	const ref = useRef(null);
+
 	useLayoutEffect(() => {
 		if (import.meta.env.VITE_MODERN_DESGIN === 'true') {
 			document.body.classList.add('modern-design');
@@ -72,17 +84,42 @@ const App = () => {
 	});
 	const { user: shop } = useContext(AuthContext);
 
+	const socket = useSocket();
+
+	useEffect(() => {
+		if (!socket.getSocket()) return;
+
+		const handleNewOrder = (data: any) => {
+			console.log('Nueva orden recibida:', data);
+			playOrderSound();
+		};
+
+		socket.on('order', handleNewOrder);
+
+		return () => {
+			socket.off('order');
+		};
+	}, [socket]);
+
+	// useEffect(() => {
+	// 	if (!socket.getSocket()) return;
+
+	// 	const handleNewOrder = (data: any) => {
+	// 		console.log('Nueva orden recibida:', data);
+	// 		playOrderSound();
+	// 		// Aquí puedes despachar Redux o mostrar toast
+	// 	};
+
+	// 	socket.on('NEW_ORDER', handleNewOrder);
+
+	// 	return () => {
+	// 		socket.off('NEW_ORDER');
+	// 	};
+	// }, [socket]);
+
 	return (
 		<ThemeProvider theme={theme}>
-			{/* <TourProvider steps={steps} styles={styles} showNavigation={false} showBadge={false}> */}
-			<div
-				ref={ref}
-				className='app'
-				style={{
-					backgroundColor: fullScreenStatus ? 'var(--bs-body-bg)' : undefined,
-					zIndex: fullScreenStatus ? 1 : undefined,
-					overflow: fullScreenStatus ? 'scroll' : undefined,
-				}}>
+			<div ref={ref} className='app'>
 				{shop.status !== 'PENDING' && shop.completedProfile && <AsideRoutes />}
 				<Wrapper />
 			</div>
@@ -90,7 +127,6 @@ const App = () => {
 				<ReactNotifications />
 			</Portal>
 			<ToastContainer closeButton={ToastCloseButton} toastClassName='toast show' />
-			{/* </TourProvider> */}
 		</ThemeProvider>
 	);
 };
