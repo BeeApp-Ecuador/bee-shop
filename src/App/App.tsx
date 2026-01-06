@@ -14,6 +14,8 @@ import AsideRoutes from '../layout/Aside/AsideRoutes';
 import { ToastCloseButton } from '../components/bootstrap/Toasts';
 import AuthContext from '../contexts/authContext';
 import { playOrderSound } from '../notifications/notificationSound';
+import { useSocket } from '../hooks/useSocket';
+import { getEnvVariables } from '../helpers/getEnvVariables';
 // import { getFcmToken } from '../firebase/getFcmToken';
 
 const App = () => {
@@ -81,6 +83,39 @@ const App = () => {
 		}
 	});
 	const { user: shop } = useContext(AuthContext);
+
+	const socket = useSocket();
+
+	useEffect(() => {
+		if (!socket.getSocket()) return;
+
+		const handleNewOrder = (data: any) => {
+			console.log('Nueva orden recibida:', data);
+			playOrderSound();
+		};
+
+		socket.on('order', handleNewOrder);
+
+		return () => {
+			socket.off('order');
+		};
+	}, [socket]);
+
+	// useEffect(() => {
+	// 	if (!socket.getSocket()) return;
+
+	// 	const handleNewOrder = (data: any) => {
+	// 		console.log('Nueva orden recibida:', data);
+	// 		playOrderSound();
+	// 		// Aquí puedes despachar Redux o mostrar toast
+	// 	};
+
+	// 	socket.on('NEW_ORDER', handleNewOrder);
+
+	// 	return () => {
+	// 		socket.off('NEW_ORDER');
+	// 	};
+	// }, [socket]);
 
 	return (
 		<ThemeProvider theme={theme}>
