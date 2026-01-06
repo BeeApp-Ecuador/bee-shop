@@ -17,6 +17,8 @@ import steps, { styles } from '../steps';
 import AsideRoutes from '../layout/Aside/AsideRoutes';
 import { ToastCloseButton } from '../components/bootstrap/Toasts';
 import AuthContext from '../contexts/authContext';
+import { getFcmToken } from '../firebase/getFCMToken';
+import { playOrderSound } from '../notifications/notificationSound';
 
 const App = () => {
 	getOS();
@@ -50,6 +52,30 @@ const App = () => {
 			document.documentElement.removeAttribute('data-bs-theme');
 		};
 	}, [darkModeStatus]);
+
+	useEffect(() => {
+		const initFcm = async () => {
+			const token = await getFcmToken();
+
+			if (!token) return;
+			console.log(token);
+
+			// await sendTokenToBackend(token);
+		};
+
+		initFcm();
+	}, []);
+
+	useEffect(() => {
+		const handler = (event: MessageEvent) => {
+			if (event.data?.type === 'NEW_ORDER') {
+				playOrderSound();
+			}
+		};
+
+		navigator.serviceWorker.addEventListener('message', handler);
+		return () => navigator.serviceWorker.removeEventListener('message', handler);
+	}, []);
 
 	/**
 	 * Full Screen

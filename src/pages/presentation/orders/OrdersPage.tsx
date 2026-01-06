@@ -13,7 +13,7 @@ import Button from '../../../components/bootstrap/Button';
 import Page from '../../../layout/Page/Page';
 import useDarkMode from '../../../hooks/useDarkMode';
 import { OrderType } from '../../../type/order-type';
-import { getFcmToken } from '../../../firebase/getFCMToken';
+
 
 const OrdersPage = () => {
 	const [page, setPage] = useState(1);
@@ -21,19 +21,6 @@ const OrdersPage = () => {
 	const [total, setTotal] = useState(0);
 	const [orders, setOrders] = useState<OrderType[]>([]);
 	const { darkModeStatus } = useDarkMode();
-
-	useEffect(() => {
-		const initFcm = async () => {
-			const token = await getFcmToken();
-
-			if (!token) return;
-			console.log(token);
-
-			// await sendTokenToBackend(token);
-		};
-
-		initFcm();
-	}, []);
 
 	// refs por orden
 	const scrollRefs = useRef<Record<string, HTMLDivElement | null>>({});

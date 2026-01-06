@@ -14,40 +14,49 @@ firebase.initializeApp({
 
 const messaging = firebase.messaging();
 
-/**
- * Notificaciones cuando la app
- * está minimizada o cerrada
- */
-messaging.onBackgroundMessage(function (payload) {
-  console.log('[SW] Background message ', payload);
+messaging.onBackgroundMessage(payload => {
+  console.log('[SW] Data message', payload);
 
-  const title = payload.notification?.title || 'Nuevo pedido';
-  const options = {
-    body: payload.notification?.body || 'Tienes un nuevo pedido',
-    icon: '/logo.png',
-    badge: '/badge.png',
-    data: payload.data,
-  };
+  self.registration.showNotification('Nuevo pedido', {
+    body: 'Tienes un nuevo pedido',
+    data: { type: 'NEW_ORDER' }
+  });
 
-  self.registration.showNotification(title, options);
+  self.clients.matchAll({ type: 'window', includeUncontrolled: true })
+    .then(clients => {
+      clients.forEach(client => {
+        client.postMessage({ type: 'NEW_ORDER' });
+      });
+    });
 });
+
+
 
 /**
  * Al hacer click en la notificación
  */
-self.addEventListener('notificationclick', function (event) {
+self.addEventListener('notificationclick', event => {
   event.notification.close();
 
+  const TARGET_URL = `${self.location.origin}/shopv2/orders`;
+  const SCOPE_PATH = '/shopv2/';
+
   event.waitUntil(
-    clients.matchAll({ type: 'window', includeUncontrolled: true }).then((clientList) => {
+    clients.matchAll({
+      type: 'window',
+      includeUncontrolled: true,
+    }).then(clientList => {
+
       for (const client of clientList) {
-        if (client.url.includes('/orders') && 'focus' in client) {
-          return client.focus();
+        if (client.url.includes(SCOPE_PATH)) {
+          client.focus();
+          return client.navigate(TARGET_URL);
         }
       }
-      if (clients.openWindow) {
-        return clients.openWindow('/orders');
-      }
+
+      return clients.openWindow(TARGET_URL);
     })
   );
 });
+
+
