@@ -1,24 +1,20 @@
 import React, { useContext, useEffect, useLayoutEffect, useRef } from 'react';
 import { ThemeProvider } from 'react-jss';
 import { ReactNotifications } from 'react-notifications-component';
-import { useFullscreen } from 'react-use';
-import { TourProvider } from '@reactour/tour';
 import dayjs from 'dayjs';
 import localizedFormat from 'dayjs/plugin/localizedFormat';
 import relativeTime from 'dayjs/plugin/relativeTime';
 import { ToastContainer } from 'react-toastify';
-import ThemeContext from '../contexts/themeContext';
 import Wrapper from '../layout/Wrapper/Wrapper';
 import Portal from '../layout/Portal/Portal';
 import useDarkMode from '../hooks/useDarkMode';
 import COLORS from '../common/data/enumColors';
 import { getOS } from '../helpers/helpers';
-import steps, { styles } from '../steps';
 import AsideRoutes from '../layout/Aside/AsideRoutes';
 import { ToastCloseButton } from '../components/bootstrap/Toasts';
 import AuthContext from '../contexts/authContext';
-import { getFcmToken } from '../firebase/getFCMToken';
 import { playOrderSound } from '../notifications/notificationSound';
+// import { getFcmToken } from '../firebase/getFcmToken';
 
 const App = () => {
 	getOS();
@@ -26,9 +22,6 @@ const App = () => {
 	dayjs.extend(localizedFormat);
 	dayjs.extend(relativeTime);
 
-	/**
-	 * Dark Mode
-	 */
 	const { themeStatus, darkModeStatus } = useDarkMode();
 	const theme = {
 		theme: themeStatus,
@@ -53,18 +46,19 @@ const App = () => {
 		};
 	}, [darkModeStatus]);
 
-	useEffect(() => {
-		const initFcm = async () => {
-			const token = await getFcmToken();
+	// useEffect(() => {
+	// 	const initFcm = async () => {
+	// 		const token = await getFcmToken();
 
-			if (!token) return;
-			console.log(token);
+	// 		if (!token) return;
+	// 		console.log(token);
 
-			// await sendTokenToBackend(token);
-		};
-
-		initFcm();
-	}, []);
+	// 		// await sendTokenToBackend(token);
+	// 	};
+	// 	console.log('dsad');
+	// 	initFcm();
+	// 	console.log('dsaddsa');
+	// }, []);
 
 	useEffect(() => {
 		const handler = (event: MessageEvent) => {
@@ -77,18 +71,8 @@ const App = () => {
 		return () => navigator.serviceWorker.removeEventListener('message', handler);
 	}, []);
 
-	/**
-	 * Full Screen
-	 */
-	const { fullScreenStatus, setFullScreenStatus } = useContext(ThemeContext);
 	const ref = useRef(null);
-	useFullscreen(ref, fullScreenStatus, {
-		onClose: () => setFullScreenStatus(false),
-	});
 
-	/**
-	 * Modern Design
-	 */
 	useLayoutEffect(() => {
 		if (import.meta.env.VITE_MODERN_DESGIN === 'true') {
 			document.body.classList.add('modern-design');
@@ -100,15 +84,7 @@ const App = () => {
 
 	return (
 		<ThemeProvider theme={theme}>
-			{/* <TourProvider steps={steps} styles={styles} showNavigation={false} showBadge={false}> */}
-			<div
-				ref={ref}
-				className='app'
-				style={{
-					backgroundColor: fullScreenStatus ? 'var(--bs-body-bg)' : undefined,
-					zIndex: fullScreenStatus ? 1 : undefined,
-					overflow: fullScreenStatus ? 'scroll' : undefined,
-				}}>
+			<div ref={ref} className='app'>
 				{shop.status !== 'PENDING' && shop.completedProfile && <AsideRoutes />}
 				<Wrapper />
 			</div>
@@ -116,7 +92,6 @@ const App = () => {
 				<ReactNotifications />
 			</Portal>
 			<ToastContainer closeButton={ToastCloseButton} toastClassName='toast show' />
-			{/* </TourProvider> */}
 		</ThemeProvider>
 	);
 };

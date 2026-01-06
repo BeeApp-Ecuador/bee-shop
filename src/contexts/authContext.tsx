@@ -8,6 +8,8 @@ export interface IAuthContextProps {
 	userData: Partial<IUserProps>;
 	token: string | null;
 	setToken?: React.Dispatch<React.SetStateAction<string | null>>;
+	fcmToken?: string | null;
+	setFcmToken?: React.Dispatch<React.SetStateAction<string | null>>;
 }
 
 const AuthContext = createContext<IAuthContextProps>({} as IAuthContextProps);
@@ -25,6 +27,10 @@ export const AuthContextProvider: FC<IAuthContextProviderProps> = ({ children })
 		const savedToken = localStorage.getItem('tokenShop');
 		return savedToken ? savedToken : null;
 	});
+	const [fcmToken, setFcmToken] = useState<string | null>(() => {
+		const savedFcmToken = localStorage.getItem('fcmTokenShop');
+		return savedFcmToken ? savedFcmToken : null;
+	});
 
 	const [userData, setUserData] = useState<Partial<IUserProps>>({});
 
@@ -32,7 +38,8 @@ export const AuthContextProvider: FC<IAuthContextProviderProps> = ({ children })
 	useEffect(() => {
 		localStorage.setItem('facit_authUsername', JSON.stringify(shop));
 		localStorage.setItem('tokenShop', token ?? '');
-	}, [shop, token]);
+		localStorage.setItem('fcmTokenShop', fcmToken ?? '');
+	}, [shop, token, fcmToken]);
 
 	// 🔹 Actualiza los datos del usuario cuando cambia shop
 	useEffect(() => {
@@ -50,8 +57,10 @@ export const AuthContextProvider: FC<IAuthContextProviderProps> = ({ children })
 			token,
 			setToken,
 			userData,
+			fcmToken,
+			setFcmToken,
 		}),
-		[shop, token, userData],
+		[shop, token, userData, fcmToken],
 	);
 
 	return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

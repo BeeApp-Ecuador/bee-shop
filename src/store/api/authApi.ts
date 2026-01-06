@@ -70,10 +70,23 @@ export const authApi = createApi({
 			}),
 		}),
 
+		saveFcmToken: builder.mutation({
+			query: (body) => ({
+				url: 'api/v2/shop/fcm',
+				method: 'POST',
+				body,
+				headers: {
+					'Content-Type': 'application/json',
+					Authorization: localStorage.getItem('tokenShop')!,
+				},
+			}),
+		}),
+
 		logout: builder.mutation({
-			query: () => ({
+			query: (body) => ({
 				url: 'api/v2/shop/logout',
 				method: 'DELETE',
+				body,
 				headers: {
 					'Content-Type': 'application/json',
 					Authorization: localStorage.getItem('tokenShop')!,
@@ -92,4 +105,5 @@ export const {
 	useChangePasswordMutation,
 	useGetSessionQuery,
 	useLogoutMutation,
+	useSaveFcmTokenMutation,
 } = authApi;

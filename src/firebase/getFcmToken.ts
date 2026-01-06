@@ -6,6 +6,7 @@ import { firebaseSwRegistration } from '../index';
 const { VITE_FIREBASE_VAPID_KEY } = getEnvVariables();
 
 export const getFcmToken = async (): Promise<string | null> => {
+	console.log('entra al getfcm token');
 	try {
 		// Espera a que el SW esté listo
 		await navigator.serviceWorker.ready;
