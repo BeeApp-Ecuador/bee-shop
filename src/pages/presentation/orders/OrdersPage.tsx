@@ -157,8 +157,14 @@ const OrdersPage = () => {
 								</div>
 							</CardBody>
 
-							<CardFooter className='d-flex justify-content-end'>
+							<CardFooter>
+								<Button color='danger' isLight size='lg'>
+									Rechazar
+								</Button>
 								<strong>Total: ${order.total.toFixed(2)}</strong>
+								<Button color='success' isOutline size='lg' className='ms-2'>
+									Aceptar
+								</Button>
 							</CardFooter>
 						</Card>
 					))
