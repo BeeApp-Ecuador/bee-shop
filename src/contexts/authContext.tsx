@@ -20,9 +20,15 @@ interface IAuthContextProviderProps {
 
 export const AuthContextProvider: FC<IAuthContextProviderProps> = ({ children }) => {
 	const [shop, setShop] = useState<ShopType>(() => {
-		const saved = localStorage.getItem('facit_authUsername');
-		return saved ? (JSON.parse(saved) as ShopType) : ({} as ShopType);
+		try {
+			const saved = localStorage.getItem('facit_authUsername');
+			return saved ? (JSON.parse(saved) as ShopType) : ({} as ShopType);
+		} catch {
+			localStorage.removeItem('facit_authUsername');
+			return {} as ShopType;
+		}
 	});
+
 	const [token, setToken] = useState<string | null>(() => {
 		const savedToken = localStorage.getItem('tokenShop');
 		return savedToken ? savedToken : null;
@@ -36,9 +42,23 @@ export const AuthContextProvider: FC<IAuthContextProviderProps> = ({ children })
 
 	// 🔹 Guarda el valor en localStorage cuando cambia
 	useEffect(() => {
-		localStorage.setItem('facit_authUsername', JSON.stringify(shop));
-		localStorage.setItem('tokenShop', token ?? '');
-		localStorage.setItem('fcmTokenShop', fcmToken ?? '');
+		if (shop && Object.keys(shop).length > 0) {
+			localStorage.setItem('facit_authUsername', JSON.stringify(shop));
+		} else {
+			localStorage.removeItem('facit_authUsername');
+		}
+
+		if (token) {
+			localStorage.setItem('tokenShop', token);
+		} else {
+			localStorage.removeItem('tokenShop');
+		}
+
+		if (fcmToken) {
+			localStorage.setItem('fcmTokenShop', fcmToken);
+		} else {
+			localStorage.removeItem('fcmTokenShop');
+		}
 	}, [shop, token, fcmToken]);
 
 	// 🔹 Actualiza los datos del usuario cuando cambia shop

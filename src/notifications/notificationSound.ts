@@ -1,14 +1,46 @@
+// audioManager.ts
 let audio: HTMLAudioElement | null = null;
+let audioUnlocked = false;
+let listenerAttached = false;
+
+export const initAudioUnlock = () => {
+	if (listenerAttached) return;
+
+	const unlock = async () => {
+		if (audioUnlocked) return;
+
+		try {
+			audio = new Audio('/shopv2/sounds/new-order.wav');
+			audio.preload = 'auto';
+			audio.volume = 0.2;
+
+			await audio.play();
+			audio.pause();
+			audio.currentTime = 0;
+
+			audioUnlocked = true;
+			console.log('🔓 Audio desbloqueado');
+
+			document.removeEventListener('pointerdown', unlock);
+			document.removeEventListener('keydown', unlock);
+		} catch (e) {
+			console.warn('❌ No se pudo desbloquear el audio', e);
+		}
+	};
+
+	document.addEventListener('pointerdown', unlock);
+	document.addEventListener('keydown', unlock);
+
+	listenerAttached = true;
+	console.log('🎧 Listener global de audio registrado');
+};
 
 export const playOrderSound = () => {
-	console.log('play audio');
-	if (!audio) {
-		audio = new Audio('/sounds/new-order.wav');
-		audio.volume = 1;
+	if (!audioUnlocked || !audio) {
+		console.warn('🔇 Audio bloqueado');
+		return;
 	}
 
 	audio.currentTime = 0;
-	audio.play().catch(() => {
-		console.warn('Autoplay bloqueado hasta interacción del usuario');
-	});
+	audio.play();
 };

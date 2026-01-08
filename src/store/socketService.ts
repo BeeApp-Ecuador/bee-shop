@@ -1,57 +1,40 @@
-// socketService.ts
 import { io, Socket } from 'socket.io-client';
 
 let socket: Socket | null = null;
 
 const connect = (url: string, queryParams?: any) => {
-	console.log(url);
-	console.log(queryParams);
-	socket = io(url, { query: queryParams, transports: ['websocket'], reconnection: true });
+	if (socket) return socket;
+
+	socket = io(url, {
+		query: queryParams,
+		transports: ['websocket'],
+		reconnection: true,
+	});
 
 	socket.on('connect', () => {
-		console.log('Socket conectado');
+		console.log('Socket conectado:', socket?.id);
 	});
 
 	socket.on('disconnect', () => {
 		console.log('Socket desconectado');
 	});
+
+	// socket.on('order', (data) => {
+	// 	console.log('Nueva orden:', data);
+	// });
+
+	return socket;
 };
 
 const disconnect = () => {
-	if (socket) {
-		socket.disconnect();
-		socket = null;
-	}
-};
-
-const on = (event: string, callback: (data: any) => void) => {
-	if (socket) {
-		socket.on(event, callback);
-	}
-};
-
-const off = (event: string) => {
-	if (socket) {
-		socket.off(event);
-	}
-};
-
-const emit = (event: string, data: any) => {
-	if (socket) {
-		socket.emit(event, data);
-	}
+	socket?.disconnect();
+	socket = null;
 };
 
 const getSocket = () => socket;
 
-// Asigna el objeto a una variable antes de exportarlo
-const socketService = {
+export default {
 	connect,
 	disconnect,
-	on,
-	off,
-	emit,
 	getSocket,
 };
-
-export default socketService;

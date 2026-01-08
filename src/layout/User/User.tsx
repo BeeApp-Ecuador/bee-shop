@@ -16,6 +16,7 @@ import ThemeContext from '../../contexts/themeContext';
 import { ShopType } from '../../type/shop-type';
 import { useLogoutMutation } from '../../store/api/authApi';
 import { getFcmToken } from '../../firebase/getFcmToken';
+import socketService from '../../store/socketService';
 
 const User = () => {
 	const { width } = useWindowSize();
@@ -48,6 +49,7 @@ const User = () => {
 			if (width < Number(import.meta.env.VITE_MOBILE_BREAKPOINT_SIZE)) {
 				setAsideStatus(false);
 			}
+			socketService.disconnect();
 			navigate(`../${demoPagesMenu.login.path}`);
 		}
 	};

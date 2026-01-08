@@ -4,6 +4,7 @@ const showNotification = (
 	title: string | JSX.Element,
 	message: string | JSX.Element,
 	type = 'default',
+	duration: number = 5000, // ms | 0 = persistente
 ) => {
 	Store.addNotification({
 		title,
@@ -15,7 +16,7 @@ const showNotification = (
 		animationIn: ['animate__animated', 'animate__fadeIn'],
 		animationOut: ['animate__animated', 'animate__fadeOut'],
 		dismiss: {
-			duration: 5000,
+			duration: duration,
 			pauseOnHover: true,
 			onScreen: true,
 			showIcon: true,

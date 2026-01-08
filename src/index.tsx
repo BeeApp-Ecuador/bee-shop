@@ -10,29 +10,25 @@ import { AuthContextProvider } from './contexts/authContext';
 import './i18n';
 import { Provider } from 'react-redux';
 import { store } from './store';
-export let firebaseSwRegistration: ServiceWorkerRegistration | null = null;
+import { registerFirebaseSW } from './firebase/firebaseSw';
+import { initAudioUnlock } from './notifications/notificationSound';
 
+// 🔹 Registro del Service Worker (sin exportar nada)
 if ('serviceWorker' in navigator) {
-	window.addEventListener('load', async () => {
-		try {
-			firebaseSwRegistration = await navigator.serviceWorker.register(
-				'/shopv2/firebase-messaging-sw.js',
-			);
-
-			console.log('✅ Firebase SW registrado');
-		} catch (err) {
-			console.error('❌ SW error', err);
-		}
+	window.addEventListener('load', () => {
+		registerFirebaseSW();
 	});
 }
+
+initAudioUnlock();
 const children = (
 	<AuthContextProvider>
 		<ThemeContextProvider>
 			<Provider store={store}>
 				<Router basename='shopv2'>
-					<React.StrictMode>
-						<App />
-					</React.StrictMode>
+					{/* <React.StrictMode> */}
+					<App />
+					{/* </React.StrictMode> */}
 				</Router>
 			</Provider>
 		</ThemeContextProvider>

@@ -102,7 +102,7 @@ const Login: FC<ILoginProps> = ({ isSignUp }) => {
 	const [error, setError] = useState<string>('');
 
 	const navigate = useNavigate();
-	const handleOnClick = useCallback(() => navigate('/'), [navigate]);
+	const handleOnClick = useCallback(() => navigate('/profile'), [navigate]);
 	const [registerShop] = useRegisterMutation();
 	const [sendCode] = useSendEmailVerificationMutation();
 	const [showSuccess, setShowSuccess] = useState(false);

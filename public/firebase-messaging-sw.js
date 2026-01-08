@@ -17,17 +17,13 @@ const messaging = firebase.messaging();
 messaging.onBackgroundMessage(payload => {
   console.log('[SW] Data message', payload);
 
-  self.registration.showNotification('Nuevo pedido', {
-    body: 'Tienes un nuevo pedido',
-    data: { type: 'NEW_ORDER' }
-  });
 
-  self.clients.matchAll({ type: 'window', includeUncontrolled: true })
-    .then(clients => {
-      clients.forEach(client => {
-        client.postMessage({ type: 'NEW_ORDER' });
-      });
-    });
+  // self.clients.matchAll({ type: 'window', includeUncontrolled: true })
+  //   .then(clients => {
+  //     clients.forEach(client => {
+  //       client.postMessage({ type: 'NEW_ORDER' });
+  //     });
+  //   });
 });
 
 

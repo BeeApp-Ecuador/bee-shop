@@ -13,7 +13,7 @@ import Button from '../../../components/bootstrap/Button';
 import Page from '../../../layout/Page/Page';
 import useDarkMode from '../../../hooks/useDarkMode';
 import { OrderType } from '../../../type/order-type';
-
+import Spinner from '../../../components/bootstrap/Spinner';
 
 const OrdersPage = () => {
 	const [page, setPage] = useState(1);
@@ -72,7 +72,9 @@ const OrdersPage = () => {
 
 			<Page>
 				{isLoadingOrders ? (
-					<div>Cargando órdenes...</div>
+					<div className='d-flex justify-content-center align-items-center vh-100'>
+						<Spinner isGrow />
+					</div>
 				) : orders.length === 0 ? (
 					<div>No hay órdenes disponibles.</div>
 				) : (
@@ -155,8 +157,14 @@ const OrdersPage = () => {
 								</div>
 							</CardBody>
 
-							<CardFooter className='d-flex justify-content-end'>
+							<CardFooter>
+								<Button color='danger' isLight size='lg'>
+									Rechazar
+								</Button>
 								<strong>Total: ${order.total.toFixed(2)}</strong>
+								<Button color='success' isOutline size='lg' className='ms-2'>
+									Aceptar
+								</Button>
 							</CardFooter>
 						</Card>
 					))
