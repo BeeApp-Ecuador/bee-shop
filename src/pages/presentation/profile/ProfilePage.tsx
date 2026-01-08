@@ -31,6 +31,7 @@ import LegalAgentInfo from '../../../components/profile/LegalAgentInfo';
 import AddressInfo from '../../../components/profile/AddressInfo';
 import FillProfile from '../../../components/profile/FillProfile';
 import Checks from '../../../components/bootstrap/forms/Checks';
+import { useFillProfileMutation } from '../../../store/api/profileApi';
 
 const ProfilePage = () => {
 	const { user: shop } = useContext(AuthContext);
@@ -39,6 +40,7 @@ const ProfilePage = () => {
 	const [changePassword] = useChangePasswordMutation();
 	const [isUpdatingPassword, setIsUpdatingPassword] = useState(false);
 	const { data: sessionData, isSuccess } = useGetSessionQuery({});
+	const [changeAcceptMethod] = useFillProfileMutation();
 
 	useEffect(() => {
 		if (sessionData && isSuccess) {
@@ -46,6 +48,37 @@ const ProfilePage = () => {
 		}
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [sessionData]);
+
+	const handleAcceptMethodChange = async (autoAcceptOrders: boolean) => {
+		const body = {
+			autoAcceptOrders,
+		};
+		const { data, error } = await changeAcceptMethod(body);
+		if (error) {
+			showNotification(
+				<span className='d-flex align-items-center'>
+					<Icon icon='Error' size='lg' className='me-1' />
+					<span>Error</span>
+				</span>,
+				'Ocurrió un error al actualizar el método de aceptación de órdenes, intenta nuevamente',
+				'danger',
+			);
+		}
+		if (data) {
+			showNotification(
+				<span className='d-flex align-items-center'>
+					<Icon icon='Success' size='lg' className='me-1' />
+					<span>Éxito</span>
+				</span>,
+				'Método de aceptación de órdenes actualizado correctamente',
+				'success',
+			);
+			setUser({
+				...shop,
+				autoAcceptOrders: autoAcceptOrders,
+			});
+		}
+	};
 
 	const formikPassword = useFormik({
 		initialValues: {
@@ -326,7 +359,7 @@ const ProfilePage = () => {
 											<FormGroup
 												className='col-lg-6'
 												id='acceptOrders'
-												label='Aceptación de Órdenes'>
+												label='Aceptación de Pedidos'>
 												<Checks
 													name='acceptOrders'
 													key='autoAcceptOrders'
@@ -339,7 +372,9 @@ const ProfilePage = () => {
 															? 'autoAcceptOrders'
 															: ''
 													}
-													onChange={() => {}}
+													onChange={() => {
+														handleAcceptMethodChange(true);
+													}}
 												/>
 												<Checks
 													name='acceptOrders'
@@ -353,26 +388,13 @@ const ProfilePage = () => {
 															? 'manualAcceptOrders'
 															: ''
 													}
-													onChange={() => {}}
+													onChange={() => {
+														handleAcceptMethodChange(false);
+													}}
 												/>
 											</FormGroup>
-											{/* <div className='w-100 m-0' /> */}
 										</div>
 									</CardBody>
-									<CardFooter>
-										<CardFooterRight>
-											<Button
-												color='primary'
-												icon='Save'
-												isDisable={isUpdatingPassword}
-												onClick={formikPassword.handleSubmit}>
-												{isUpdatingPassword && (
-													<Spinner isSmall inButton isGrow />
-												)}
-												Cambiar Contraseña
-											</Button>
-										</CardFooterRight>
-									</CardFooter>
 								</Card>
 							</CardTabItem>
 						</Card>
