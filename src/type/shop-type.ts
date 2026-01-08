@@ -1,6 +1,7 @@
 export interface ShopType {
 	address: string;
 	addressLegalAgent: string;
+	autoAcceptOrders: boolean;
 	businessName: string;
 	category?: [];
 	ciLegalAgent: string;

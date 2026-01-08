@@ -37,6 +37,19 @@ export const ordersApi = createApi({
 			},
 			keepUnusedDataFor: 0,
 		}),
+		changeStatus: builder.mutation({
+			query: ({ orderId, body }: { orderId: string; status: string }) => {
+				return {
+					url: `api/v2/shop/order/status/${orderId}`,
+					method: 'PUT',
+					body: body,
+					headers: {
+						'Content-Type': 'application/json',
+						Authorization: localStorage.getItem('tokenShop')!,
+					},
+				};
+			},
+		}),
 	}),
 });
-export const { useGetOrdersQuery } = ordersApi;
+export const { useGetOrdersQuery, useChangeStatusMutation } = ordersApi;

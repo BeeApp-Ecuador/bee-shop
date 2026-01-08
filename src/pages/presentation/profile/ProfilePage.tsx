@@ -30,6 +30,7 @@ import Spinner from '../../../components/bootstrap/Spinner';
 import LegalAgentInfo from '../../../components/profile/LegalAgentInfo';
 import AddressInfo from '../../../components/profile/AddressInfo';
 import FillProfile from '../../../components/profile/FillProfile';
+import Checks from '../../../components/bootstrap/forms/Checks';
 
 const ProfilePage = () => {
 	const { user: shop } = useContext(AuthContext);
@@ -291,6 +292,71 @@ const ProfilePage = () => {
 													id='confirmNewPassword'
 												/>
 											</FormGroup>
+										</div>
+									</CardBody>
+									<CardFooter>
+										<CardFooterRight>
+											<Button
+												color='primary'
+												icon='Save'
+												isDisable={isUpdatingPassword}
+												onClick={formikPassword.handleSubmit}>
+												{isUpdatingPassword && (
+													<Spinner isSmall inButton isGrow />
+												)}
+												Cambiar Contraseña
+											</Button>
+										</CardFooterRight>
+									</CardFooter>
+								</Card>
+							</CardTabItem>
+							<CardTabItem id='settings' title='Configuración' icon='Settings'>
+								<Card
+									className='rounded-2'
+									tag='form'
+									onSubmit={formikPassword.handleSubmit}>
+									<CardHeader>
+										<CardLabel icon='Settings'>
+											<CardTitle>Configuración</CardTitle>
+										</CardLabel>
+									</CardHeader>
+									<CardBody>
+										<div className='row g-4'>
+											{/* <div className='w-100 m-0' /> */}
+											<FormGroup
+												className='col-lg-6'
+												id='acceptOrders'
+												label='Aceptación de Órdenes'>
+												<Checks
+													name='acceptOrders'
+													key='autoAcceptOrders'
+													type='radio'
+													label='Automáticamente'
+													value='autoAcceptOrders'
+													id='autoAcceptOrders'
+													checked={
+														shop.autoAcceptOrders
+															? 'autoAcceptOrders'
+															: ''
+													}
+													onChange={() => {}}
+												/>
+												<Checks
+													name='acceptOrders'
+													key='manualAcceptOrders'
+													type='radio'
+													label='Manualmente'
+													value='manualAcceptOrders'
+													id='manualAcceptOrders'
+													checked={
+														!shop.autoAcceptOrders
+															? 'manualAcceptOrders'
+															: ''
+													}
+													onChange={() => {}}
+												/>
+											</FormGroup>
+											{/* <div className='w-100 m-0' /> */}
 										</div>
 									</CardBody>
 									<CardFooter>
