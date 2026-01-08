@@ -14,7 +14,6 @@ import Page from '../../../layout/Page/Page';
 import useDarkMode from '../../../hooks/useDarkMode';
 import { OrderType } from '../../../type/order-type';
 
-
 const OrdersPage = () => {
 	const [page, setPage] = useState(1);
 	const [limit, setLimit] = useState(10);

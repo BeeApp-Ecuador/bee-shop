@@ -13,10 +13,10 @@ import { getOS } from '../helpers/helpers';
 import AsideRoutes from '../layout/Aside/AsideRoutes';
 import { ToastCloseButton } from '../components/bootstrap/Toasts';
 import AuthContext from '../contexts/authContext';
-import { playOrderSound } from '../notifications/notificationSound';
+// import { lockAudio, playOrderSound, unlockAudio } from '../notifications/notificationSound';
 import { useSocket } from '../hooks/useSocket';
-import { getEnvVariables } from '../helpers/getEnvVariables';
-// import { getFcmToken } from '../firebase/getFcmToken';
+import socketService from '../store/socketService';
+import { playOrderSound } from '../notifications/notificationSound';
 
 const App = () => {
 	getOS();
@@ -48,20 +48,6 @@ const App = () => {
 		};
 	}, [darkModeStatus]);
 
-	// useEffect(() => {
-	// 	const initFcm = async () => {
-	// 		const token = await getFcmToken();
-
-	// 		if (!token) return;
-	// 		console.log(token);
-
-	// 		// await sendTokenToBackend(token);
-	// 	};
-	// 	console.log('dsad');
-	// 	initFcm();
-	// 	console.log('dsaddsa');
-	// }, []);
-
 	useEffect(() => {
 		const handler = (event: MessageEvent) => {
 			if (event.data?.type === 'NEW_ORDER') {
@@ -82,40 +68,39 @@ const App = () => {
 			document.body.classList.remove('modern-design');
 		}
 	});
+
+	// useEffect(() => {
+	// 	lockAudio();
+
+	// 	const unlock = () => {
+	// 		unlockAudio();
+	// 	};
+
+	// 	document.addEventListener('pointerdown', unlock, { once: true });
+
+	// 	return () => {
+	// 		document.removeEventListener('pointerdown', unlock);
+	// 	};
+	// }, []);
+
 	const { user: shop } = useContext(AuthContext);
 
-	const socket = useSocket();
+	useSocket();
 
 	useEffect(() => {
-		if (!socket.getSocket()) return;
+		const socket = socketService.getSocket();
+		if (!socket) return;
 
 		const handleNewOrder = (data: any) => {
-			console.log('Nueva orden recibida:', data);
 			playOrderSound();
 		};
 
 		socket.on('order', handleNewOrder);
 
 		return () => {
-			socket.off('order');
+			socket.off('order', handleNewOrder);
 		};
-	}, [socket]);
-
-	// useEffect(() => {
-	// 	if (!socket.getSocket()) return;
-
-	// 	const handleNewOrder = (data: any) => {
-	// 		console.log('Nueva orden recibida:', data);
-	// 		playOrderSound();
-	// 		// Aquí puedes despachar Redux o mostrar toast
-	// 	};
-
-	// 	socket.on('NEW_ORDER', handleNewOrder);
-
-	// 	return () => {
-	// 		socket.off('NEW_ORDER');
-	// 	};
-	// }, [socket]);
+	}, []);
 
 	return (
 		<ThemeProvider theme={theme}>

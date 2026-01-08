@@ -1,7 +1,7 @@
 import { getToken } from 'firebase/messaging';
 import { messaging } from '../firebase';
 import { getEnvVariables } from '../helpers/getEnvVariables';
-import { firebaseSwRegistration } from '../index';
+import { firebaseSwRegistration } from './firebaseSw';
 
 const { VITE_FIREBASE_VAPID_KEY } = getEnvVariables();
 

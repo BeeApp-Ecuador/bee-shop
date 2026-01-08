@@ -1,32 +1,25 @@
 import { useContext, useEffect } from 'react';
-import socketService from '../store/socketService';
 import AuthContext from '../contexts/authContext';
 import { getEnvVariables } from '../helpers/getEnvVariables';
+import socketService from '../store/socketService';
 
 export const useSocket = () => {
 	const { user: shop, token } = useContext(AuthContext);
 	const { VITE_URL } = getEnvVariables();
 
 	useEffect(() => {
-		// Solo conectar si hay usuario loggeado
-		if (shop && shop._id) {
-			console.log('Conectando socket para usuario:', shop.email);
-
-			if (!socketService.getSocket()) {
-				socketService.connect(`${VITE_URL}shop-user`, {
-					token: token,
-				});
-			}
+		if (shop?._id && token) {
+			socketService.connect(`${VITE_URL}shop-user`, {
+				token,
+			});
 		}
 
-		// Cleanup: desconectar solo si ya no hay usuario
 		return () => {
-			if (!shop || !shop._id) {
+			if (!shop?._id) {
 				socketService.disconnect();
-				console.log('Socket desconectado');
 			}
 		};
-	}, [shop, token, VITE_URL]);
+	}, [shop?._id, token, VITE_URL]);
 
 	return socketService;
 };
