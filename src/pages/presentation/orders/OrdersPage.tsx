@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useContext, useEffect, useRef, useState } from 'react';
 import { useGetOrdersQuery } from '../../../store/api/ordersApi';
 import PageWrapper from '../../../layout/PageWrapper/PageWrapper';
 import SubHeader, { SubHeaderLeft, SubHeaderRight } from '../../../layout/SubHeader/SubHeader';
@@ -14,8 +14,11 @@ import Page from '../../../layout/Page/Page';
 import useDarkMode from '../../../hooks/useDarkMode';
 import { OrderType } from '../../../type/order-type';
 import Spinner from '../../../components/bootstrap/Spinner';
+import AuthContext from '../../../contexts/authContext';
 
 const OrdersPage = () => {
+	const { user: shop } = useContext(AuthContext);
+
 	const [page, setPage] = useState(1);
 	const [limit, setLimit] = useState(10);
 	const [total, setTotal] = useState(0);
@@ -157,15 +160,25 @@ const OrdersPage = () => {
 								</div>
 							</CardBody>
 
-							<CardFooter>
-								<Button color='danger' isLight size='lg'>
-									Rechazar
-								</Button>
-								<strong>Total: ${order.total.toFixed(2)}</strong>
-								<Button color='success' isOutline size='lg' className='ms-2'>
-									Aceptar
-								</Button>
-							</CardFooter>
+							{!shop.autoAcceptOrders ? (
+								<CardFooter>
+									<Button color='danger' isLight size='lg'>
+										Rechazar
+									</Button>
+									<h5>
+										<strong>Total: ${order.total.toFixed(2)}</strong>
+									</h5>
+									<Button color='success' isOutline size='lg' className='ms-2'>
+										Aceptar
+									</Button>
+								</CardFooter>
+							) : (
+								<CardFooter className='d-flex justify-content-end'>
+									<h5>
+										<strong>Total: ${order.total.toFixed(2)}</strong>
+									</h5>
+								</CardFooter>
+							)}
 						</Card>
 					))
 				)}
