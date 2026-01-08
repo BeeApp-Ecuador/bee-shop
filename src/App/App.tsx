@@ -17,6 +17,8 @@ import AuthContext from '../contexts/authContext';
 import { useSocket } from '../hooks/useSocket';
 import socketService from '../store/socketService';
 import { playOrderSound } from '../notifications/notificationSound';
+import showNotification from '../components/extras/showNotification';
+import Icon from '../components/icon/Icon';
 
 const App = () => {
 	getOS();
@@ -92,6 +94,15 @@ const App = () => {
 		if (!socket) return;
 
 		const handleNewOrder = (data: any) => {
+			showNotification(
+				<span className='d-flex align-items-center'>
+					<Icon icon='Check' size='lg' className='me-1' />
+					<span>Nueva orden</span>
+				</span>,
+				'Tienes un nuevo pedido',
+				'success',
+				0,
+			);
 			playOrderSound();
 		};
 

@@ -19,10 +19,9 @@ const connect = (url: string, queryParams?: any) => {
 		console.log('Socket desconectado');
 	});
 
-	socket.on('order', (data) => {
-		console.log('Nueva orden:', data);
-		// Aquí NO reproduces sonido todavía
-	});
+	// socket.on('order', (data) => {
+	// 	console.log('Nueva orden:', data);
+	// });
 
 	return socket;
 };
