@@ -16,7 +16,6 @@ const messaging = firebase.messaging();
 
 messaging.onBackgroundMessage(payload => {
   console.log('[SW] Data message', payload);
-  console.log('[SW] Data message', payload);
 
 
   // self.clients.matchAll({ type: 'window', includeUncontrolled: true })
