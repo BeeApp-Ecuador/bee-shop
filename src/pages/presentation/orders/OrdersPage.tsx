@@ -172,7 +172,11 @@ const OrdersPage = () => {
 
 							{shop.autoAcceptOrders ? (
 								<CardFooter>
-									<Button color='danger' isLight size='lg'>
+									<Button
+										color='danger'
+										isLight
+										size='lg'
+										onClick={() => handleChangeStatus(order._id, 'REJECTED')}>
 										Rechazar
 									</Button>
 									<h5>
