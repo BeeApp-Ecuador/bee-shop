@@ -160,7 +160,7 @@ const OrdersPage = () => {
 								</div>
 							</CardBody>
 
-							{!shop.autoAcceptOrders ? (
+							{shop.autoAcceptOrders ? (
 								<CardFooter>
 									<Button color='danger' isLight size='lg'>
 										Rechazar
