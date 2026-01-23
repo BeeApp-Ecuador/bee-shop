@@ -1,5 +1,5 @@
 import React, { useContext, useEffect, useRef, useState } from 'react';
-import { useGetOrdersQuery } from '../../../store/api/ordersApi';
+import { useChangeStatusMutation, useGetOrdersQuery } from '../../../store/api/ordersApi';
 import PageWrapper from '../../../layout/PageWrapper/PageWrapper';
 import SubHeader, { SubHeaderLeft, SubHeaderRight } from '../../../layout/SubHeader/SubHeader';
 import Card, {
@@ -24,6 +24,7 @@ const OrdersPage = () => {
 	const [total, setTotal] = useState(0);
 	const [orders, setOrders] = useState<OrderType[]>([]);
 	const { darkModeStatus } = useDarkMode();
+	const [changeStatus] = useChangeStatusMutation();
 
 	// refs por orden
 	const scrollRefs = useRef<Record<string, HTMLDivElement | null>>({});
@@ -50,6 +51,15 @@ const OrdersPage = () => {
 			setTotal(ordersData.total);
 		}
 	}, [ordersData]);
+
+	const handleChangeStatus = async (orderId: string, status: string) => {
+		try {
+			const { data: statusData } = await changeStatus({ orderId, status });
+			console.log('Orden actualizada:', statusData);
+		} catch (error) {
+			console.error('Error al aceptar la orden:', error);
+		}
+	};
 
 	return (
 		<PageWrapper title='Órdenes'>
@@ -168,7 +178,12 @@ const OrdersPage = () => {
 									<h5>
 										<strong>Total: ${order.total.toFixed(2)}</strong>
 									</h5>
-									<Button color='success' isOutline size='lg' className='ms-2'>
+									<Button
+										color='success'
+										isOutline
+										size='lg'
+										className='ms-2'
+										onClick={() => handleChangeStatus(order._id, 'ACCEPTED')}>
 										Aceptar
 									</Button>
 								</CardFooter>
