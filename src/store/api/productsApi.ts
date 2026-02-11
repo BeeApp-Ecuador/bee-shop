@@ -76,6 +76,16 @@ export const productsApi = createApi({
 				body: body,
 			}),
 		}),
+		updateImage: builder.mutation({
+			query: ({ productId, body }: { productId: string; body: any }) => ({
+				url: `api/v2/shop/product/img/${productId}`,
+				method: 'PUT',
+				headers: {
+					Authorization: localStorage.getItem('tokenShop')!,
+				},
+				body: body,
+			}),
+		}),
 	}),
 });
 
@@ -84,4 +94,5 @@ export const {
 	useCreateProductMutation,
 	useAddOptionsToProductMutation,
 	useDeleteProductMutation,
+	useUpdateImageMutation,
 } = productsApi;

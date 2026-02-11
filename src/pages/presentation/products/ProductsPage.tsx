@@ -373,7 +373,9 @@ const ProductsPage = () => {
 						isStaticBackdrop
 						size='xl'>
 						<ModalHeader setIsOpen={setIsCreatingProduct}>
-							<ModalTitle id='preview'>Crear Producto</ModalTitle>
+							<ModalTitle id='preview'>
+								{editingProduct !== null ? 'Editar Producto' : 'Crear Producto'}
+							</ModalTitle>
 						</ModalHeader>
 						<ModalBody>
 							<CreateProduct
