@@ -26,6 +26,7 @@ import Icon from '../icon/Icon';
 import {
 	useAddOptionsToProductMutation,
 	useCreateProductMutation,
+	useUpdateImageMutation,
 } from '../../store/api/productsApi';
 
 const CreateProduct = ({
@@ -61,6 +62,7 @@ const CreateProduct = ({
 	const [createProduct] = useCreateProductMutation();
 	const [addOptionsToProduct] = useAddOptionsToProductMutation();
 	const [updateProduct] = useAddOptionsToProductMutation();
+	const [updateImage] = useUpdateImageMutation();
 
 	// const { setUser } = useContext(AuthContext);
 
@@ -130,6 +132,7 @@ const CreateProduct = ({
 			...values,
 			options: [] as OptionType[],
 		};
+
 		delete body.img;
 		if (formikProduct.values.haveOptions) {
 			console.log('rntra al if');
@@ -153,6 +156,14 @@ const CreateProduct = ({
 			}
 		}
 		if (optionsData) {
+			if (values.img) {
+				const formData = new FormData();
+				formData.append('img', values.img!);
+				await updateImage({
+					productId: productToEdit!._id!,
+					body: formData,
+				});
+			}
 			setIsError(false);
 			setShowModal(true);
 		}
