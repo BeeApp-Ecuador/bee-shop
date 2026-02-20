@@ -10,7 +10,7 @@ export const initAudioUnlock = () => {
 		if (audioUnlocked) return;
 
 		try {
-			audio = new Audio('/shopv2/sounds/new-order.wav');
+			audio = new Audio('/shop/sounds/new-order.wav');
 			audio.preload = 'auto';
 			audio.volume = 0.2;
 
