@@ -34,8 +34,8 @@ messaging.onBackgroundMessage(payload => {
 self.addEventListener('notificationclick', event => {
   event.notification.close();
 
-  const TARGET_URL = `${self.location.origin}/shopv2/orders`;
-  const SCOPE_PATH = '/shopv2/';
+  const TARGET_URL = `${self.location.origin}/shop/orders`;
+  const SCOPE_PATH = '/shop/';
 
   event.waitUntil(
     clients.matchAll({

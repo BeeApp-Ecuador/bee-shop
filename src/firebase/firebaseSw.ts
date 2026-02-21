@@ -5,7 +5,7 @@ export const registerFirebaseSW = async () => {
 
 	try {
 		firebaseSwRegistration = await navigator.serviceWorker.register(
-			'/shopv2/firebase-messaging-sw.js',
+			'/shop/firebase-messaging-sw.js',
 		);
 		console.log('✅ Firebase SW registrado');
 	} catch (err) {

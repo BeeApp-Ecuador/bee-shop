@@ -25,7 +25,7 @@ const children = (
 	<AuthContextProvider>
 		<ThemeContextProvider>
 			<Provider store={store}>
-				<Router basename='shopv2'>
+				<Router basename='shop'>
 					{/* <React.StrictMode> */}
 					<App />
 					{/* </React.StrictMode> */}
