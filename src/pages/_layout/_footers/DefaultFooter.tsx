@@ -5,7 +5,6 @@ import Footer from '../../../layout/Footer/Footer';
 
 const DefaultFooter = () => {
 	const { darkModeStatus } = useDarkMode();
-	// get the current year
 	const currentYear = new Date().getFullYear();
 
 	return (
