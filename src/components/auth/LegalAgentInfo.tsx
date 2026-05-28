@@ -14,7 +14,7 @@ const LegalAgentInfo = ({
 }) => {
 	const countryOptions = getCountries().map((country) => ({
 		value: country.dialCode,
-		label: `${country.flag} +${country.dialCode} ${country.name}`,
+		label: `${country.flag} ${country.name} (+${country.dialCode})`,
 		text: `+${country.dialCode} ${country.name}`,
 	}));
 	const [maxLength, setMaxLength] = useState(9);
@@ -52,7 +52,7 @@ const LegalAgentInfo = ({
 							isTouched={formikRegister.touched.prefixLegalAgent}
 							invalidFeedback={formikRegister.errors.prefixLegalAgent}
 							isValid={formikRegister.isValid}
-							onChange={(e) => {
+							onChange={(e: React.ChangeEvent<HTMLSelectElement>) => {
 								formikRegister.setFieldValue('phoneLegalAgent', '');
 								formikRegister.handleChange(e);
 								const country = getCountryByDialCode(e.target.value);

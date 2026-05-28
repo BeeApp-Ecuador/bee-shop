@@ -5,13 +5,14 @@ import Footer from '../../../layout/Footer/Footer';
 
 const DefaultFooter = () => {
 	const { darkModeStatus } = useDarkMode();
+	const currentYear = new Date().getFullYear();
 
 	return (
 		<Footer>
 			<div className='container-fluid'>
 				<div className='row'>
 					<div className='col'>
-						<span className='fw-light'>Copyright © 2025 - Version 4.5.0</span>
+						<span className='fw-light'>Copyright © {currentYear} - Version 4.5.0</span>
 					</div>
 					<div className='col-auto'>
 						<a

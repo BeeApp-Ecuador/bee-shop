@@ -11,7 +11,7 @@ import { RegisterFormValues } from '../../pages/presentation/auth/Login';
 const BusinessInfo = ({ formikRegister }: { formikRegister: FormikProps<RegisterFormValues> }) => {
 	const countryOptions = getCountries().map((country) => ({
 		value: country.dialCode,
-		label: `${country.flag} +${country.dialCode} ${country.name}`,
+		label: `${country.flag} ${country.name} (+${country.dialCode})`,
 		text: `+${country.dialCode} ${country.name}`,
 	}));
 	const [maxLength, setMaxLength] = useState(9);
