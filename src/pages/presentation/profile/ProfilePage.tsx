@@ -245,8 +245,7 @@ const ProfilePage = () => {
 						<Card hasTab>
 							<CardTabItem id='profile' title='Representante' icon='Contacts'>
 								<Alert isLight className='border-0' shadow='md' icon='LocalPolice'>
-									La información que se muestra aquí no es compartida con
-									terceros.
+									La información aquí mostrada no es compartida con terceros.
 								</Alert>
 								<LegalAgentInfo shop={shop} />
 							</CardTabItem>
