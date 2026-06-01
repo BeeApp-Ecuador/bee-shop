@@ -25,6 +25,7 @@ const OrdersPage = () => {
 	const [orders, setOrders] = useState<OrderType[]>([]);
 	const { darkModeStatus } = useDarkMode();
 	const [changeStatus] = useChangeStatusMutation();
+	const [ordersStaus, setOrdersStatus] = useState<'PLACED' | 'IN_PREPARATION'>('PLACED');
 
 	// refs por orden
 	const scrollRefs = useRef<Record<string, HTMLDivElement | null>>({});
@@ -43,6 +44,7 @@ const OrdersPage = () => {
 	const { data: ordersData, isLoading: isLoadingOrders } = useGetOrdersQuery({
 		page,
 		limit,
+		status: ordersStaus,
 	});
 
 	useEffect(() => {
@@ -74,8 +76,17 @@ const OrdersPage = () => {
 				</SubHeaderLeft>
 
 				<SubHeaderRight>
-					<Button color={darkModeStatus ? 'light' : 'dark'} icon='Assignment'>
+					<Button
+						color={darkModeStatus ? 'light' : 'dark'}
+						icon='Assignment'
+						onClick={() => setOrdersStatus('PLACED')}>
 						Nuevos Pedidos
+					</Button>
+					<Button
+						color={darkModeStatus ? 'light' : 'dark'}
+						icon='Assignment'
+						onClick={() => setOrdersStatus('IN_PREPARATION')}>
+						Aceptados
 					</Button>
 					<Button color={darkModeStatus ? 'light' : 'dark'} isLight icon='History'>
 						Historial
@@ -176,7 +187,9 @@ const OrdersPage = () => {
 										color='danger'
 										isLight
 										size='lg'
-										onClick={() => handleChangeStatus(order._id, 'REJECTED')}>
+										onClick={() =>
+											handleChangeStatus(order._id, 'REJECTED_BY_SHOP')
+										}>
 										Rechazar
 									</Button>
 									<h5>
@@ -187,7 +200,9 @@ const OrdersPage = () => {
 										isOutline
 										size='lg'
 										className='ms-2'
-										onClick={() => handleChangeStatus(order._id, 'ACCEPTED')}>
+										onClick={() =>
+											handleChangeStatus(order._id, 'IN_PREPARATION')
+										}>
 										Aceptar
 									</Button>
 								</CardFooter>
