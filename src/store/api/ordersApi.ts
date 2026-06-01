@@ -19,13 +19,20 @@ export const ordersApi = createApi({
 	}),
 	endpoints: (builder) => ({
 		getOrders: builder.query({
-			query: ({ page = 1, limit = 10, buyStatus = 'DELIVERY', search = '' }) => {
+			query: ({
+				page = 1,
+				limit = 10,
+				buyStatus = 'DELIVERY',
+				status = 'PLACED',
+				search = '',
+			}) => {
 				const params: Record<string, any> = {
 					page,
 					limit,
 					// search,
 				};
 				if (buyStatus !== null && buyStatus !== undefined) params.buyStatus = buyStatus;
+				if (status !== null && status !== undefined) params.status = status;
 				return {
 					url: 'api/v2/shop/order',
 					params,
