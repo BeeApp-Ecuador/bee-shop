@@ -503,6 +503,18 @@ const Login: FC<ILoginProps> = ({ isSignUp }) => {
 											</div>
 										</>
 									)}
+									{/* forgot your password? */}
+									{!singUpStatus && (
+										<div className='col-12 text-end'>
+											<Link
+												to='/forgot-password'
+												className={classNames(
+													'text-decoration-none link-dark',
+												)}>
+												¿Olvidaste tu contraseña?
+											</Link>
+										</div>
+									)}
 								</form>
 							</CardBody>
 						</Card>
