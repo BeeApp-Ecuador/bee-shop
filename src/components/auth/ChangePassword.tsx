@@ -23,18 +23,36 @@ export const ChangePassword = ({ changePassword }: ChangePasswordProps) => {
 			verifyPassword: '',
 		},
 		validate: (values) => {
-			// const errors: { email?: string } = {};
-			// if (!values.email) {
-			// 	errors.email = 'Email is required';
-			// } else if (!/^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i.test(values.email)) {
-			// 	errors.email = 'Invalid email address';
-			// }
-			// return errors;
+			const errors: Partial<Record<keyof ChangePasswordFormValues, string>> = {};
+
+			if (!values.password) {
+				errors.password = 'Requerido';
+			} else if (values.password.length < 6) {
+				errors.password = 'La contraseña debe tener al menos 6 caracteres';
+			}
+			// password must contain at least one uppercase letter, one lowercase letter, one number and one special character
+			else if (
+				!/(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{6,}/.test(
+					values.password,
+				)
+			) {
+				errors.password =
+					'La contraseña debe contener al menos una letra mayúscula, una letra minúscula, un número y uno de estos caracteres especiales (@ $ ! % * ? &)';
+			}
+
+			if (!values.verifyPassword) {
+				errors.verifyPassword = 'Requerido';
+			} else if (values.verifyPassword !== values.password) {
+				errors.verifyPassword = 'Las contraseñas no coinciden';
+			}
+			return errors;
 		},
 		validateOnChange: false,
 		validateOnBlur: true,
 		onSubmit: async (values) => {
-			setIsLoading(true);
+			// setIsLoading(true);
+			console.log(values);
+
 			// await sendCode(values.email);
 			// setIsLoading(false);
 		},
@@ -43,8 +61,15 @@ export const ChangePassword = ({ changePassword }: ChangePasswordProps) => {
 	return (
 		<>
 			<div className='row g-4'>
+				<div className='col-12 col-sm-12'>
+					<span className='text-muted small'>
+						La contraseña debe tener al menos 6 caracteres y debe contener al menos una
+						letra mayúscula, una letra minúscula, un número y uno de estos caracteres
+						especiales (@ $ ! % * ? &)
+					</span>
+				</div>
 				<div className='col-12'>
-					<FormGroup id='password' isFloating label='Password'>
+					<FormGroup id='password' isFloating label='Contraseña'>
 						<Input
 							type='password'
 							autoComplete='password'
@@ -59,7 +84,7 @@ export const ChangePassword = ({ changePassword }: ChangePasswordProps) => {
 					</FormGroup>
 				</div>
 				<div className='col-12'>
-					<FormGroup id='verifyPassword' isFloating label='Password'>
+					<FormGroup id='verifyPassword' isFloating label='Repetir contraseña'>
 						<Input
 							type='password'
 							autoComplete='verifyPassword'
