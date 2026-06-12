@@ -8,9 +8,10 @@ interface VerifyCodeProps {
 	onComplete: () => void;
 	resendCode: () => void;
 	email: string;
+	type?: 'WELCOME' | 'RECOVER';
 }
 
-const VerifyCode = ({ onComplete, resendCode, email }: VerifyCodeProps) => {
+const VerifyCode = ({ onComplete, resendCode, email, type = 'WELCOME' }: VerifyCodeProps) => {
 	const [values, setValues] = useState(['', '', '', '']);
 	const inputRefs = useRef<(HTMLInputElement | null)[]>([]);
 	const [verifyCode] = useVerifyCodeMutation();
@@ -65,8 +66,13 @@ const VerifyCode = ({ onComplete, resendCode, email }: VerifyCodeProps) => {
 			}
 
 			if (data && data.statusCode === 200) {
-				setSuccess('Un momento, estamos creando tu cuenta...');
-				setIsCreating(true);
+				if (type === 'WELCOME') {
+					setSuccess('Un momento, estamos creando tu cuenta...');
+					setIsCreating(true);
+				} else {
+					setSuccess('Cerrar popup para cambiar contraseña');
+					setIsCreating(true);
+				}
 				onComplete();
 			}
 		}

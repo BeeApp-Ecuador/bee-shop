@@ -112,6 +112,10 @@ const Login: FC<ILoginProps> = ({ isSignUp }) => {
 	const [login] = useLoginMutation();
 	const [saveFcmToken] = useSaveFcmTokenMutation();
 
+	const [isRecoveringPassword, setIsRecoveringPassword] = useState(false);
+
+	const [recoverPasswordEmail, setRecoverPasswordEmail] = useState('');
+
 	const handleSendCode = async (email: string, type: string = 'WELCOME') => {
 		const { data, error } = await sendCode({ email, role: 'SHOP', type });
 		if (error) {
@@ -128,7 +132,9 @@ const Login: FC<ILoginProps> = ({ isSignUp }) => {
 		if (data && data.statusCode === 201) {
 			if (type === 'WELCOME') {
 				setShowVerifyCode(true);
+				setIsRecoveringPassword(false);
 			} else {
+				setIsRecoveringPassword(true);
 				setShowForgotPassword(false);
 				setShowVerifyCode(true);
 			}
@@ -450,6 +456,7 @@ const Login: FC<ILoginProps> = ({ isSignUp }) => {
 												className='rounded-1 w-100'
 												size='lg'
 												onClick={() => {
+													setIsRecoveringPassword(false);
 													setSingUpStatus(!singUpStatus);
 												}}>
 												Login
@@ -462,6 +469,7 @@ const Login: FC<ILoginProps> = ({ isSignUp }) => {
 												className='rounded-1 w-100'
 												size='lg'
 												onClick={() => {
+													setIsRecoveringPassword(false);
 													setSingUpStatus(!singUpStatus);
 												}}>
 												Registro
@@ -592,10 +600,20 @@ const Login: FC<ILoginProps> = ({ isSignUp }) => {
 					<ModalBody>
 						<VerifyCode
 							email={formikRegister.values.email}
-							onComplete={async () =>
-								handleRegister(formikRegister.values, formikRegister)
-							}
-							resendCode={() => handleSendCode(formikRegister.values.email)}
+							onComplete={async () => {
+								if (isRecoveringPassword) {
+									console.log('recuperar');
+								} else {
+									return handleRegister(formikRegister.values, formikRegister);
+								}
+							}}
+							resendCode={() => {
+								if (isRecoveringPassword) {
+									return handleSendCode(recoverPasswordEmail, 'RECOVER');
+								} else {
+									return handleSendCode(formikRegister.values.email);
+								}
+							}}
 						/>
 					</ModalBody>
 				</Modal>
@@ -613,7 +631,12 @@ const Login: FC<ILoginProps> = ({ isSignUp }) => {
 						<ModalTitle id='forgotPasswordModalLabel'>Recuperar contraseña</ModalTitle>
 					</ModalHeader>
 					<ModalBody>
-						<ForgotPassword sendCode={(email) => handleSendCode(email, 'RECOVER')} />
+						<ForgotPassword
+							sendCode={(email) => {
+								setRecoverPasswordEmail(email);
+								return handleSendCode(email, 'RECOVER');
+							}}
+						/>
 					</ModalBody>
 				</Modal>
 				<Modal
