@@ -112,24 +112,24 @@ const Login: FC<ILoginProps> = ({ isSignUp }) => {
 	const [login] = useLoginMutation();
 	const [saveFcmToken] = useSaveFcmTokenMutation();
 
-	const handleSendCode = async (email: string, forgotPassword: boolean = false) => {
-		if (forgotPassword) {
-			console.log('voy a recuperar contraseña');
-		} else {
-			const { data, error } = await sendCode({ email, role: 'SHOP' });
-			if (error) {
-				console.log(error);
-				if (error && 'status' in error && error.status === 409) {
-					setError('El email ya está en uso.');
-					setIsOpen(true);
-					return;
-				}
-				setError('Error al enviar el correo de verificación.');
+	const handleSendCode = async (email: string, type: string = 'WELCOME') => {
+		const { data, error } = await sendCode({ email, role: 'SHOP', type });
+		if (error) {
+			console.log(error);
+			if (error && 'status' in error && error.status === 409) {
+				setError('El email ya está en uso.');
 				setIsOpen(true);
 				return;
 			}
-			if (data && data.statusCode === 201) {
+			setError('Error al enviar el correo de verificación.');
+			setIsOpen(true);
+			return;
+		}
+		if (data && data.statusCode === 201) {
+			if (type === 'WELCOME') {
 				setShowVerifyCode(true);
+			} else {
+				setShowForgotPassword(true);
 			}
 		}
 	};
@@ -612,7 +612,7 @@ const Login: FC<ILoginProps> = ({ isSignUp }) => {
 						<ModalTitle id='forgotPasswordModalLabel'>Recuperar contraseña</ModalTitle>
 					</ModalHeader>
 					<ModalBody>
-						<ForgotPassword sendCode={(email) => handleSendCode(email, true)} />
+						<ForgotPassword sendCode={(email) => handleSendCode(email, 'RECOVER')} />
 					</ModalBody>
 				</Modal>
 				<Modal
