@@ -129,7 +129,8 @@ const Login: FC<ILoginProps> = ({ isSignUp }) => {
 			if (type === 'WELCOME') {
 				setShowVerifyCode(true);
 			} else {
-				setShowForgotPassword(true);
+				setShowForgotPassword(false);
+				setShowVerifyCode(true);
 			}
 		}
 	};
