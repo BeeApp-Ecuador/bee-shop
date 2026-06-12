@@ -36,6 +36,7 @@ import showNotification from '../../../components/extras/showNotification';
 import Icon from '../../../components/icon/Icon';
 import { getFcmToken } from '../../../firebase/getFcmToken';
 import { ForgotPassword } from '../../../components/auth/ForgotPassword';
+import { ChangePassword } from '../../../components/auth/ChangePassword';
 
 export interface RegisterFormValues {
 	nameLegalAgent: string;
@@ -101,6 +102,7 @@ const Login: FC<ILoginProps> = ({ isSignUp }) => {
 	const [isOpen, setIsOpen] = useState(false);
 	const [showVerifyCode, setShowVerifyCode] = useState(false);
 	const [showForgotPassword, setShowForgotPassword] = useState(false);
+	const [showChangePassword, setShowChangePassword] = useState(false);
 	const [error, setError] = useState<string>('');
 
 	const navigate = useNavigate();
@@ -111,6 +113,10 @@ const Login: FC<ILoginProps> = ({ isSignUp }) => {
 
 	const [login] = useLoginMutation();
 	const [saveFcmToken] = useSaveFcmTokenMutation();
+
+	const [isRecoveringPassword, setIsRecoveringPassword] = useState(false);
+
+	const [recoverPasswordEmail, setRecoverPasswordEmail] = useState('');
 
 	const handleSendCode = async (email: string, type: string = 'WELCOME') => {
 		const { data, error } = await sendCode({ email, role: 'SHOP', type });
@@ -128,7 +134,9 @@ const Login: FC<ILoginProps> = ({ isSignUp }) => {
 		if (data && data.statusCode === 201) {
 			if (type === 'WELCOME') {
 				setShowVerifyCode(true);
+				setIsRecoveringPassword(false);
 			} else {
+				setIsRecoveringPassword(true);
 				setShowForgotPassword(false);
 				setShowVerifyCode(true);
 			}
@@ -450,6 +458,7 @@ const Login: FC<ILoginProps> = ({ isSignUp }) => {
 												className='rounded-1 w-100'
 												size='lg'
 												onClick={() => {
+													setIsRecoveringPassword(false);
 													setSingUpStatus(!singUpStatus);
 												}}>
 												Login
@@ -462,6 +471,7 @@ const Login: FC<ILoginProps> = ({ isSignUp }) => {
 												className='rounded-1 w-100'
 												size='lg'
 												onClick={() => {
+													setIsRecoveringPassword(false);
 													setSingUpStatus(!singUpStatus);
 												}}>
 												Registro
@@ -591,11 +601,27 @@ const Login: FC<ILoginProps> = ({ isSignUp }) => {
 					</ModalHeader>
 					<ModalBody>
 						<VerifyCode
-							email={formikRegister.values.email}
-							onComplete={async () =>
-								handleRegister(formikRegister.values, formikRegister)
+							email={
+								isRecoveringPassword
+									? recoverPasswordEmail
+									: formikRegister.values.email
 							}
-							resendCode={() => handleSendCode(formikRegister.values.email)}
+							type={isRecoveringPassword ? 'RECOVER' : 'WELCOME'}
+							onComplete={async () => {
+								if (isRecoveringPassword) {
+									setShowVerifyCode(false);
+									setShowChangePassword(true);
+								} else {
+									return handleRegister(formikRegister.values, formikRegister);
+								}
+							}}
+							resendCode={() => {
+								if (isRecoveringPassword) {
+									return handleSendCode(recoverPasswordEmail, 'RECOVER');
+								} else {
+									return handleSendCode(formikRegister.values.email);
+								}
+							}}
 						/>
 					</ModalBody>
 				</Modal>
@@ -613,7 +639,39 @@ const Login: FC<ILoginProps> = ({ isSignUp }) => {
 						<ModalTitle id='forgotPasswordModalLabel'>Recuperar contraseña</ModalTitle>
 					</ModalHeader>
 					<ModalBody>
-						<ForgotPassword sendCode={(email) => handleSendCode(email, 'RECOVER')} />
+						<ForgotPassword
+							sendCode={(email) => {
+								setRecoverPasswordEmail(email);
+								return handleSendCode(email, 'RECOVER');
+							}}
+						/>
+					</ModalBody>
+				</Modal>
+				<Modal
+					isOpen={showChangePassword}
+					setIsOpen={setShowChangePassword}
+					titleId='changePasswordModalLabel'
+					// isStaticBackdrop={staticBackdropStatus}
+					// isScrollable={scrollableStatus}
+					isCentered={true}
+					size='sm'
+					// fullScreen={fullScreenStatus}
+					isAnimation={true}>
+					<ModalHeader setIsOpen={() => setShowChangePassword(!showChangePassword)}>
+						<ModalTitle id='forgotPasswordModalLabel'>Actualizar contraseña</ModalTitle>
+					</ModalHeader>
+					<ModalBody>
+						{/* <ForgotPassword
+							sendCode={(email) => {
+								setRecoverPasswordEmail(email);
+								return handleSendCode(email, 'RECOVER');
+							}}
+						/> */}
+						<ChangePassword
+							changePassword={(value) => {
+								console.log(value);
+							}}
+						/>
 					</ModalBody>
 				</Modal>
 				<Modal
