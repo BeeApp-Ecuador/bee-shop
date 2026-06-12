@@ -35,6 +35,7 @@ import {
 import showNotification from '../../../components/extras/showNotification';
 import Icon from '../../../components/icon/Icon';
 import { getFcmToken } from '../../../firebase/getFcmToken';
+import { ForgotPassword } from '../../../components/auth/ForgotPassword';
 
 export interface RegisterFormValues {
 	nameLegalAgent: string;
@@ -99,6 +100,7 @@ const Login: FC<ILoginProps> = ({ isSignUp }) => {
 	const [singUpStatus, setSingUpStatus] = useState<boolean>(!!isSignUp);
 	const [isOpen, setIsOpen] = useState(false);
 	const [showVerifyCode, setShowVerifyCode] = useState(false);
+	const [showForgotPassword, setShowForgotPassword] = useState(false);
 	const [error, setError] = useState<string>('');
 
 	const navigate = useNavigate();
@@ -110,21 +112,25 @@ const Login: FC<ILoginProps> = ({ isSignUp }) => {
 	const [login] = useLoginMutation();
 	const [saveFcmToken] = useSaveFcmTokenMutation();
 
-	const handleSendCode = async (email: string) => {
-		const { data, error } = await sendCode({ email, role: 'SHOP' });
-		if (error) {
-			console.log(error);
-			if (error && 'status' in error && error.status === 409) {
-				setError('El email ya está en uso.');
+	const handleSendCode = async (email: string, forgotPassword: boolean = false) => {
+		if (forgotPassword) {
+			console.log('voy a recuperar contraseña');
+		} else {
+			const { data, error } = await sendCode({ email, role: 'SHOP' });
+			if (error) {
+				console.log(error);
+				if (error && 'status' in error && error.status === 409) {
+					setError('El email ya está en uso.');
+					setIsOpen(true);
+					return;
+				}
+				setError('Error al enviar el correo de verificación.');
 				setIsOpen(true);
 				return;
 			}
-			setError('Error al enviar el correo de verificación.');
-			setIsOpen(true);
-			return;
-		}
-		if (data && data.statusCode === 201) {
-			setShowVerifyCode(true);
+			if (data && data.statusCode === 201) {
+				setShowVerifyCode(true);
+			}
 		}
 	};
 
@@ -506,13 +512,15 @@ const Login: FC<ILoginProps> = ({ isSignUp }) => {
 									{/* forgot your password? */}
 									{!singUpStatus && (
 										<div className='col-12 text-end'>
-											<Link
-												to='/forgot-password'
+											<Button
+												onClick={() => {
+													setShowForgotPassword(true);
+												}}
 												className={classNames(
 													'text-decoration-none link-dark',
 												)}>
 												¿Olvidaste tu contraseña?
-											</Link>
+											</Button>
 										</div>
 									)}
 								</form>
@@ -588,6 +596,23 @@ const Login: FC<ILoginProps> = ({ isSignUp }) => {
 							}
 							resendCode={() => handleSendCode(formikRegister.values.email)}
 						/>
+					</ModalBody>
+				</Modal>
+				<Modal
+					isOpen={showForgotPassword}
+					setIsOpen={setShowForgotPassword}
+					titleId='forgotPasswordModalLabel'
+					// isStaticBackdrop={staticBackdropStatus}
+					// isScrollable={scrollableStatus}
+					isCentered={true}
+					size='sm'
+					// fullScreen={fullScreenStatus}
+					isAnimation={true}>
+					<ModalHeader setIsOpen={() => setShowForgotPassword(!showForgotPassword)}>
+						<ModalTitle id='forgotPasswordModalLabel'>Recuperar contraseña</ModalTitle>
+					</ModalHeader>
+					<ModalBody>
+						<ForgotPassword sendCode={(email) => handleSendCode(email, true)} />
 					</ModalBody>
 				</Modal>
 				<Modal
